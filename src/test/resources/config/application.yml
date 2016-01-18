@@ -1,0 +1,34 @@
+spring:
+  application.name: HyperstateTest
+
+server:
+    port: 8443
+    ssl:
+        key-store: build/keystore.jks
+        key-store-password: secret
+        key-password: secret
+        key-alias: selfsigned
+    
+security:
+  user:
+    name: 'user'
+    password: 'password'
+    
+    
+
+logging:
+    level.org.apache.http.wire: 'DEBUG'
+    level.au.com.windyroad.hyperstate: 'DEBUG'
+    
+server.tomcat.access-log-enabled: true
+
+
+au.com.windyroad.hyperstate.test    :
+    ssl:
+        hostname: localhost
+        
+        
+javax.net.ssl.trustStore: build/truststore.jks
+javax.net.ssl.trustStorePassword: changeit
+
+spring.jackson.serialization.indent_output: true

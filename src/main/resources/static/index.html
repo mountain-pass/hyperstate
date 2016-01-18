@@ -1,0 +1,96 @@
+<!doctype html>
+<html ng-app="serviceGateway" ng-controller="EntityController as controller"
+  class="{{controller.entity.class.join(' ')}}">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<base href="/">
+<title>Service Gateway</title>
+<link rel="stylesheet" type="text/css" href="/webjars/bootstrap/3.2.0/css/bootstrap.min.css" />
+<link rel="stylesheet" href="/css/style.css">
+
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+  <nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+          aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span
+            class="icon-bar"></span>
+        </button>
+        <!-- a class="navbar-brand" href="">BRAND</a-->
+      </div>
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li><a href="/">Home</a></li>
+          <li ng-repeat="link in controller.entity.links" ng-if="link.title"
+            class="{{$.inArray('self', link.rel) ? 'active' : ''}}"><a href="{{link.href}}"
+            rel="{{link.rel.join(' ')}}">{{link.title}}</a></li>
+        </ul>
+      </div>
+      <!--/.nav-collapse -->
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="page-header">
+      <h1>Service Gateway</h1>
+      <h2 ng-if="controller.entity.title">{{controller.entity.title}}</h2>
+    </div>
+
+    <div id="properties">
+      <div class="row" ng-repeat="(key, value) in controller.entity.properties">
+        <div class="{{key}}">
+          <label for="property:{{key}}">{{key}}</label>
+          <div id="property:{{key}}">{{value}}</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="entities">
+      <div class="row" ng-repeat="entity in controller.entity.entities">
+        <a ng-if="entity.href" href="{{entity.href}}" rel="{{entity.rel.join(' ')}}"
+          class="col-sm-12 entity {{field.class.join(' ')}}" ng-click="controller.processNavClick($event)">{{entity.title || 'entity'}}</a>
+      </div>
+    </div>
+
+    <div ng-repeat="action in controller.entity.actions">
+      <h3>{{action.title || action.name}}</h3>
+      <form ng-submit="controller.processForm(this)" class="{{action.class}}" name="{{action.name}}" method="{{action.method}}">
+        <div class="row">
+          <div ng-repeat="field in action.fields" class="{{field.class.join(' ')}} form-group col-sm-4">
+            <div ng-if="field.type != 'submit'">
+              <label for="{{action.name}}:{{field.name}}">{{field.title || field.name}}</label> <input
+                type="{{field.type || 'text'}}" ng-model="field.value" name="{{field.name}}"
+                id="{{action.name}}:{{field.name}}" class="form-control" />
+              <p class="help-block"></p>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div ng-repeat="field in action.fields" ng-if="field.type == 'submit'"
+            class="{{field.class.join(' ')}} form-group col-sm-4">
+            <button type="submit" class="btn btn-success">{{field.title || field.value || 'Submit'}}</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <pre>{{controller.entity}}</pre>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="/webjars/jquery/2.1.1/jquery.min.js" type="text/javascript"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script type="text/javascript" src="/webjars/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="/webjars/angularjs/1.4.8/angular.min.js" type="text/javascript"></script>
+    <script src="/js/entity.js" type="text/javascript"></script>
+</body>
+</html>

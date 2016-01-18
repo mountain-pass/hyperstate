@@ -1,0 +1,159 @@
+buildscript {
+	ext { springBootVersion = '1.3.0.RELEASE' }
+	repositories { 
+	   jcenter()
+       mavenCentral()
+       maven { url "https://repo.spring.io/milestone" }
+       maven { url "https://repo.spring.io/snapshot" }
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}") 
+		classpath 'com.github.ben-manes:gradle-versions-plugin:0.11.3'
+	}
+}
+
+plugins {
+    id "io.spring.dependency-management" version "0.5.4.RELEASE"
+}
+
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'announce'
+apply plugin: 'com.github.ben-manes.versions'
+
+
+compileJava.options.compilerArgs.add '-parameters'
+compileTestJava.options.compilerArgs.add '-parameters'
+
+dependencyManagement {
+	//imports { mavenBom 'org.springframework.cloud:spring-cloud-starter-parent:1.0.0.RELEASE' }
+}
+
+jar { baseName = 'hyperstate' }
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories { 
+    jcenter()
+    mavenCentral()
+    maven { url "https://repo.spring.io/milestone" }
+    maven { url "https://repo.spring.io/snapshot" }
+    
+}
+
+
+configurations {
+    providedRuntime
+}
+
+dependencies {
+	compile("org.springframework.boot:spring-boot-starter-web")
+	compile("org.springframework.boot:spring-boot-starter-actuator")
+    compile("org.springframework.boot:spring-boot-starter-aop")
+    compile("org.springframework:spring-aop")
+    compile("org.aspectj:aspectjweaver")
+    
+    
+    compile 'org.springframework.hateoas:spring-hateoas'
+    compile 'org.springframework.data:spring-data-commons'
+	compile("org.eclipse.jdt:org.eclipse.jdt.annotation:2.0.0")
+	compile('com.google.guava:guava:18.0')
+	
+	compile("com.fasterxml.jackson.core:jackson-core")
+	compile('com.fasterxml.jackson.core:jackson-annotations')
+
+	compile('org.apache.httpcomponents:httpasyncclient')
+	compile('commons-codec:commons-codec:1.10')
+	
+	compile("org.webjars:bootstrap:3.2.0")
+    compile("org.webjars:jquery:2.1.1")
+    compile 'org.webjars.bower:angularjs:1.4.8'
+    compile 'org.apache.commons:commons-lang3:3.4'
+    
+    
+	providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
+	
+	testCompile 'org.springframework.boot:spring-boot-starter-test'
+	testCompile "info.cukes:cucumber-java:1.2.4","info.cukes:cucumber-junit:1.2.4","info.cukes:cucumber-spring:1.2.4"
+
+	testCompile 'org.seleniumhq.selenium:selenium-java:2.48.2'
+	
+	// so we can generate self signed certs
+	testCompile 'org.bouncycastle:bcpkix-jdk15on:1.53'
+	
+}
+
+
+eclipse {
+	classpath {
+		containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
+		containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7'
+	}
+}
+
+eclipseProject {
+  doLast {
+    // https://discuss.gradle.org/t/how-to-write-properties-to-3rd-party-eclipse-settings-files/6499/2
+
+    def props = new Properties()
+    file(".settings/org.eclipse.jdt.core.prefs").withInputStream {
+      stream -> props.load(stream)
+    }
+    props.setProperty("org.eclipse.jdt.core.compiler.codegen.methodParameters", "generate")
+    file(".settings/org.eclipse.jdt.core.prefs").withOutputStream {
+      stream -> props.store(stream, null)
+    }
+  }
+}
+
+task wrapper(type: Wrapper) { gradleVersion = '2.9' }
+
+test {
+}
+
+
+task unitTest(type: Test) {
+    testClassesDir = sourceSets.test.output.classesDir
+    classpath = sourceSets.test.runtimeClasspath
+    ext.outputDir = "${buildDir}/test-results-ut"
+    outputs.dir file(outputDir)
+    systemProperty 'cucumber.options',  "--plugin json:${outputDir}/cucumber.json --plugin html:${outputDir}/html --plugin junit:${outputDir}/TEST-cucumber.xml"
+}
+
+
+task integrationTest(type: Test, dependsOn : unitTest) {
+    testClassesDir = sourceSets.test.output.classesDir
+    classpath = sourceSets.test.runtimeClasspath
+    ext.outputDir = "${buildDir}/test-results-it"
+    outputs.dir file(outputDir)
+    systemProperty 'cucumber.options',  "--plugin json:${outputDir}/cucumber.json --plugin html:${outputDir}/html --plugin junit:${outputDir}/TEST-cucumber.xml"
+    systemProperty 'spring.profiles.active', 'integration'
+}
+
+task uiIntegrationTest(type: Test, dependsOn : integrationTest) {
+    testClassesDir = sourceSets.test.output.classesDir
+    classpath = sourceSets.test.runtimeClasspath
+    ext.outputDir = "${buildDir}/test-results-ui"
+    outputs.dir file(outputDir)
+    systemProperty 'cucumber.options',  "--plugin json:${outputDir}/cucumber.json --plugin html:${outputDir}/html --plugin junit:${outputDir}/TEST-cucumber.xml"
+    systemProperty 'spring.profiles.active', 'ui-integration'
+}
+
+test.dependsOn {
+    tasks.findAll { task -> task.name.endsWith('Test') }
+}
+
+
+gradle.taskGraph.afterTask { Task task, TaskState state ->
+    if (state.failure) {
+        announce.announce("':${task.name}' FAILED", "local")
+    }
+    else {
+        announce.announce("':${task.name}' succeeded", "local")
+    }
+}

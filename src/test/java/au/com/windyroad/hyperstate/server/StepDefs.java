@@ -24,7 +24,6 @@ import au.com.windyroad.hyperstate.core.Relationship;
 import au.com.windyroad.hyperstate.core.Resolver;
 import au.com.windyroad.hyperstate.server.entities.Account;
 import au.com.windyroad.hyperstate.server.entities.AccountProperties;
-import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -159,9 +158,10 @@ public class StepDefs {
     }
 
     @Then("^it will have a self link referencing \"([^\"]*)\"$")
-    public void it_will_have_a_self_link_referencing(String arg1)
+    public void it_will_have_a_self_link_referencing(String path)
             throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
+        assertThat(currentEntity.getLink(Relationship.SELF).getPath(),
+                endsWith(path));
     }
+
 }

@@ -152,9 +152,10 @@ public class StepDefs {
     }
 
     @Then("^it will have no links apart from \"([^\"]*)\"$")
-    public void it_will_have_no_links_apart_from(String arg1) throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
+    public void it_will_have_no_links_apart_from(String rel) throws Throwable {
+        assertThat(currentEntity.getLinks().size(), equalTo(1));
+        assertThat(currentEntity.getLinks().asList().get(0).getNature(),
+                hasItemInArray(rel));
     }
 
     @Then("^it will have a self link referencing \"([^\"]*)\"$")

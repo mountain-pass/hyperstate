@@ -23,8 +23,8 @@ public class InMemoryRepository implements EntityRepository {
     Map<String, BiFunction<EntityRepository, EntityWrapper<?>, Stream<EntityRelationship>>> childrenQuery = new HashMap<>();
 
     @Override
-    public CompletableFuture<Stream<EntityRelationship>> findChildren(
-            EntityWrapper<?> entityWrapper) {
+    public <S extends EntityWrapper<?>> CompletableFuture<Stream<EntityRelationship>> findChildren(
+            S entityWrapper) {
         BiFunction<EntityRepository, EntityWrapper<?>, Stream<EntityRelationship>> function = childrenQuery
                 .get(entityWrapper.getId());
         if (function != null) {
@@ -37,9 +37,18 @@ public class InMemoryRepository implements EntityRepository {
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public CompletableFuture<EntityWrapper<?>> findOne(String path) {
-        return CompletableFuture.supplyAsync(() -> entities.get(path));
+    public <S extends EntityWrapper<?>> CompletableFuture<S> findOne(
+            String path, Class<S> type) {
+        return (CompletableFuture<S>) CompletableFuture
+                .supplyAsync(() -> entities.get(path));
+    }
+
+    @Override
+    public <S extends EntityWrapper<?>> CompletableFuture<S> save(S entity) {
+        entities.put(entity.getId(), entity);
+        return CompletableFuture.supplyAsync(() -> entity);
     }
 
 }

@@ -94,7 +94,7 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
                 }
             }
         }
-        getNatures().add(properties.getClass().getSimpleName());
+        getNatures().add(this.getClass().getSimpleName());
 
         // Label titleAnnotation = properties.getClass()
         // .getAnnotation(Label.class);
@@ -149,9 +149,9 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
         return CompletableFuture.supplyAsync(() -> rval);
     }
 
-    public Link getLink(String self) {
+    public Link getLink(String rel) {
         Optional<NavigationalRelationship> link = getLinks().stream()
-                .filter(l -> l.hasNature(Relationship.SELF)).findAny();
+                .filter(l -> l.hasNature(rel)).findAny();
         if (link.isPresent()) {
             return link.get().getLink();
         } else {

@@ -22,7 +22,7 @@ public interface Resolver {
     public CompletableFuture<UpdatedEntity> update(Link link,
             Map<String, Object> filteredParameters);
 
-    public <E> CompletableFuture<E> get(String path, Class<E> type)
-            throws URISyntaxException;
+    public <E extends EntityWrapper<?>> CompletableFuture<E> get(String path,
+            Class<E> type) throws URISyntaxException;
 
 }

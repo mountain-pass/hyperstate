@@ -139,7 +139,8 @@ public class RestTemplateResolver implements Resolver {
     HyperstateTestConfiguration config;
 
     @Override
-    public <E> CompletableFuture<E> get(String path, Class<E> type) {
+    public <E extends EntityWrapper<?>> CompletableFuture<E> get(String path,
+            Class<E> type) {
         URI rootUrl = config.getBaseUri().resolve(path);
 
         return FutureConverter.convert(

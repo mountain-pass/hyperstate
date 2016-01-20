@@ -126,7 +126,8 @@ public class WebDriverResolver implements Resolver {
     }
 
     @Override
-    public <E> CompletableFuture<E> get(String path, Class<E> type) {
+    public <E extends EntityWrapper<?>> CompletableFuture<E> get(String path,
+            Class<E> type) {
         return get(config.getBaseUri().resolve(path), type);
     }
 
@@ -284,6 +285,10 @@ public class WebDriverResolver implements Resolver {
             }
         });
         return e;
+    }
+
+    public String getUrl() {
+        return webDriver.getCurrentUrl();
     }
 
 }

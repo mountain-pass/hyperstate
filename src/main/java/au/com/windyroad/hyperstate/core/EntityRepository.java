@@ -10,10 +10,14 @@ import au.com.windyroad.hyperstate.core.entities.EntityWrapper;
 public interface EntityRepository {
 
     @Async
-    CompletableFuture<Stream<EntityRelationship>> findChildren(
-            EntityWrapper<?> entityWrapper);
+    public <S extends EntityWrapper<?>> CompletableFuture<Stream<EntityRelationship>> findChildren(
+            S entityWrapper);
 
     @Async
-    CompletableFuture<EntityWrapper<?>> findOne(String path);
+    public <S extends EntityWrapper<?>> CompletableFuture<S> findOne(
+            String path, Class<S> type);
+
+    @Async
+    public <S extends EntityWrapper<?>> CompletableFuture<S> save(S entity);
 
 }

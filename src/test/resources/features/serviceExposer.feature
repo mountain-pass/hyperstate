@@ -9,8 +9,7 @@ Scenario: Expose single domain entity
     | username     | tom        |
     | creationDate | 2016/01/15 |
     And it has no actions
-    And it has no links apart from "self"
-    And it has a self link referencing "/test/testAccount"
+    And it's only link is self link referencing "/test/testAccount"
     And it is exposed at "/test/testAccount"
     When request is made to "/test/testAccount"
     Then the response will be an "Account" domain entity with

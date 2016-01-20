@@ -46,13 +46,10 @@ public class RepositoryResolver implements Resolver {
     }
 
     @Override
-    public <E> CompletableFuture<E> get(String path, Class<E> type) {
+    public <E extends EntityWrapper<?>> CompletableFuture<E> get(String path,
+            Class<E> type) {
 
-        return repository.findOne(path).thenApply(entity -> {
-            @SuppressWarnings("unchecked")
-            E root = (E) entity;
-            return root;
-        });
+        return repository.findOne(path, type);
     }
 
 }

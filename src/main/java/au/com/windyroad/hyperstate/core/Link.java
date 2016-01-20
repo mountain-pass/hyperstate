@@ -6,6 +6,7 @@ import java.util.Set;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -32,4 +33,7 @@ abstract public class Link extends Labelled {
 
     @JsonProperty("href")
     public abstract URI getAddress();
+
+    @JsonIgnore
+    public abstract String getPath();
 }

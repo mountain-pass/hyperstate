@@ -35,13 +35,17 @@ public class JavaLink extends Link {
     @Override
     @JsonProperty("href")
     public URI getAddress() {
-        return BasicLinkBuilder.linkToCurrentMapping().slash(entity)
-                .toUri();
+        return BasicLinkBuilder.linkToCurrentMapping().slash(entity).toUri();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> T resolve(ParameterizedTypeReference<T> type) {
         return (T) entity;
+    }
+
+    @Override
+    public String getPath() {
+        return entity.getId();
     }
 }

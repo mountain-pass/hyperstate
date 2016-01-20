@@ -42,11 +42,16 @@ public class WebDriverLink extends Link {
 
     @Override
     public URI getAddress() {
-        throw new PendingException();
+        return URI.create(this.resolver.getUrl());
     }
 
     public WebElement getWebElement() {
         return this.webElement;
+    }
+
+    @Override
+    public String getPath() {
+        return this.resolver.getUrl();
     }
 
 }

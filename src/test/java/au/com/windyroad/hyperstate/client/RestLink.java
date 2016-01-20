@@ -12,6 +12,7 @@ import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import au.com.windyroad.hyperstate.core.Link;
@@ -80,6 +81,12 @@ public class RestLink extends Link {
 
     public void setAddress(URI address) {
         this.address = address;
+    }
+
+    @Override
+    @JsonIgnore
+    public String getPath() {
+        return address.toString();
     }
 
 }

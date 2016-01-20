@@ -23,6 +23,7 @@ abstract public class Labelled {
     }
 
     public Labelled(Labelled labelled) {
+        this();
         this.label = labelled.label;
     }
 

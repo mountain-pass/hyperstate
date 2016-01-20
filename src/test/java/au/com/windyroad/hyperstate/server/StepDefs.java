@@ -22,7 +22,6 @@ import org.springframework.test.context.ContextConfiguration;
 import au.com.windyroad.hyperstate.core.EntityRepository;
 import au.com.windyroad.hyperstate.core.Relationship;
 import au.com.windyroad.hyperstate.core.Resolver;
-import au.com.windyroad.hyperstate.core.entities.EntityWrapper;
 import au.com.windyroad.hyperstate.server.entities.Account;
 import au.com.windyroad.hyperstate.server.entities.AccountProperties;
 import cucumber.api.PendingException;
@@ -53,7 +52,7 @@ public class StepDefs {
     @Autowired
     ApplicationContext context;
 
-    private EntityWrapper<?> currentEntity;
+    private Account currentEntity;
 
     private AccountBuilder currentAccountBuilder;
 
@@ -108,9 +107,10 @@ public class StepDefs {
     public void an_domain_entity_with(String entityName,
             Map<String, String> properties) throws Throwable {
         assertThat(entityName, equalTo("Account"));
+        assertThat(properties.keySet(), contains("username", "creationDate"));
 
-        currentAccountBuilder = new AccountBuilder(
-                new AccountProperties(properties));
+        currentAccountBuilder = new AccountBuilder(new AccountProperties(
+                properties.get("username"), properties.get("creationDate")));
     }
 
     @Given("^it has no actions$")
@@ -138,13 +138,17 @@ public class StepDefs {
     public void the_response_will_be_an_domain_entity_with(String type,
             Map<String, String> properties) throws Throwable {
         assertThat(currentEntity.getNatures(), hasItem(type));
-        throw new PendingException("check properties");
+
+        assertThat(properties.keySet(), contains("username", "creationDate"));
+        assertThat(currentEntity.getProperties().getUsername(),
+                equalTo(properties.get("username")));
+        assertThat(currentEntity.getProperties().getCreationDate(),
+                equalTo(properties.get("creationDate")));
     }
 
     @Then("^it will have no actions$")
     public void it_will_have_no_actions() throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
+        assertThat(currentEntity.getActions(), empty());
     }
 
     @Then("^it will have no links apart from \"([^\"]*)\"$")

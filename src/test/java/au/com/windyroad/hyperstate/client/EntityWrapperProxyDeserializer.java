@@ -53,6 +53,7 @@ public class EntityWrapperProxyDeserializer extends DelegatingDeserializer {
                         Object[] args, MethodProxy proxy) throws Throwable {
 
                     if (method.getName().equals("getAction")
+                            || method.getName().equals("getActions")
                             || method.getName().equals("toLinkedEntity")
                             || method.getName().equals("getEntities")
                             || method.getName().equals("getProperties")

@@ -36,7 +36,7 @@ import au.com.windyroad.hyperstate.core.MediaTypes;
 import au.com.windyroad.hyperstate.core.entities.Entity;
 import au.com.windyroad.hyperstate.core.entities.EntityWrapper;
 
-public abstract class HateoasController {
+public abstract class HyperstateController {
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
     @Autowired

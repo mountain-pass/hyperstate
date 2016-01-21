@@ -20,4 +20,10 @@ public interface EntityRepository {
     @Async
     public <S extends EntityWrapper<?>> CompletableFuture<S> save(S entity);
 
+    @Async
+    public CompletableFuture<EntityWrapper<?>> findOne(String identifier);
+
+    @Async
+    public CompletableFuture<Void> delete(EntityWrapper<?> entity);
+
 }

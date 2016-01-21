@@ -126,11 +126,17 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
         return ImmutableSet.copyOf(actions.values());
     }
 
-    @JsonProperty("entities")
     public CompletableFuture<Collection<EntityRelationship>> getEntities()
             throws IllegalAccessException, IllegalArgumentException,
             InvocationTargetException, URISyntaxException {
         return getEntities(0);
+    }
+
+    @JsonProperty("entities")
+    private Collection<EntityRelationship> getEntitiesAndJoin()
+            throws IllegalAccessException, IllegalArgumentException,
+            InvocationTargetException, URISyntaxException {
+        return getEntities().join();
     }
 
     public CompletableFuture<Collection<EntityRelationship>> getEntities(

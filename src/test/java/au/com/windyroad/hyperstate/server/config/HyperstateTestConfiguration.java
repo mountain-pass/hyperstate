@@ -1,4 +1,4 @@
-package au.com.windyroad.hyperstate.server;
+package au.com.windyroad.hyperstate.server.config;
 
 import java.io.File;
 import java.io.FileInputStream;

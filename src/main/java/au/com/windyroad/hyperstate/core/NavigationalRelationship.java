@@ -30,4 +30,8 @@ public class NavigationalRelationship extends Relationship {
         return this.link;
     }
 
+    public void setLink(Link link) {
+        this.link = link;
+    }
+
 }

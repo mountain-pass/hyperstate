@@ -35,7 +35,7 @@ import au.com.windyroad.hyperstate.core.entities.CreatedEntity;
 import au.com.windyroad.hyperstate.core.entities.Entity;
 import au.com.windyroad.hyperstate.core.entities.EntityWrapper;
 import au.com.windyroad.hyperstate.core.entities.UpdatedEntity;
-import au.com.windyroad.hyperstate.server.HyperstateTestConfiguration;
+import au.com.windyroad.hyperstate.server.config.HyperstateTestConfiguration;
 import cucumber.api.PendingException;
 
 @Component

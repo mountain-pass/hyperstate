@@ -41,14 +41,26 @@ public class InMemoryRepository implements EntityRepository {
     @Override
     public <S extends EntityWrapper<?>> CompletableFuture<S> findOne(
             String path, Class<S> type) {
-        return (CompletableFuture<S>) CompletableFuture
-                .supplyAsync(() -> entities.get(path));
+        return (CompletableFuture<S>) findOne(path);
     }
 
     @Override
     public <S extends EntityWrapper<?>> CompletableFuture<S> save(S entity) {
         entities.put(entity.getId(), entity);
         return CompletableFuture.supplyAsync(() -> entity);
+    }
+
+    @Override
+    public CompletableFuture<EntityWrapper<?>> findOne(String identifier) {
+        return CompletableFuture.supplyAsync(() -> entities.get(identifier));
+    }
+
+    @Override
+    public CompletableFuture<Void> delete(EntityWrapper<?> entity) {
+        return CompletableFuture.supplyAsync(() -> {
+            entities.remove(entity.getId());
+            return null;
+        });
     }
 
 }

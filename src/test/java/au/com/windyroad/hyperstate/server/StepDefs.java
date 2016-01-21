@@ -22,6 +22,7 @@ import org.springframework.test.context.ContextConfiguration;
 import au.com.windyroad.hyperstate.core.EntityRepository;
 import au.com.windyroad.hyperstate.core.Relationship;
 import au.com.windyroad.hyperstate.core.Resolver;
+import au.com.windyroad.hyperstate.server.config.HyperstateTestConfiguration;
 import au.com.windyroad.hyperstate.server.entities.Account;
 import au.com.windyroad.hyperstate.server.entities.AccountProperties;
 import cucumber.api.java.en.Given;

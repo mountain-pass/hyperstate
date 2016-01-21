@@ -25,6 +25,7 @@ abstract public class Labelled {
     public Labelled(Labelled labelled) {
         this();
         this.label = labelled.label;
+        this.natures = labelled.natures;
     }
 
     void setLabel(String template, String... args) {
@@ -68,6 +69,7 @@ abstract public class Labelled {
      * @param natures
      *            the natures to set
      */
+    @JsonProperty("class")
     public void setNatures(Set<String> natures) {
         this.natures = natures;
     }

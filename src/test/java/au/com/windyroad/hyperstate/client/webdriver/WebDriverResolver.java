@@ -4,8 +4,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -237,10 +239,13 @@ public class WebDriverResolver implements Resolver {
                     return propertiesEnhancer.create(new Class[] {},
                             new Object[] {});
 
+                } else if (method.getName().equals("getNatures")) {
+                    return new HashSet<String>(Arrays
+                            .asList(webDriver.findElement(By.tagName("html"))
+                                    .getAttribute("class").split(" *")));
                 } else if (method.getName().equals("toLinkedEntity")
                         || method.getName().equals("getProperties")
-                        || method.getName().equals("getTitle    ")
-                        || method.getName().equals("getNatures")
+                        || method.getName().equals("getTitle")
                         || method.getName().equals("getLinks")
                         || method.getName().equals("getLink")) {
                     throw new PendingException(method.getName());

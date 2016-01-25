@@ -71,7 +71,7 @@ public abstract class HyperstateController {
 
     @RequestMapping(method = RequestMethod.GET, produces = { "text/html",
             "application/xhtml+xml" })
-    public String htmlView() {
+    public String html() {
         return "/index.html";
     }
 

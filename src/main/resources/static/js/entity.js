@@ -35,6 +35,7 @@ function getLocation(href) {
 
 app.controller('EntityController', function($scope, $http, $location, $window) {
 	var controller = this;
+	var loading = true;
 	
 	controller.processNavClick = function (event){
 		console.log("processNavClick");
@@ -50,13 +51,14 @@ app.controller('EntityController', function($scope, $http, $location, $window) {
 		cache: false
 	}).success(function(data) {
 		controller.entity = data;
+		controller.loading = false;
 	});
 
 	controller.processForm = function(form) {
 		console.log("processForm");
 		console.log(form);
 		var action = form.action;
-
+		controller.loading = true;
 		$http(
 				{
 					method : action.method || "GET",
@@ -67,6 +69,9 @@ app.controller('EntityController', function($scope, $http, $location, $window) {
 								|| "application/x-www-form-urlencoded"
 					}
 				}).then(function successCallback(response) {
+			
+			controller.loading = false;
+
 			if (response.status == 201) {
 				var location = getLocation(response.headers("Location"));
 				var currLoc = getLocation($location.absUrl());
@@ -80,10 +85,16 @@ app.controller('EntityController', function($scope, $http, $location, $window) {
 				console.log("Ehost: " + (location.host == currLoc.host));
 				if(location.protocol == currLoc.protocol
 						&& location.host == currLoc.host) {
+					
+					controller.loading = true;
+
 					$location.url(location.pathname + location.search + location.hash);					
+					
 					$http.get(location).then(function successCallback(response) {
+						controller.loading = true;
 						controller.entity = response.data;
 					}, function errorCallback(response) {
+						controller.loading = false;
 						alert("TODO: location follow error handing");
 					});
 				}
@@ -98,6 +109,7 @@ app.controller('EntityController', function($scope, $http, $location, $window) {
 			}
 		}, function errorCallback(response) {
 			alert("TODO: error handing");
+			controller.loading = false;
 		});
 		return false;
 	};

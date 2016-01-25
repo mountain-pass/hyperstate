@@ -121,17 +121,19 @@ public class StepDefs {
     @Given("^it's only link is self link referencing \"([^\"]*)\"$")
     public void it_s_only_link_is_self_link_referencing(String path)
             throws Throwable {
-        currentAccountBuilder.setExpectedLinkAddress(Relationship.SELF, path);
+        currentAccountBuilder.setExpectedLinkAddress(Relationship.SELF,
+                "/hyperstateTest" + path);
     }
 
     @Given("^it is exposed at \"([^\"]*)\"$")
     public void it_is_exposed_at(String path) throws Throwable {
-        currentAccountBuilder.build(path);
+        currentAccountBuilder.build("/hyperstateTest" + path);
     }
 
     @When("^request is made to \"([^\"]*)\"$")
     public void request_is_made_to(String path) throws Throwable {
-        currentEntity = resolver.get(path, Account.class).get();
+        currentEntity = resolver.get("/hyperstateTest" + path, Account.class)
+                .get();
     }
 
     @Then("^the response will be an? \"([^\"]*)\" domain entity with$")
@@ -162,7 +164,7 @@ public class StepDefs {
     public void it_will_have_a_self_link_referencing(String path)
             throws Throwable {
         assertThat(currentEntity.getLink(Relationship.SELF).getPath(),
-                endsWith(path));
+                endsWith("/hyperstateTest" + path));
     }
 
 }

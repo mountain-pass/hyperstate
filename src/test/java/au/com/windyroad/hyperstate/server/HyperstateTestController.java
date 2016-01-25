@@ -13,7 +13,7 @@ import au.com.windyroad.hyperstate.core.EntityRepository;
 import au.com.windyroad.hyperstate.core.entities.EntityWrapper;
 
 @Controller
-@RequestMapping(value = "/**")
+@RequestMapping(value = "/hyperstateTest/**")
 public class HyperstateTestController extends HyperstateController {
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 

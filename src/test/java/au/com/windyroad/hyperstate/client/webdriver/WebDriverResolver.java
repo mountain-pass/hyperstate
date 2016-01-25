@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -26,6 +27,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.AsyncRestTemplate;
+
+import com.google.common.collect.ImmutableSet;
 
 import au.com.windyroad.hyperstate.client.CreateAction;
 import au.com.windyroad.hyperstate.client.GetAction;
@@ -153,36 +156,11 @@ public class WebDriverResolver implements Resolver {
                     MethodProxy methodProxy) throws Throwable {
 
                 if (method.getName().equals("getAction")) {
+                    waitTillLoaded(5);
+
                     String actionName = args[0].toString();
-                    WebElement form = (new WebDriverWait(webDriver, 5))
-                            .until(ExpectedConditions.presenceOfElementLocated(
-                                    By.name(actionName)));
-
-                    List<WebElement> inputs = form
-                            .findElements(By.tagName("input"));
-
-                    au.com.windyroad.hyperstate.core.Parameter[] fields = new au.com.windyroad.hyperstate.core.Parameter[inputs
-                            .size()];
-                    for (int i = 0; i < inputs.size(); ++i) {
-                        String type = inputs.get(i).getAttribute("type");
-                        String value = inputs.get(i).getAttribute("value");
-                        String name = inputs.get(i).getAttribute("name");
-
-                        fields[i] = new au.com.windyroad.hyperstate.core.Parameter(
-                                name, type, value);
-                    }
-
-                    switch (form.getAttribute("method")) {
-                    case "get":
-                        return new GetAction(resolver, actionName,
-                                new WebDriverLink(form), fields);
-                    case "post":
-                        return new CreateAction(resolver, actionName,
-                                new WebDriverLink(form), fields);
-                    default:
-                        throw new PendingException("unimplemented method: "
-                                + form.getAttribute("method"));
-                    }
+                    return getAction(resolver,
+                            webDriver.findElement(By.name(actionName)));
 
                 } else if (method.getName().equals("reload")) {
                     webDriver.get(webDriver.getCurrentUrl());
@@ -216,9 +194,11 @@ public class WebDriverResolver implements Resolver {
                                 MethodProxy propertiesMethodProxy)
                                         throws Throwable {
                             String key = propertiesMethod.getName()
-                                    .toLowerCase()
-                                    .replaceFirst("^get", "property:")
-                                    .replaceFirst("^is", "property:");
+                                    .replaceFirst("^get", "")
+                                    .replaceFirst("^is", "");
+                            key = "property:"
+                                    + key.substring(0, 1).toLowerCase()
+                                    + key.substring(1);
                             String value = webDriver.findElement(By.id(key))
                                     .getText();
                             if (propertiesMethod.getReturnType()
@@ -240,9 +220,23 @@ public class WebDriverResolver implements Resolver {
                             new Object[] {});
 
                 } else if (method.getName().equals("getNatures")) {
+
+                    waitTillLoaded(5);
+
                     return new HashSet<String>(Arrays
                             .asList(webDriver.findElement(By.tagName("html"))
-                                    .getAttribute("class").split(" *")));
+                                    .getAttribute("class").split("\\s+")));
+
+                } else if (method.getName().equals("getActions")) {
+
+                    waitTillLoaded(5);
+
+                    return ImmutableSet
+                            .copyOf(webDriver.findElement(By.id("actions"))
+                                    .findElements(By.tagName("form")).stream()
+                                    .map(we -> getAction(resolver, we))
+                                    .collect(Collectors.toSet()));
+
                 } else if (method.getName().equals("toLinkedEntity")
                         || method.getName().equals("getProperties")
                         || method.getName().equals("getTitle")
@@ -288,12 +282,46 @@ public class WebDriverResolver implements Resolver {
                 // return result;
                 // });
             }
+
+            private Action<?> getAction(WebDriverResolver resolver,
+                    WebElement form) {
+                List<WebElement> inputs = form
+                        .findElements(By.tagName("input"));
+
+                au.com.windyroad.hyperstate.core.Parameter[] fields = new au.com.windyroad.hyperstate.core.Parameter[inputs
+                        .size()];
+                for (int i = 0; i < inputs.size(); ++i) {
+                    String type = inputs.get(i).getAttribute("type");
+                    String value = inputs.get(i).getAttribute("value");
+                    String name = inputs.get(i).getAttribute("name");
+
+                    fields[i] = new au.com.windyroad.hyperstate.core.Parameter(
+                            name, type, value);
+                }
+
+                switch (form.getAttribute("method")) {
+                case "get":
+                    return new GetAction(resolver, form.getAttribute("name"),
+                            new WebDriverLink(form), fields);
+                case "post":
+                    return new CreateAction(resolver, form.getAttribute("name"),
+                            new WebDriverLink(form), fields);
+                default:
+                    throw new PendingException("unimplemented method: "
+                            + form.getAttribute("method"));
+                }
+            }
         });
         return e;
     }
 
     public String getUrl() {
         return webDriver.getCurrentUrl();
+    }
+
+    private void waitTillLoaded(long timeoutInSeconds) {
+        (new WebDriverWait(webDriver, timeoutInSeconds)).until(
+                ExpectedConditions.presenceOfElementLocated(By.id("loaded")));
     }
 
 }

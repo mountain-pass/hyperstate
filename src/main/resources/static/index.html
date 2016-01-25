@@ -38,6 +38,9 @@
         </ul>
       </div>
       <!--/.nav-collapse -->
+
+      <div ng-if="controller.loading" class="animate-if" id="loading">Loading...</div>
+      <div ng-if="!controller.loading" class="animate-if" id="loaded">Loaded</div>
     </div>
   </nav>
 
@@ -59,31 +62,36 @@
     <div id="entities">
       <div class="row" ng-repeat="entity in controller.entity.entities">
         <a ng-if="entity.href" href="{{entity.href}}" rel="{{entity.rel.join(' ')}}"
-          class="col-sm-12 entity {{field.class.join(' ')}}" ng-click="controller.processNavClick($event)">{{entity.title || 'entity'}}</a>
+          class="col-sm-12 entity {{field.class.join(' ')}}" ng-click="controller.processNavClick($event)">{{entity.title
+          || 'entity'}}</a>
       </div>
     </div>
 
-    <div ng-repeat="action in controller.entity.actions">
-      <h3>{{action.title || action.name}}</h3>
-      <form ng-submit="controller.processForm(this)" class="{{action.class}}" name="{{action.name}}" method="{{action.method}}">
-        <div class="row">
-          <div ng-repeat="field in action.fields" class="{{field.class.join(' ')}} form-group col-sm-4">
-            <div ng-if="field.type != 'submit'">
-              <label for="{{action.name}}:{{field.name}}">{{field.title || field.name}}</label> <input
-                type="{{field.type || 'text'}}" ng-model="field.value" name="{{field.name}}"
-                id="{{action.name}}:{{field.name}}" class="form-control" />
-              <p class="help-block"></p>
+    <div id="actions">
+      <div ng-repeat="action in controller.entity.actions">
+        <h3>{{action.title || action.name}}</h3>
+        <form ng-submit="controller.processForm(this)" class="{{action.class}}" name="{{action.name}}"
+          method="{{action.method}}">
+          <div class="row">
+            <div ng-repeat="field in action.fields" class="{{field.class.join(' ')}} form-group col-sm-4">
+              <div ng-if="field.type != 'submit'">
+                <label for="{{action.name}}:{{field.name}}">{{field.title || field.name}}</label> <input
+                  type="{{field.type || 'text'}}" ng-model="field.value" name="{{field.name}}"
+                  id="{{action.name}}:{{field.name}}" class="form-control" />
+                <p class="help-block"></p>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <div ng-repeat="field in action.fields" ng-if="field.type == 'submit'"
-            class="{{field.class.join(' ')}} form-group col-sm-4">
-            <button type="submit" class="btn btn-success">{{field.title || field.value || 'Submit'}}</button>
+          <div class="row">
+            <div ng-repeat="field in action.fields" ng-if="field.type == 'submit'"
+              class="{{field.class.join(' ')}} form-group col-sm-4">
+              <button type="submit" class="btn btn-success">{{field.title || field.value || 'Submit'}}</button>
+            </div>
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
+    
     <pre>{{controller.entity}}</pre>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

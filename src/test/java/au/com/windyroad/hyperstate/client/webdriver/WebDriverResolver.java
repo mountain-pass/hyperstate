@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -18,15 +19,15 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.AsyncRestTemplate;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -35,6 +36,7 @@ import au.com.windyroad.hyperstate.client.GetAction;
 import au.com.windyroad.hyperstate.core.Action;
 import au.com.windyroad.hyperstate.core.EntityRelationship;
 import au.com.windyroad.hyperstate.core.Link;
+import au.com.windyroad.hyperstate.core.NavigationalRelationship;
 import au.com.windyroad.hyperstate.core.Resolver;
 import au.com.windyroad.hyperstate.core.entities.CreatedEntity;
 import au.com.windyroad.hyperstate.core.entities.Entity;
@@ -48,14 +50,10 @@ import cucumber.api.PendingException;
 @Primary
 public class WebDriverResolver implements Resolver {
 
-    @Autowired
-    private AsyncRestTemplate restTemplate;
+    private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private WebDriver webDriver;
-
-    @Autowired
-    private ApplicationContext applicationContext;
 
     @Autowired
     HyperstateTestConfiguration config;
@@ -221,26 +219,28 @@ public class WebDriverResolver implements Resolver {
 
                 } else if (method.getName().equals("getNatures")) {
 
-                    waitTillLoaded(5);
-
-                    return new HashSet<String>(Arrays
-                            .asList(webDriver.findElement(By.tagName("html"))
-                                    .getAttribute("class").split("\\s+")));
+                    return getNatures();
 
                 } else if (method.getName().equals("getActions")) {
 
-                    waitTillLoaded(5);
+                    return getActions(resolver);
 
-                    return ImmutableSet
-                            .copyOf(webDriver.findElement(By.id("actions"))
-                                    .findElements(By.tagName("form")).stream()
-                                    .map(we -> getAction(resolver, we))
-                                    .collect(Collectors.toSet()));
+                } else if (method.getName().equals("getLinks")) {
 
+                    return getLinks(resolver);
+
+                } else if (method.getName().equals("getLink")) {
+                    Optional<NavigationalRelationship> link = getLinks(resolver)
+                            .stream().filter(l -> l.hasNature((String) args[0]))
+                            .findAny();
+                    if (link.isPresent()) {
+                        return link.get().getLink();
+                    } else {
+                        return null;
+                    }
                 } else if (method.getName().equals("toLinkedEntity")
                         || method.getName().equals("getProperties")
                         || method.getName().equals("getTitle")
-                        || method.getName().equals("getLinks")
                         || method.getName().equals("getLink")) {
                     throw new PendingException(method.getName());
                 } else {
@@ -283,6 +283,40 @@ public class WebDriverResolver implements Resolver {
                 // });
             }
 
+            private Object getNatures() {
+                waitTillLoaded(5);
+
+                return new HashSet<String>(
+                        Arrays.asList(webDriver.findElement(By.tagName("html"))
+                                .getAttribute("class").split("\\s+")));
+            }
+
+            private Object getActions(WebDriverResolver resolver) {
+                waitTillLoaded(5);
+
+                return ImmutableSet
+                        .copyOf(webDriver.findElement(By.id("actions"))
+                                .findElements(By.tagName("form")).stream()
+                                .map(we -> getAction(resolver, we))
+                                .collect(Collectors.toSet()));
+            }
+
+            private ImmutableSet<NavigationalRelationship> getLinks(
+                    WebDriverResolver resolver) {
+                waitTillLoaded(5);
+
+                return ImmutableSet.copyOf(webDriver.findElement(By.id("links"))
+                        .findElements(By.tagName("a")).stream()
+                        .map(we -> getNavigationalRelationship(resolver, we))
+                        .collect(Collectors.toSet()));
+            }
+
+            private void waitTillLoaded(long timeoutInSeconds) {
+                (new WebDriverWait(webDriver, timeoutInSeconds))
+                        .until(ExpectedConditions
+                                .visibilityOfElementLocated(By.id("loaded")));
+            }
+
             private Action<?> getAction(WebDriverResolver resolver,
                     WebElement form) {
                 List<WebElement> inputs = form
@@ -302,26 +336,32 @@ public class WebDriverResolver implements Resolver {
                 switch (form.getAttribute("method")) {
                 case "get":
                     return new GetAction(resolver, form.getAttribute("name"),
-                            new WebDriverLink(form), fields);
+                            new WebDriverLink(resolver, form), fields);
                 case "post":
                     return new CreateAction(resolver, form.getAttribute("name"),
-                            new WebDriverLink(form), fields);
+                            new WebDriverLink(resolver, form), fields);
                 default:
                     throw new PendingException("unimplemented method: "
                             + form.getAttribute("method"));
                 }
             }
+
+            private Link getLink(WebDriverResolver resolver, WebElement a) {
+                return new WebDriverLink(resolver, a);
+            }
+
+            private NavigationalRelationship getNavigationalRelationship(
+                    WebDriverResolver resolver, WebElement a) {
+                return new NavigationalRelationship(getLink(resolver, a),
+                        a.getAttribute("rel").split("\\s+"));
+            }
+
         });
         return e;
     }
 
     public String getUrl() {
         return webDriver.getCurrentUrl();
-    }
-
-    private void waitTillLoaded(long timeoutInSeconds) {
-        (new WebDriverWait(webDriver, timeoutInSeconds)).until(
-                ExpectedConditions.presenceOfElementLocated(By.id("loaded")));
     }
 
 }

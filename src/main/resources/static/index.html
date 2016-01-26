@@ -1,5 +1,5 @@
 <!doctype html>
-<html ng-app="serviceGateway" ng-controller="EntityController as controller"
+<html ng-app="hyperstate" ng-controller="EntityController as controller"
   class="{{controller.entity.class.join(' ')}}">
 <head>
 <meta charset="utf-8">
@@ -9,6 +9,7 @@
 <base href="/">
 <title>Service Gateway</title>
 <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/3.2.0/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="/webjars/angularjs/1.4.8/angular-csp.css" />
 <link rel="stylesheet" href="/css/style.css">
 
 <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -27,26 +28,25 @@
           <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span
             class="icon-bar"></span>
         </button>
-        <!-- a class="navbar-brand" href="">BRAND</a-->
+        <a class="navbar-brand" href="{{controller.appUrl}}">{{controller.appName}}</a>
       </div>
       <div id="navbar" class="collapse navbar-collapse">
-        <ul class="nav navbar-nav">
-          <li><a href="/">Home</a></li>
-          <li ng-repeat="link in controller.entity.links" ng-if="link.title"
-            class="{{$.inArray('self', link.rel) ? 'active' : ''}}"><a href="{{link.href}}"
-            rel="{{link.rel.join(' ')}}">{{link.title}}</a></li>
+        <ul class="nav navbar-nav" id="links">
+          <li ng-repeat="link in controller.entity.links" class="{{$.inArray('self', link.rel) ? 'active' : ''}}"><a
+            href="{{link.href}}" rel="{{link.rel.join(' ')}}">{{link.title ? link.title : link.rel[0] }}</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li ng-hide="!controller.loading" class="" id="loading"><a href="#">Loading...</a></li>
+          <li ng-show="!controller.loading" class="ng-hide" id="loaded"><a href="#">Loaded</a></li>
         </ul>
       </div>
       <!--/.nav-collapse -->
 
-      <div ng-if="controller.loading" class="animate-if" id="loading">Loading...</div>
-      <div ng-if="!controller.loading" class="animate-if" id="loaded">Loaded</div>
     </div>
   </nav>
 
   <div class="container">
     <div class="page-header">
-      <h1>Service Gateway</h1>
       <h2 ng-if="controller.entity.title">{{controller.entity.title}}</h2>
     </div>
 
@@ -91,7 +91,7 @@
         </form>
       </div>
     </div>
-    
+
     <pre>{{controller.entity}}</pre>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

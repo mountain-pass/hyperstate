@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -139,7 +140,8 @@ public class StepDefs {
     @Then("^the response will be an? \"([^\"]*)\" domain entity with$")
     public void the_response_will_be_an_domain_entity_with(String type,
             Map<String, String> properties) throws Throwable {
-        assertThat(currentEntity.getNatures(), hasItem(type));
+        Set<String> natures = currentEntity.getNatures();
+        assertThat(natures, hasItem(type));
 
         assertThat(properties.keySet(), contains("username", "creationDate"));
         assertThat(currentEntity.getProperties().getUsername(),

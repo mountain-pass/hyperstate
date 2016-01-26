@@ -1,4 +1,4 @@
-var app = angular.module('serviceGateway', []);
+var app = angular.module('hyperstate', []);
 
 app.config(function($locationProvider, $httpProvider) {
 	  $locationProvider.html5Mode(true);

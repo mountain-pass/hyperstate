@@ -8,6 +8,7 @@ Scenario: Get Controller Root
     Given a Hyperstate controller "hyperstateTestController" at "/hyperstateTest"
     When request is made to "/hyperstateTest"
     Then the response will be an "HyperstateRootEntity" domain entity
+    And it will have a self link referencing "/hyperstateTest"
 
 Scenario: Expose single domain entity
     Given an "Account" domain entity with

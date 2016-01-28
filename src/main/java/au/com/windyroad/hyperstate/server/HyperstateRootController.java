@@ -2,9 +2,7 @@ package au.com.windyroad.hyperstate.server;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -16,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.HandlerMapping;
 
 import au.com.windyroad.hyperstate.core.Action;
@@ -37,55 +32,35 @@ import au.com.windyroad.hyperstate.core.MediaTypes;
 import au.com.windyroad.hyperstate.core.entities.Entity;
 import au.com.windyroad.hyperstate.core.entities.EntityWrapper;
 
-public abstract class HyperstateController {
-
+//@Controller
+@RequestMapping("/")
+public class HyperstateRootController {
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     ApplicationContext context;
 
-    @RequestMapping(value = "**", method = RequestMethod.GET, produces = {
+    @Autowired
+    HyperstateApplication hyperstateApplication;
+
+    @RequestMapping(method = RequestMethod.GET, produces = {
             MediaTypes.SIREN_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE })
     @ResponseBody
     @Async
     public CompletableFuture<ResponseEntity<?>> self(
             @RequestParam Map<String, Object> allRequestParams,
             final HttpServletRequest request) {
-        String url = (String) request.getAttribute(
-                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        if (!allRequestParams.isEmpty()) {
-            url += "?" + request.getQueryString();
-        }
-        final RequestAttributes currentRequestAttributes = RequestContextHolder
-                .getRequestAttributes();
-        return getEntity(url).thenApplyAsync(entity -> {
-            RequestContextHolder.setRequestAttributes(currentRequestAttributes);
-            if (entity == null) {
-                return ResponseEntity.notFound().build();
-            } else {
-                return ResponseEntity.ok(entity);
-            }
-        });
+        return CompletableFuture
+                .supplyAsync(() -> ResponseEntity.ok(hyperstateApplication));
     }
 
-    protected abstract CompletableFuture<EntityWrapper<?>> getEntity(
-            String identifier);
-
-    @RequestMapping(value = "**", method = RequestMethod.GET, produces = {
-            "text/html", "application/xhtml+xml" })
-    public String html(final HttpServletRequest request) {
-        String path = (String) request.getAttribute(
-                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        if ("/index.html".equals(path)) {
-            throw new NotImplementedException(
-                    "eeeek! Looks like you've created a "
-                            + HyperstateController.class.getSimpleName()
-                            + " without a context path. We don't support that yet.");
-        }
+    @RequestMapping(method = RequestMethod.GET, produces = { "text/html",
+            "application/xhtml+xml" })
+    public String html() {
         return "/index.html";
     }
 
-    @RequestMapping(value = "**", method = RequestMethod.POST, produces = {
+    @RequestMapping(method = RequestMethod.POST, produces = {
             "application/vnd.siren+json",
             "application/json" }, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @ResponseBody
@@ -96,9 +71,9 @@ public abstract class HyperstateController {
                     SecurityException, ScriptException, IllegalAccessException,
                     IllegalArgumentException, InvocationTargetException,
                     InterruptedException, ExecutionException {
-        String path = (String) request.getAttribute(
+        String url = (String) request.getAttribute(
                 HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        EntityWrapper<?> entity = getEntity(path).get();
+        EntityWrapper<?> entity = hyperstateApplication;
         if (entity == null) {
             return ResponseEntity.notFound().build();
         }
@@ -113,14 +88,12 @@ public abstract class HyperstateController {
             // todo add body with classes indicating what is missing
             return ResponseEntity.badRequest().build();
         }
-        // todo: post actions should have a link return value
-        // todo: automatically treat actions that return links as POST actions
         Entity result = (Entity) action
                 .invoke(allRequestParams.toSingleValueMap()).get();
         return ResponseEntity.created(result.getAddress()).build();
     }
 
-    @RequestMapping(value = "**", method = RequestMethod.DELETE, produces = {
+    @RequestMapping(method = RequestMethod.DELETE, produces = {
             "application/vnd.siren+json",
             "application/json" }, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @ResponseBody
@@ -131,38 +104,10 @@ public abstract class HyperstateController {
                     SecurityException, ScriptException, IllegalAccessException,
                     IllegalArgumentException, InvocationTargetException,
                     InterruptedException, ExecutionException {
-        String url = (String) request.getAttribute(
-                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        return getEntity(url).thenApplyAsync(entity -> {
-            if (entity == null) {
-                return ResponseEntity.noContent().build();
-            }
-            Optional<Action<?>> actionOptional = entity.getActions().stream()
-                    .filter(e -> e.getNature().equals(HttpMethod.DELETE))
-                    .findAny();
-
-            if (!actionOptional.isPresent()) {
-                deleteEntity(entity);
-            } else {
-                try {
-                    Action<?> action = actionOptional.get();
-                    CompletableFuture<?> invocationResult = action
-                            .invoke(new HashMap<>());
-                    invocationResult.join();
-                } catch (Exception e) {
-                    LOGGER.error(e.getMessage(), e);
-                    return ResponseEntity
-                            .status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-                }
-            }
-            return ResponseEntity.noContent().build();
-        });
+        throw new NotImplementedException("TODO. Shutdown?");
     }
 
-    protected abstract CompletableFuture<Void> deleteEntity(
-            EntityWrapper<?> entity);
-
-    @RequestMapping(value = "**", method = RequestMethod.PUT, produces = {
+    @RequestMapping(method = RequestMethod.PUT, produces = {
             "application/vnd.siren+json",
             "application/json" }, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @ResponseBody
@@ -175,7 +120,7 @@ public abstract class HyperstateController {
                     InterruptedException, ExecutionException {
         String url = (String) request.getAttribute(
                 HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        EntityWrapper<?> entity = getEntity(url).get();
+        EntityWrapper<?> entity = hyperstateApplication;
         if (entity == null) {
             return ResponseEntity.notFound().build();
         }
@@ -203,7 +148,5 @@ public abstract class HyperstateController {
         LOGGER.error(e.getLocalizedMessage(), e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
-
-    public abstract EntityWrapper<?> getRoot();
 
 }

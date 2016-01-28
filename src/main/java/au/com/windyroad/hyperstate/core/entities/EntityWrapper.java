@@ -101,6 +101,8 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
         // if (titleAnnotation != null) {
         // setTitle(titleAnnotation.value(), args);
         // }
+        repository.save(this);
+
     }
 
     public EntityWrapper(EntityWrapper<T> src) {

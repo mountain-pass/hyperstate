@@ -18,14 +18,19 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import au.com.windyroad.hyperstate.core.EntityRepository;
 import au.com.windyroad.hyperstate.core.Relationship;
 import au.com.windyroad.hyperstate.core.Resolver;
+import au.com.windyroad.hyperstate.core.entities.EntityWrapper;
+import au.com.windyroad.hyperstate.core.entities.VanillaEntity;
 import au.com.windyroad.hyperstate.server.config.HyperstateTestConfiguration;
 import au.com.windyroad.hyperstate.server.entities.Account;
 import au.com.windyroad.hyperstate.server.entities.AccountProperties;
+import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -53,9 +58,38 @@ public class StepDefs {
     @Autowired
     ApplicationContext context;
 
-    private Account currentEntity;
+    private EntityWrapper<?> currentEntity;
 
     private AccountBuilder currentAccountBuilder;
+
+    @Given("^a Hyperstate controller \"([^\"]*)\" at \"([^\"]*)\" with a \"([^\"]*)\" root entity$")
+    public void a_Hyperstate_controller_at_with_a_root_entity(String beanName,
+            String path, String rootType) throws Throwable {
+
+        // check bean
+        HyperstateController hyperstateController = context
+                .getAutowireCapableBeanFactory()
+                .getBean(beanName, HyperstateController.class);
+        assertThat(hyperstateController, is(notNullValue()));
+
+        // check path
+        RequestMapping requestMapping = AnnotationUtils.findAnnotation(
+                hyperstateController.getClass(), RequestMapping.class);
+        assertThat(requestMapping, is(notNullValue()));
+        assertThat(requestMapping.value(), is(arrayContaining(path)));
+
+        // check root entity
+        assertThat(hyperstateController.getRoot().getNatures(),
+                hasItem(rootType));
+
+    }
+
+    @Then("^the response will be an \"([^\"]*)\" domain entity$")
+    public void the_response_will_be_an_domain_entity(String type)
+            throws Throwable {
+        Set<String> natures = currentEntity.getNatures();
+        assertThat(natures, hasItem(type));
+    }
 
     class AccountBuilder {
 
@@ -107,6 +141,10 @@ public class StepDefs {
     @Given("^an \"([^\"]*)\" domain entity with$")
     public void an_domain_entity_with(String entityName,
             Map<String, String> properties) throws Throwable {
+        // CompletableFuture<HyperstateApplication> applicationFuture = resolver
+        // .get("/", HyperstateApplication.class);
+        // HyperstateApplication application = applicationFuture.get();
+
         assertThat(entityName, equalTo("Account"));
         assertThat(properties.keySet(), contains("username", "creationDate"));
 
@@ -122,32 +160,48 @@ public class StepDefs {
     @Given("^it's only link is self link referencing \"([^\"]*)\"$")
     public void it_s_only_link_is_self_link_referencing(String path)
             throws Throwable {
-        currentAccountBuilder.setExpectedLinkAddress(Relationship.SELF,
-                "/hyperstateTest" + path);
+        currentAccountBuilder.setExpectedLinkAddress(Relationship.SELF, path);
     }
 
     @Given("^it is exposed at \"([^\"]*)\"$")
     public void it_is_exposed_at(String path) throws Throwable {
-        currentAccountBuilder.build("/hyperstateTest" + path);
+        currentAccountBuilder.build(path);
     }
 
     @When("^request is made to \"([^\"]*)\"$")
     public void request_is_made_to(String path) throws Throwable {
-        currentEntity = resolver.get("/hyperstateTest" + path, Account.class)
-                .get();
+        currentEntity = resolver.get(path, VanillaEntity.class).get();
+    }
+
+    @When("^request is made to \"([^\"]*)\" for an \"([^\"]*)\"$")
+    public void request_is_made_to_for_an(String path, String typeName)
+            throws Throwable {
+        @SuppressWarnings("unchecked")
+        Class<? extends EntityWrapper<?>> type = (Class<? extends EntityWrapper<?>>) Class
+                .forName(typeName);
+        currentEntity = resolver.get(path, type).get();
     }
 
     @Then("^the response will be an? \"([^\"]*)\" domain entity with$")
     public void the_response_will_be_an_domain_entity_with(String type,
             Map<String, String> properties) throws Throwable {
-        Set<String> natures = currentEntity.getNatures();
-        assertThat(natures, hasItem(type));
+        the_response_will_be_an_domain_entity(type);
 
-        assertThat(properties.keySet(), contains("username", "creationDate"));
-        assertThat(currentEntity.getProperties().getUsername(),
-                equalTo(properties.get("username")));
-        assertThat(currentEntity.getProperties().getCreationDate(),
-                equalTo(properties.get("creationDate")));
+        switch (type) {
+        case "Account":
+            assertThat(properties.keySet(),
+                    contains("username", "creationDate"));
+            AccountProperties entityProperties = (AccountProperties) currentEntity
+                    .getProperties();
+            assertThat(entityProperties.getUsername(),
+                    equalTo(properties.get("username")));
+            assertThat(entityProperties.getCreationDate(),
+                    equalTo(properties.get("creationDate")));
+            break;
+        default:
+            throw new PendingException("checking properties for a " + type
+                    + " has not been coded");
+        }
     }
 
     @Then("^it will have no actions$")
@@ -166,7 +220,7 @@ public class StepDefs {
     public void it_will_have_a_self_link_referencing(String path)
             throws Throwable {
         assertThat(currentEntity.getLink(Relationship.SELF).getPath(),
-                endsWith("/hyperstateTest" + path));
+                endsWith(path));
     }
 
 }

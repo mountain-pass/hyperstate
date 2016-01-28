@@ -3,18 +3,23 @@ Feature: Service Exposer
     and to ensure consistency for the services I create
     As a service developer
     I want to have REST services automatically created for my domain entity classes
-    
+
+Scenario: Get Controller
+    Given a Hyperstate controller "hyperstateTestController" at "/hyperstateTest" with a "HyperstateTestRoot" root entity
+    When request is made to "/hyperstateTest"
+    Then the response will be an "HyperstateTestRoot" domain entity
+
 Scenario: Expose single domain entity
     Given an "Account" domain entity with
     | username     | tom        |
     | creationDate | 2016/01/15 |
     And it has no actions
-    And it's only link is self link referencing "/test/testAccount"
-    And it is exposed at "/test/testAccount"
-    When request is made to "/test/testAccount"
+    And it's only link is self link referencing "/hyperstateTest/test/testAccount"
+    And it is exposed at "/hyperstateTest/test/testAccount"
+    When request is made to "/hyperstateTest/test/testAccount" for an "au.com.windyroad.hyperstate.server.entities.Account"
     Then the response will be an "Account" domain entity with
     | username     | tom        |
     | creationDate | 2016/01/15 |
     And it will have no actions
     And it will have no links apart from "self"
-    And it will have a self link referencing "/test/testAccount"
+    And it will have a self link referencing "/hyperstateTest/test/testAccount"

@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import javax.annotation.PostConstruct;
 import javax.script.ScriptException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,6 +35,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.HandlerMapping;
 
 import au.com.windyroad.hyperstate.core.Action;
+import au.com.windyroad.hyperstate.core.EntityRepository;
 import au.com.windyroad.hyperstate.core.MediaTypes;
 import au.com.windyroad.hyperstate.core.entities.Entity;
 import au.com.windyroad.hyperstate.core.entities.EntityWrapper;
@@ -44,11 +47,33 @@ public abstract class HyperstateController {
     @Autowired
     ApplicationContext context;
 
+    @Autowired
+    EntityRepository repository;
+
+    public HyperstateController() {
+
+    }
+
+    @PostConstruct
+    public void postConstruct() {
+        new HyperstateRootEntity(context, repository, this.getClass());
+    }
+
+    protected CompletableFuture<EntityWrapper<?>> getEntity(String identifier) {
+        RequestMapping requestMapping = AnnotationUtils
+                .findAnnotation(this.getClass(), RequestMapping.class);
+        return repository.findOne(identifier);
+    }
+
+    protected CompletableFuture<Void> deleteEntity(EntityWrapper<?> entity) {
+        return repository.delete(entity);
+    }
+
     @RequestMapping(value = "**", method = RequestMethod.GET, produces = {
             MediaTypes.SIREN_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE })
     @ResponseBody
     @Async
-    public CompletableFuture<ResponseEntity<?>> self(
+    public CompletableFuture<ResponseEntity<?>> get(
             @RequestParam Map<String, Object> allRequestParams,
             final HttpServletRequest request) {
         String url = (String) request.getAttribute(
@@ -67,9 +92,6 @@ public abstract class HyperstateController {
             }
         });
     }
-
-    protected abstract CompletableFuture<EntityWrapper<?>> getEntity(
-            String identifier);
 
     @RequestMapping(value = "**", method = RequestMethod.GET, produces = {
             "text/html", "application/xhtml+xml" })
@@ -159,9 +181,6 @@ public abstract class HyperstateController {
         });
     }
 
-    protected abstract CompletableFuture<Void> deleteEntity(
-            EntityWrapper<?> entity);
-
     @RequestMapping(value = "**", method = RequestMethod.PUT, produces = {
             "application/vnd.siren+json",
             "application/json" }, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
@@ -204,6 +223,15 @@ public abstract class HyperstateController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
-    public abstract EntityWrapper<?> getRoot();
+    public CompletableFuture<EntityWrapper<?>> getRoot() {
+        return getEntity(getRootPath());
+    }
+
+    private String getRootPath() {
+        RequestMapping requestMapping = AnnotationUtils
+                .findAnnotation(this.getClass(), RequestMapping.class);
+
+        return requestMapping.value()[0];
+    }
 
 }

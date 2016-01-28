@@ -4,10 +4,10 @@ Feature: Service Exposer
     As a service developer
     I want to have REST services automatically created for my domain entity classes
 
-Scenario: Get Controller
-    Given a Hyperstate controller "hyperstateTestController" at "/hyperstateTest" with a "HyperstateTestRoot" root entity
+Scenario: Get Controller Root
+    Given a Hyperstate controller "hyperstateTestController" at "/hyperstateTest"
     When request is made to "/hyperstateTest"
-    Then the response will be an "HyperstateTestRoot" domain entity
+    Then the response will be an "HyperstateRootEntity" domain entity
 
 Scenario: Expose single domain entity
     Given an "Account" domain entity with

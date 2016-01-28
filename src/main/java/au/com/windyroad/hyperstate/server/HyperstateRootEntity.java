@@ -6,22 +6,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import au.com.windyroad.hyperstate.core.EntityRepository;
 import au.com.windyroad.hyperstate.core.entities.VanillaEntity;
-import au.com.windyroad.hyperstate.server.HyperstateController;
 
-class HyperstateTestRoot extends VanillaEntity {
+class HyperstateRootEntity extends VanillaEntity {
 
     /**
      * 
      */
-    public HyperstateTestRoot() {
+    public HyperstateRootEntity() {
     }
 
-    public HyperstateTestRoot(ApplicationContext context,
+    public HyperstateRootEntity(ApplicationContext context,
             EntityRepository repository,
-            HyperstateController hyperstateController, String label) {
+            Class<? extends HyperstateController> controllerClass) {
         super(context, repository,
-                AnnotationUtils.findAnnotation(hyperstateController.getClass(),
-                        RequestMapping.class).value()[0],
-                label);
+                AnnotationUtils
+                        .findAnnotation(controllerClass, RequestMapping.class)
+                        .value()[0],
+                controllerClass.getSimpleName());
     }
 }

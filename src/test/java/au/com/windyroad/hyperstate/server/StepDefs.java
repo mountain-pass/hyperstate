@@ -62,9 +62,9 @@ public class StepDefs {
 
     private AccountBuilder currentAccountBuilder;
 
-    @Given("^a Hyperstate controller \"([^\"]*)\" at \"([^\"]*)\" with a \"([^\"]*)\" root entity$")
-    public void a_Hyperstate_controller_at_with_a_root_entity(String beanName,
-            String path, String rootType) throws Throwable {
+    @Given("^a Hyperstate controller \"([^\"]*)\" at \"([^\"]*)\"$")
+    public void a_Hyperstate_controller_at(String beanName, String path)
+            throws Throwable {
 
         // check bean
         HyperstateController hyperstateController = context
@@ -77,10 +77,6 @@ public class StepDefs {
                 hyperstateController.getClass(), RequestMapping.class);
         assertThat(requestMapping, is(notNullValue()));
         assertThat(requestMapping.value(), is(arrayContaining(path)));
-
-        // check root entity
-        assertThat(hyperstateController.getRoot().getNatures(),
-                hasItem(rootType));
 
     }
 
@@ -141,9 +137,6 @@ public class StepDefs {
     @Given("^an \"([^\"]*)\" domain entity with$")
     public void an_domain_entity_with(String entityName,
             Map<String, String> properties) throws Throwable {
-        // CompletableFuture<HyperstateApplication> applicationFuture = resolver
-        // .get("/", HyperstateApplication.class);
-        // HyperstateApplication application = applicationFuture.get();
 
         assertThat(entityName, equalTo("Account"));
         assertThat(properties.keySet(), contains("username", "creationDate"));

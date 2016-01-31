@@ -8,7 +8,6 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.context.ApplicationContext;
 
 import au.com.windyroad.hyperstate.core.EntityRelationship;
-import au.com.windyroad.hyperstate.core.EntityRepository;
 import au.com.windyroad.hyperstate.core.entities.EntityWrapper;
 
 public class RestEntity<T> extends EntityWrapper<T> {
@@ -20,9 +19,9 @@ public class RestEntity<T> extends EntityWrapper<T> {
         throw new NotImplementedException("dead?");
     }
 
-    public RestEntity(ApplicationContext context, EntityRepository repository,
-            String path, T properties, String title) {
-        super(context, repository, path, properties, title);
+    public RestEntity(ApplicationContext context, String path, T properties,
+            String title) {
+        super(context, path, properties, title);
     }
 
     /*

@@ -4,8 +4,6 @@ import java.util.Properties;
 
 import org.springframework.context.ApplicationContext;
 
-import au.com.windyroad.hyperstate.core.EntityRepository;
-
 public class VanillaEntity extends EntityWrapper<Properties> {
 
     public VanillaEntity(VanillaEntity src) {
@@ -16,10 +14,9 @@ public class VanillaEntity extends EntityWrapper<Properties> {
         super(new Properties());
     }
 
-    public VanillaEntity(ApplicationContext context,
-            EntityRepository repository, String path, String label,
+    public VanillaEntity(ApplicationContext context, String path, String label,
             String... natures) {
-        super(context, repository, path, new Properties(), label, natures);
+        super(context, path, new Properties(), label, natures);
     }
 
 }

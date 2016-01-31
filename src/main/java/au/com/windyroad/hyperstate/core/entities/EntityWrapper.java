@@ -54,20 +54,18 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
 
     T properties;
 
-    private EntityRepository repository;
-
     private String path;
+
+    private EntityRepository repository;
 
     protected EntityWrapper(@JsonProperty("properties") T properties) {
         this.properties = properties;
     }
 
-    protected EntityWrapper(ApplicationContext context,
-            EntityRepository repository, String path, T properties,
-            String label, String... natures) {
+    protected EntityWrapper(ApplicationContext context, String path,
+            T properties, String label, String... natures) {
         super(label, natures);
         this.properties = properties;
-        this.repository = repository;
         this.path = path;
         add(new NavigationalRelationship(new JavaLink(this),
                 Relationship.SELF));
@@ -101,14 +99,11 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
         // if (titleAnnotation != null) {
         // setTitle(titleAnnotation.value(), args);
         // }
-        repository.save(this);
-
     }
 
     public EntityWrapper(EntityWrapper<T> src) {
         super(src);
         this.properties = src.properties;
-        this.repository = src.repository;
         this.path = src.path;
         this.actions = src.actions;
         this.entities = src.entities;
@@ -137,6 +132,10 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
             throws IllegalAccessException, IllegalArgumentException,
             InvocationTargetException, URISyntaxException {
         return getEntities().join();
+    }
+
+    public void setRepository(EntityRepository repository) {
+        this.repository = repository;
     }
 
     public CompletableFuture<Collection<EntityRelationship>> getEntities(

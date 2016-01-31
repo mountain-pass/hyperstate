@@ -32,8 +32,7 @@ public class HyperstateApplication extends EntityWrapper<Properties> {
     @Autowired
     public HyperstateApplication(ApplicationContext context,
             EntityRepository repository) {
-        super(context, repository, "/", System.getProperties(),
-                "Hyperstate Application");
+        super(context, "/", System.getProperties(), "Hyperstate Application");
         LOGGER.debug(this.getLink(Relationship.SELF).getNatures().toString());
     }
 

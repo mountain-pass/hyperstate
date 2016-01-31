@@ -46,10 +46,10 @@ public abstract class HyperstateController {
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    ApplicationContext context;
+    private ApplicationContext context;
 
     @Autowired
-    EntityRepository repository;
+    private EntityRepository repository;
 
     public HyperstateController() {
 
@@ -57,7 +57,7 @@ public abstract class HyperstateController {
 
     @PostConstruct
     public void postConstruct() {
-        new HyperstateRootEntity(context, repository, this.getClass());
+        repository.save(new HyperstateRootEntity(context, this.getClass()));
     }
 
     protected CompletableFuture<EntityWrapper<?>> getEntity(String identifier) {

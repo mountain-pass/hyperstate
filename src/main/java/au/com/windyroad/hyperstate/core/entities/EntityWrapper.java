@@ -128,9 +128,7 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
         return ImmutableSet.copyOf(actions.values());
     }
 
-    public CompletableFuture<Collection<EntityRelationship>> getEntities()
-            throws IllegalAccessException, IllegalArgumentException,
-            InvocationTargetException, URISyntaxException {
+    public CompletableFuture<Collection<EntityRelationship>> getEntities() {
         return getEntities(0);
     }
 
@@ -142,8 +140,7 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
     }
 
     public CompletableFuture<Collection<EntityRelationship>> getEntities(
-            int page) throws IllegalAccessException, IllegalArgumentException,
-                    InvocationTargetException, URISyntaxException {
+            int page) {
         if (entities != null) {
             return CompletableFuture.supplyAsync(() -> entities);
         }

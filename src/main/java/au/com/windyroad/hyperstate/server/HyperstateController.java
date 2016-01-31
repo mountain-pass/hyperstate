@@ -39,6 +39,7 @@ import au.com.windyroad.hyperstate.core.EntityRepository;
 import au.com.windyroad.hyperstate.core.MediaTypes;
 import au.com.windyroad.hyperstate.core.entities.Entity;
 import au.com.windyroad.hyperstate.core.entities.EntityWrapper;
+import au.com.windyroad.hyperstate.server.entities.HyperstateRootEntity;
 
 public abstract class HyperstateController {
 

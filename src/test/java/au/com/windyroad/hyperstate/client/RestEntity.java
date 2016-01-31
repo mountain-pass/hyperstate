@@ -1,6 +1,5 @@
 package au.com.windyroad.hyperstate.client;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
@@ -33,8 +32,7 @@ public class RestEntity<T> extends EntityWrapper<T> {
      */
     @Override
     public CompletableFuture<Collection<EntityRelationship>> getEntities(
-            int page) throws IllegalAccessException, IllegalArgumentException,
-                    InvocationTargetException {
+            int page) {
         return CompletableFuture.supplyAsync(() -> this.entities);
     }
 

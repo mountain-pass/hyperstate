@@ -7,8 +7,15 @@ Feature: Service Exposer
 Scenario: Get Controller Root
     Given a Hyperstate controller "hyperstateTestController" at "/hyperstateTest"
     When request is made to "/hyperstateTest"
-    Then the response will be an "HyperstateRootEntity" domain entity
+    Then the response will be a "HyperstateRootEntity" domain entity
     And it will have a self link referencing "/hyperstateTest"
+
+Scenario: Add Relationship
+    Given a Hyperstate controller "hyperstateTestController" at "/hyperstateTest"
+    And the controller's root has an "accounts" link to an "Accounts" domain entity
+    When request is made to "/hyperstateTest"
+    And its "accounts" link is followed
+    Then the response will be a "Accounts" domain entity
 
 Scenario: Expose single domain entity
     Given an "Account" domain entity with

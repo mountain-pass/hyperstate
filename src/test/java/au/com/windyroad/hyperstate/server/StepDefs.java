@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -22,6 +23,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import au.com.windyroad.hyperstate.core.EntityRelationship;
 import au.com.windyroad.hyperstate.core.EntityRepository;
 import au.com.windyroad.hyperstate.core.Relationship;
 import au.com.windyroad.hyperstate.core.Resolver;
@@ -62,29 +64,51 @@ public class StepDefs {
 
     private AccountBuilder currentAccountBuilder;
 
+    private HyperstateController controller;
+
     @Given("^a Hyperstate controller \"([^\"]*)\" at \"([^\"]*)\"$")
     public void a_Hyperstate_controller_at(String beanName, String path)
             throws Throwable {
 
-        // check bean
-        HyperstateController hyperstateController = context
-                .getAutowireCapableBeanFactory()
-                .getBean(beanName, HyperstateController.class);
-        assertThat(hyperstateController, is(notNullValue()));
+        controller = context.getAutowireCapableBeanFactory().getBean(beanName,
+                HyperstateController.class);
+        assertThat(controller, is(notNullValue()));
 
         // check path
-        RequestMapping requestMapping = AnnotationUtils.findAnnotation(
-                hyperstateController.getClass(), RequestMapping.class);
+        RequestMapping requestMapping = AnnotationUtils
+                .findAnnotation(controller.getClass(), RequestMapping.class);
         assertThat(requestMapping, is(notNullValue()));
         assertThat(requestMapping.value(), is(arrayContaining(path)));
 
     }
 
-    @Then("^the response will be an \"([^\"]*)\" domain entity$")
+    @Then("^the response will be an? \"([^\"]*)\" domain entity$")
     public void the_response_will_be_an_domain_entity(String type)
             throws Throwable {
         Set<String> natures = currentEntity.getNatures();
         assertThat(natures, hasItem(type));
+    }
+
+    @Given("^the controller's root has an? \"([^\"]*)\" link to an \"([^\"]*)\" domain entity$")
+    public void the_controller_s_root_has_an_link_to_an_domain_entity(
+            String rel, String typeName) throws Throwable {
+        controller.getRoot().thenAcceptAsync(root -> {
+            root.getEntities().thenAcceptAsync(entities -> {
+                Optional<EntityRelationship> match = entities.stream()
+                        .filter(entityRel -> {
+                    return entityRel.hasNature(rel);
+                }).filter(entityRel -> {
+                    return entityRel.getEntity().hasNature(typeName);
+                }).findAny();
+                assertThat(match.isPresent(), is(equalTo(true)));
+            });
+        });
+    }
+
+    @When("^its \"([^\"]*)\" link is followed$")
+    public void its_link_is_followed(String arg1) throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
     }
 
     class AccountBuilder {

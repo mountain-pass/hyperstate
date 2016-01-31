@@ -1,4 +1,4 @@
-package au.com.windyroad.hyperstate.server;
+package au.com.windyroad.hyperstate.server.entities;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -6,13 +6,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import au.com.windyroad.hyperstate.core.EntityRepository;
 import au.com.windyroad.hyperstate.core.entities.VanillaEntity;
+import au.com.windyroad.hyperstate.server.HyperstateController;
 
-class HyperstateRootEntity extends VanillaEntity {
+public class HyperstateRootEntity extends VanillaEntity {
 
-    /**
-     * 
-     */
-    public HyperstateRootEntity() {
+    protected HyperstateRootEntity() {
     }
 
     public HyperstateRootEntity(ApplicationContext context,

@@ -6,6 +6,8 @@ import org.springframework.context.ApplicationContext;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
+import au.com.windyroad.hyperstate.core.entities.EntityWrapper;
+
 public class NavigationalRelationship extends Relationship {
 
     private Link link;
@@ -16,6 +18,12 @@ public class NavigationalRelationship extends Relationship {
     public NavigationalRelationship(Link link, String... natures) {
         super(natures);
         this.link = link;
+    }
+
+    public NavigationalRelationship(EntityWrapper<?> accounts,
+            String... natures) {
+        super(natures);
+        this.link = accounts.toLinkedEntity().getLink();
     }
 
     @Autowired

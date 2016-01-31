@@ -14,10 +14,10 @@ import au.com.windyroad.hyperstate.core.entities.VanillaEntity;
 public class HyperstateTestController extends HyperstateController {
 
     @PostConstruct
-    public void onConstruted() {
+    public void onConstructed() {
         EntityWrapper<?> root = getRoot().join();
         VanillaEntity accounts = new VanillaEntity(context, repository,
-                root.getId() + "/accounts", "Accounts");
+                root.getId() + "/accounts", "Accounts", "Accounts");
 
         root.add(new NavigationalRelationship(accounts, "accounts"));
 

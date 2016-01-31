@@ -64,8 +64,8 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
 
     protected EntityWrapper(ApplicationContext context,
             EntityRepository repository, String path, T properties,
-            String label) {
-        super(label);
+            String label, String... natures) {
+        super(label, natures);
         this.properties = properties;
         this.repository = repository;
         this.path = path;
@@ -94,7 +94,7 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
                 }
             }
         }
-        getNatures().add(this.getClass().getSimpleName());
+        // getNatures().add(this.getClass().getSimpleName());
 
         // Label titleAnnotation = properties.getClass()
         // .getAnnotation(Label.class);

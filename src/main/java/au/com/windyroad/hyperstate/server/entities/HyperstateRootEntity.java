@@ -20,6 +20,7 @@ public class HyperstateRootEntity extends VanillaEntity {
                 AnnotationUtils
                         .findAnnotation(controllerClass, RequestMapping.class)
                         .value()[0],
-                controllerClass.getSimpleName());
+                controllerClass.getSimpleName(),
+                HyperstateRootEntity.class.getSimpleName());
     }
 }

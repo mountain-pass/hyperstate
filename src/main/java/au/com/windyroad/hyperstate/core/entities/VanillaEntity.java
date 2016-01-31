@@ -17,8 +17,9 @@ public class VanillaEntity extends EntityWrapper<Properties> {
     }
 
     public VanillaEntity(ApplicationContext context,
-            EntityRepository repository, String path, String label) {
-        super(context, repository, path, new Properties(), label);
+            EntityRepository repository, String path, String label,
+            String... natures) {
+        super(context, repository, path, new Properties(), label, natures);
     }
 
 }

@@ -106,9 +106,8 @@ public class StepDefs {
     }
 
     @When("^its \"([^\"]*)\" link is followed$")
-    public void its_link_is_followed(String arg1) throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
+    public void its_link_is_followed(String rel) throws Throwable {
+        currentEntity = currentEntity.getLink(rel).resolve(VanillaEntity.class);
     }
 
     class AccountBuilder {

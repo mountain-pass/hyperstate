@@ -18,8 +18,8 @@ public abstract class Entity extends Labelled {
         super(entity);
     }
 
-    public Entity(String label) {
-        super(label);
+    public Entity(String label, String... natures) {
+        super(label, natures);
     }
 
     public abstract <K, T extends EntityWrapper<K>> T resolve(Class<T> type);

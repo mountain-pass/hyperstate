@@ -33,7 +33,7 @@
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav" id="links">
           <li ng-repeat="link in controller.entity.links" class="{{$.inArray('self', link.rel) ? 'active' : ''}}"><a
-            href="{{link.href}}" rel="{{link.rel.join(' ')}}">{{link.title ? link.title : link.rel[0] }}</a></li>
+            href="{{link.href}}" rel="{{link.rel.join(' ')}}" ng-click="controller.processNavClick($event)">{{link.title ? link.title : link.rel[0] }}</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li ng-hide="!controller.loading" class="" id="loading"><a href="#">Loading...</a></li>

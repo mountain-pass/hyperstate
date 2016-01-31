@@ -1,5 +1,6 @@
 package au.com.windyroad.hyperstate.core;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -49,12 +50,13 @@ abstract public class Labelled {
     }
 
     public Labelled(String label, Set<String> natures) {
-        this.natures = natures;
         this.label = label;
+        this.natures = natures;
     }
 
-    public Labelled(String label) {
+    public Labelled(String label, String... natures) {
         this.label = label;
+        this.natures.addAll(Arrays.asList(natures));
     }
 
     /**

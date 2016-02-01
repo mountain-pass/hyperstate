@@ -3,11 +3,12 @@ package au.com.windyroad.hyperstate.core;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
+import org.springframework.data.repository.Repository;
 import org.springframework.scheduling.annotation.Async;
 
 import au.com.windyroad.hyperstate.core.entities.EntityWrapper;
 
-public interface EntityRepository {
+public interface EntityRepository extends Repository<EntityWrapper<?>, String> {
 
     @Async
     public <S extends EntityWrapper<?>> CompletableFuture<Stream<EntityRelationship>> findChildren(

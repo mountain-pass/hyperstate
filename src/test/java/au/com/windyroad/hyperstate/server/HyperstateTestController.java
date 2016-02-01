@@ -11,6 +11,7 @@ import au.com.windyroad.hyperstate.core.EntityRepository;
 import au.com.windyroad.hyperstate.core.NavigationalRelationship;
 import au.com.windyroad.hyperstate.core.entities.EntityWrapper;
 import au.com.windyroad.hyperstate.core.entities.VanillaEntity;
+import au.com.windyroad.hyperstate.server.entities.HyperstateRootEntity;
 
 @Controller
 @RequestMapping(value = "/hyperstateTest")
@@ -24,7 +25,9 @@ public class HyperstateTestController extends HyperstateController {
 
     @PostConstruct
     public void onConstructed() {
-        EntityWrapper<?> root = getRoot().join();
+        EntityWrapper<?> root = new HyperstateRootEntity(context,
+                this.getClass());
+        repository.save(root);
         VanillaEntity accounts = new VanillaEntity(context,
                 root.getId() + "/accounts", "Accounts", "Accounts");
         repository.save(accounts);

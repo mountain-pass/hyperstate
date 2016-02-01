@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import javax.annotation.PostConstruct;
 import javax.script.ScriptException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -39,7 +38,6 @@ import au.com.windyroad.hyperstate.core.EntityRepository;
 import au.com.windyroad.hyperstate.core.MediaTypes;
 import au.com.windyroad.hyperstate.core.entities.Entity;
 import au.com.windyroad.hyperstate.core.entities.EntityWrapper;
-import au.com.windyroad.hyperstate.server.entities.HyperstateRootEntity;
 
 public abstract class HyperstateController {
 
@@ -53,11 +51,6 @@ public abstract class HyperstateController {
 
     public HyperstateController() {
 
-    }
-
-    @PostConstruct
-    public void postConstruct() {
-        repository.save(new HyperstateRootEntity(context, this.getClass()));
     }
 
     protected CompletableFuture<EntityWrapper<?>> getEntity(String identifier) {

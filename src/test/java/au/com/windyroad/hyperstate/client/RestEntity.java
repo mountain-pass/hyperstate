@@ -21,7 +21,7 @@ public class RestEntity<T> extends EntityWrapper<T> {
 
     public RestEntity(ApplicationContext context, String path, T properties,
             String title) {
-        super(context, path, properties, title);
+        super(path, properties, title);
     }
 
     /*

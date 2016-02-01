@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.hateoas.Identifiable;
 import org.springframework.http.HttpMethod;
@@ -62,8 +61,8 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
         this.properties = properties;
     }
 
-    protected EntityWrapper(ApplicationContext context, String path,
-            T properties, String label, String... natures) {
+    protected EntityWrapper(String path, T properties,
+            String label, String... natures) {
         super(label, natures);
         this.properties = properties;
         this.path = path;

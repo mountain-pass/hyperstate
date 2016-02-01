@@ -135,8 +135,7 @@ public class StepDefs {
 
         public CompletableFuture<Account> build(String path)
                 throws InterruptedException, ExecutionException {
-            Account entity = new Account(context, path, properties,
-                    "The Account");
+            Account entity = new Account(path, properties, "The Account");
 
             String[] actionNames = entity.getActions().stream()
                     .map(a -> a.getLabel()).collect(Collectors.toList())

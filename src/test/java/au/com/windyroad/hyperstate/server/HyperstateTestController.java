@@ -27,9 +27,10 @@ public class HyperstateTestController extends HyperstateController {
     public void onConstructed() {
         EntityWrapper<?> root = new HyperstateRootEntity(context,
                 this.getClass());
+        root.setRepository(repository);
         repository.save(root);
-        VanillaEntity accounts = new VanillaEntity(context,
-                root.getId() + "/accounts", "Accounts", "Accounts");
+        VanillaEntity accounts = new VanillaEntity(root.getId() + "/accounts",
+                "Accounts", "Accounts");
         repository.save(accounts);
         accounts.setRepository(repository);
 

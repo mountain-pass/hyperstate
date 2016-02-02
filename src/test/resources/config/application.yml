@@ -18,12 +18,12 @@ security:
 
 logging:
     level.org.apache.http.wire: 'DEBUG'
-    level.au.com.windyroad.hyperstate: 'DEBUG'
+    level.au.com.mountainpass.hyperstate: 'DEBUG'
     
 server.tomcat.access-log-enabled: true
 
 
-au.com.windyroad.hyperstate.test    :
+au.com.mountainpass.hyperstate.test    :
     ssl:
         hostname: localhost
         

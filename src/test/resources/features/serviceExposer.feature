@@ -24,7 +24,7 @@ Scenario: Expose single domain entity
     And it has no actions
     And it's only link is self link referencing "/hyperstateTest/test/testAccount"
     And it is exposed at "/hyperstateTest/test/testAccount"
-    When request is made to "/hyperstateTest/test/testAccount" for an "au.com.windyroad.hyperstate.server.entities.Account"
+    When request is made to "/hyperstateTest/test/testAccount" for an "au.com.mountainpass.hyperstate.server.entities.Account"
     Then the response will be an "Account" domain entity with
     | username     | tom        |
     | creationDate | 2016/01/15 |

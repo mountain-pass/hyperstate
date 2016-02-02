@@ -61,8 +61,8 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
         this.properties = properties;
     }
 
-    protected EntityWrapper(String path, T properties,
-            String label, String... natures) {
+    protected EntityWrapper(String path, T properties, String label,
+            String... natures) {
         super(label, natures);
         this.properties = properties;
         this.path = path;

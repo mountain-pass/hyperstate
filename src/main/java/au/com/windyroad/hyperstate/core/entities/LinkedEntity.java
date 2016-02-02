@@ -1,6 +1,8 @@
 package au.com.windyroad.hyperstate.core.entities;
 
 import java.net.URI;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang3.NotImplementedException;
@@ -35,6 +37,12 @@ public class LinkedEntity extends Entity {
     // setNatures(natures);
     // setTitle(label);
     // }
+
+    public LinkedEntity(Link link, String label, String... natures) {
+        this.link = link;
+        setNatures(new HashSet<String>(Arrays.asList(natures)));
+        setTitle(label);
+    }
 
     public LinkedEntity(Link link, String label, Set<String> natures) {
         this.link = link;

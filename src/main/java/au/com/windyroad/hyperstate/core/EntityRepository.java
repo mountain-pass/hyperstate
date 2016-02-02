@@ -10,6 +10,7 @@ import au.com.windyroad.hyperstate.core.entities.EntityWrapper;
 
 public interface EntityRepository extends Repository<EntityWrapper<?>, String> {
 
+    // TODO move this to an entity relationship repository
     @Async
     public <S extends EntityWrapper<?>> CompletableFuture<Stream<EntityRelationship>> findChildren(
             S entityWrapper);
@@ -18,13 +19,61 @@ public interface EntityRepository extends Repository<EntityWrapper<?>, String> {
     public <S extends EntityWrapper<?>> CompletableFuture<S> findOne(
             String path, Class<S> type);
 
+    /**
+     * Saves a given entity. Use the returned instance for further operations as
+     * the save operation might have changed the entity instance completely.
+     * 
+     * @param entity
+     * @return the saved entity
+     */
     @Async
-    public <S extends EntityWrapper<?>> CompletableFuture<S> save(S entity);
+    <S extends EntityWrapper<?>> CompletableFuture<S> save(S entity);
+
+    /**
+     * Retrieves an entity by its id.
+     * 
+     * @param id
+     *            must not be {@literal null}.
+     * @return the entity with the given id or {@literal null} if none found
+     * @throws IllegalArgumentException
+     *             if {@code id} is {@literal null}
+     */
+    @Async
+    CompletableFuture<EntityWrapper<?>> findOne(String id);
+
+    /**
+     * Returns whether an entity with the given id exists.
+     * 
+     * @param id
+     *            must not be {@literal null}.
+     * @return true if an entity with the given id exists, {@literal false}
+     *         otherwise
+     * @throws IllegalArgumentException
+     *             if {@code id} is {@literal null}
+     */
 
     @Async
-    public CompletableFuture<EntityWrapper<?>> findOne(String identifier);
+    CompletableFuture<Boolean> exists(String id);
 
+    /**
+     * Deletes the entity with the given id.
+     * 
+     * @param id
+     *            must not be {@literal null}.
+     * @throws IllegalArgumentException
+     *             in case the given {@code id} is {@literal null}
+     */
     @Async
-    public CompletableFuture<Void> delete(EntityWrapper<?> entity);
+    CompletableFuture<Void> delete(String id);
+
+    /**
+     * Deletes a given entity.
+     * 
+     * @param entity
+     * @throws IllegalArgumentException
+     *             in case the given entity is {@literal null}.
+     */
+    @Async
+    CompletableFuture<Void> delete(EntityWrapper<?> entity);
 
 }

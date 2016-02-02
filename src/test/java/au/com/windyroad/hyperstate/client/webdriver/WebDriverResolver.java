@@ -41,6 +41,7 @@ import au.com.windyroad.hyperstate.core.Resolver;
 import au.com.windyroad.hyperstate.core.entities.CreatedEntity;
 import au.com.windyroad.hyperstate.core.entities.Entity;
 import au.com.windyroad.hyperstate.core.entities.EntityWrapper;
+import au.com.windyroad.hyperstate.core.entities.LinkedEntity;
 import au.com.windyroad.hyperstate.core.entities.UpdatedEntity;
 import au.com.windyroad.hyperstate.server.config.HyperstateTestConfiguration;
 import cucumber.api.PendingException;
@@ -171,9 +172,11 @@ public class WebDriverResolver implements Resolver {
                         String[] classes = entity.getAttribute("class")
                                 .split("\\s");
                         String title = entity.getText();
-                        rval.add(new EntityRelationship(
+                        String[] entityRelationships = new String[0];
+                        // TODO read entity relationships from page
+                        rval.add(new EntityRelationship(new LinkedEntity(
                                 new WebDriverLink(resolver, entity), title,
-                                classes));
+                                entityRelationships), classes));
                     }
                     return rval;
                 } else if (method.getName().equals("getProperties")) {

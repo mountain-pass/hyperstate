@@ -57,9 +57,21 @@ public class InMemoryRepository implements EntityRepository {
 
     @Override
     public CompletableFuture<Void> delete(EntityWrapper<?> entity) {
+        return delete(entity.getId());
+    }
+
+    @Override
+    public CompletableFuture<Void> delete(String id) {
         return CompletableFuture.supplyAsync(() -> {
-            entities.remove(entity.getId());
+            entities.remove(id);
             return null;
+        });
+    }
+
+    @Override
+    public CompletableFuture<Boolean> exists(String id) {
+        return CompletableFuture.supplyAsync(() -> {
+            return entities.containsKey(id);
         });
     }
 

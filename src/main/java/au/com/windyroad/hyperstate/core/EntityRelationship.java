@@ -29,10 +29,10 @@ public class EntityRelationship extends Relationship {
         bpp.processInjection(this.entity);
     }
 
-    public EntityRelationship(Link link, String label, String[] natures) {
-        super(natures);
-        this.entity = new LinkedEntity(link, label, null);
-    }
+    // public EntityRelationship(Link link, String label, String[] natures) {
+    // super(natures);
+    // this.entity = new LinkedEntity(link, label, null);
+    // }
 
     /**
      * @return the entity

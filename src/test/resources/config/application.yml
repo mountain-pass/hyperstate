@@ -32,3 +32,15 @@ javax.net.ssl.trustStore: build/truststore.jks
 javax.net.ssl.trustStorePassword: changeit
 
 spring.jackson.serialization.indent_output: true
+
+#JPA / HIBERNATE
+spring.jpa.hibernate.ddl-auto: create-drop
+spring.jpa.hibernate.dialect: org.hibernate.dialect.H2Dialect
+spring.jpa.properties.hibernate.show_sql: true
+spring.jpa.properties.hibernate.format_sql: true
+
+#DATASOURCE
+spring.datasource.url: jdbc:h2:mem:hyperstateTest;DB_CLOSE_ON_EXIT=TRUE
+
+#flyway.enabled=true
+#flyway.schemas: HYPERSTATETEST

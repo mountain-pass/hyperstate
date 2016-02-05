@@ -1,0 +1,46 @@
+This file contains the PGP keys of various developers.
+
+Users: pgp < KEYS
+or
+       gpg --import KEYS
+
+
+Developers: 
+    pgp -kxa <your name> and append it to this file.
+or
+    (pgpk -ll <your name> && pgpk -xa <your name>) >> this file.
+or
+    (gpg --list-sigs <your name>
+    && gpg --armor --export <your name>) >> this file.
+
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v2
+
+mQENBFazubQBCADXsC9LOHghml0qw0N2Fxzt/W+mzN/ihea4/Eton26MXJL7KCFR
+OfJmwND3Vt4wKAOVM+WuhpDkZbMql1vgUtIG0YSDybTIJFhA+x7zHF8JXob8mU1T
+uF1k2sBDnMSbPK7qt7aieaom4bkJh8NTNXKW/zP1Oyw+Nzd6HN9/OLLEiIOzoEQm
+sl+h/7pAoXchARSZHTniqfZho87u1KFYdojp4uaUYC4nes9V8/U2K8ISPexdQRvy
+GNW0FhDNPFKzS0H4P5tZGrnv9Qeogo9VDRs9lmeHySGEGcwRSoabCp7bMSzRG/cf
+QlAgc/SB6NyqyXNRl9OftI5TxfsnAWtKM1WLABEBAAG0IVRvbSBIb3dhcmQgPHRv
+bUB3aW5keXJvYWQuY29tLmF1PokBNwQTAQgAIQUCVrO5tAIbAwULCQgHAgYVCAkK
+CwIEFgIDAQIeAQIXgAAKCRCHAHAxRrIkMu6ACADLuN77fzxno5F08CMrbprRiwnz
+3vuzbuEk1oPLohcirSPsLg5gsfddDo7PNApoiZzBlQ3EsZWYsM1ptN6LHedoea8p
+A77FR3oBmZgK6/QpkCpHzHhSyd6WfdyCYHMKB2nDgfkxci5e5mhIvNkvwtjG0BAH
+0nRIGgvX4RUo80Qe6uPW9MGjNI4YlbJlvTvNzqOGX35MjYOhpimoMeNDD/G3nvFV
+Mln2Sk6Op8ec7Fu/zuv39wVXbWNgD0sae1dl2KYCPde5unJTDT5gJte102/qlqvb
+g8D7lcE7CqqXPDE+mS7gfUdi7j1kqE0iK7NS1xkAZpFeLdKtIKJCmIfQkpvhuQEN
+BFazubQBCAC16wAIP0TW3skkxJedtSaaUxnqVEVaTnQ9OauOL6IVCfgDALEvQ0yB
+gQv0mnXci0qgqync+rGWaYLf8JRH8yHfe2H7Oyz5VCHYdq0ym2fIr6uQZp0L2sTa
+MUlF9g8wBbU8UUGUfe781zyu9hbIaBuhUwg+m9LeEr9jDdovFA/c6E2bs1ktmEwx
+EW2J8WXWrF2qjaKXkJ6MpfqMIJtxDxExowpCRB4DwSNjqHxQgXi/DXU8CXd5Ota8
+rwaa+14pYuaNl0SYPbmuivIMKg1slV55CuYksDu1gSb4wEILTu05xRlEEyDU9V7q
+F4NYhzWv14F40L66Pxdf1dSJztp0JPXHABEBAAGJAR8EGAEIAAkFAlazubQCGwwA
+CgkQhwBwMUayJDJgfQgAl3xlelbrwciCMebpaq5k4esiB5HSw8qbJPFCIiM6B+m8
+7L8Yf8QfzfnpwOPmqFTtZC5SkFsIMAvyBa2MQv7eEnGQORC4FG8mGVSL9W8DhgkQ
+dUNaro+M2JR4ItxRcZaEkLYRpfey1Vc5ngBITvsFHwY+waaYG+gRCnHyILbQuBue
+rHy3I5e/Im5LqN2jGdr+aWw40pyvWs1HByUjazEVFTwep9fTz+QGPqFNlJg42+Of
+fEqTBDAWJuex7qF9V0q5borACABCw2oaAQM+mBUc5yOW0Obne7VSdISjYtIozjVw
+Y9GSWhBtihl1C6iuDRFH9nEAudTjJZN5WYw/bG8ppA==
+=UXZv
+-----END PGP PUBLIC KEY BLOCK-----

@@ -17,8 +17,9 @@ import java.lang.annotation.Target;
  * <p>
  * The predefined input types provided as constants on this annotation where
  * soured from
- * <a href="http://www.w3.org/TR/html51/semantics.html#the-input-element"> http:
- * //www.w3.org/TR/html51/semantics.html#the-input-element </a> on 2015/09/21</>
+ * <a href="http://www.w3.org/TR/html51/semantics.html#the-input-element">
+ * <span> http://www.w3.org/TR/html51/semantics.html#the-input-element </span>
+ * </a> on 2015/09/21
  * 
  */
 @Target({ ElementType.PARAMETER })

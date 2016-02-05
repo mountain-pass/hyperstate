@@ -24,7 +24,10 @@ public interface EntityRepository extends Repository<EntityWrapper<?>, String> {
      * the save operation might have changed the entity instance completely.
      * 
      * @param entity
+     *            The entity to be saved.
      * @return the saved entity
+     * @param <S>
+     *            the type of the entity being saved
      */
     @Async
     <S extends EntityWrapper<?>> CompletableFuture<S> save(S entity);
@@ -60,8 +63,11 @@ public interface EntityRepository extends Repository<EntityWrapper<?>, String> {
      * 
      * @param id
      *            must not be {@literal null}.
+     * @return And empty future to allow execution when the delete completes.
      * @throws IllegalArgumentException
      *             in case the given {@code id} is {@literal null}
+     * 
+     * 
      */
     @Async
     CompletableFuture<Void> delete(String id);
@@ -70,6 +76,8 @@ public interface EntityRepository extends Repository<EntityWrapper<?>, String> {
      * Deletes a given entity.
      * 
      * @param entity
+     *            the entity to deleted
+     * @return And empty future to allow execution when the delete completes.
      * @throws IllegalArgumentException
      *             in case the given entity is {@literal null}.
      */

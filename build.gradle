@@ -24,7 +24,13 @@ apply plugin: 'spring-boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'announce'
 apply plugin: 'com.github.ben-manes.versions'
+apply plugin: 'maven'
+apply plugin: 'signing'
 
+
+group = "au.com.mountainpass"
+archivesBaseName = "hyperstate"
+version = "1-SNAPSHOT"
 
 compileJava.options.compilerArgs.add '-parameters'
 compileTestJava.options.compilerArgs.add '-parameters'
@@ -116,6 +122,74 @@ eclipseProject {
 }
 
 task wrapper(type: Wrapper) { gradleVersion = '2.9' }
+
+
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+
+
+artifacts {
+    archives javadocJar, sourcesJar
+    // it would be nice to publish test reports and code analysis reports as well
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      pom.project {
+        name 'Hyperstate'
+        packaging 'jar'
+        // optionally artifactId can be defined here 
+        description 'A Hypermedia as the Engine of Application State (HATEOAS) library'
+        url 'https://github.com/mountain-pass/hyperstate'
+
+        scm {
+          connection 'scm:git:https://github.com/mountain-pass/hyperstate'
+          developerConnection 'scm:git:https://github.com/mountain-pass/hyperstate'
+          url 'https://github.com/mountain-pass/hyperstate'
+        }
+
+        licenses {
+          license {
+            name 'The Apache License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+          }
+        }
+
+        developers {
+          developer {
+            id 'tompahoward'
+            name 'Tom Howard'
+            email 'tom@windyroad.com.au'
+          }
+        }
+      }
+    }
+  }
+}
 
 test {
 }

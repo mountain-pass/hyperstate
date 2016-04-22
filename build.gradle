@@ -28,7 +28,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 
-group = "au.com.mountainpass"
+group = "au.com.mountain-pass"
 archivesBaseName = "hyperstate"
 version = "1-SNAPSHOT"
 

@@ -3,9 +3,11 @@ java:
   gradle_version: '2.4'
   
 tests:
-  - name: Unit Tests
+  - type: junit
     command: gradle unitTest
     output: exit-status
+    files:
+    - include: 'src/test/java/HyperstateTests.java'
     report_files: 
     - "build/test-results-ut/*.xml"
   

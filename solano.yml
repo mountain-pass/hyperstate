@@ -3,7 +3,7 @@ java:
   gradle_version: '2.4'
   
 tests:
-  - gradle test
+  - gradle unitTest
   
   
 cache:

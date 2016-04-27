@@ -18,4 +18,11 @@ cache:
   save_paths:    # Define the paths to save into the cache
   - .gradle      # Relative to the repo
   - HOME/.gradle
-  
+
+collect:
+  repo:                   # Paths are relative to repository
+    - build/test-results/*
+    - build/test-results-*/*
+    - build/reports/*
+    - build/libs
+    

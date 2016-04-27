@@ -30,7 +30,7 @@ apply plugin: 'signing'
 
 group = "au.com.mountain-pass"
 archivesBaseName = "hyperstate"
-version = "1-SNAPSHOT"
+//version = "1-SNAPSHOT"
 
 compileJava.options.compilerArgs.add '-parameters'
 compileTestJava.options.compilerArgs.add '-parameters'
@@ -145,6 +145,37 @@ artifacts {
 signing {
     sign configurations.archives
 }
+
+task getNextVersion << {
+    // get https://oss.sonatype.org/service/local/artifact/maven/redirect?g=au.com.mountain-pass&a=hyperstate&v=LATEST&r=public to
+    // get the URL for the most recent version (snapshot or release)
+    // get https://oss.sonatype.org/service/local/artifact/maven/redirect?g=au.com.mountain-pass&a=hyperstate&v=LATEST&r=releases to
+    // get the URL for the most recent version (release)
+    // we want to parse out the version from the latest release, add one and that gives us the next release version.
+    // if not found then the next release version is 1.
+    URL url = new URL( "https://oss.sonatype.org/service/local/artifact/maven/redirect?g=${project.group}&a=${archivesBaseName}&v=LATEST&r=releases" )
+    HttpURLConnection conn = url.openConnection();
+    conn.setInstanceFollowRedirects(false);
+    def code = conn.getResponseCode();
+    if( code == 404 ) {
+        project.version = 1
+    }
+    else {
+        // TODO
+        location = conn.getHeaderField("Location");
+        System.out.println("location : " + location);
+        project.version = 2
+    }
+    System.out.println("version : " + project.version);
+}
+
+uploadArchives.dependsOn getNextVersion
+
+task uploadSnapshotArchives(dependsOn: getNextVersion) << {
+    project.version = "${project.version}-SNAPSHOT"
+}
+
+uploadSnapshotArchives.finalizedBy uploadArchives
 
 uploadArchives {
   repositories {

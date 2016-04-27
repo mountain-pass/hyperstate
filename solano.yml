@@ -3,7 +3,11 @@ java:
   gradle_version: '2.4'
   
 tests:
-  - gradle unitTest
+  - name: Unit Tests
+    command: gradle unitTest
+    output: exit-status
+    report_files: 
+    - "build/test-results-ut/*.xml"
   
   
 cache:

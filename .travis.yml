@@ -1,0 +1,21 @@
+language: java
+
+jdk:
+  - oraclejdk8
+  
+branches:
+  only:
+    - master
+
+cache:
+  directories:
+  - $HOME/.gradle
+  
+script: 
+  - ./gradlew assemble
+  - ./gradlew unitTest
+  - ./gradlew integrationTest
+  - ./gradlew uiIntegrationTest
+
+after_success:
+  - ./gradlew uploadArchives

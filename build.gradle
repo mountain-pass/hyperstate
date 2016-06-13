@@ -17,6 +17,7 @@ plugins { id "io.spring.dependency-management" version "0.5.4.RELEASE" }
 ext{
     ossrhUsername = hasProperty('ossrhUsername') ? ossrhUsername : System.getenv('OSSRH_JIRA_USERNAME')
     ossrhPassword = hasProperty('ossrhPassword') ? ossrhPassword : System.getenv('OSSRH_JIRA_PASSWORD')
+    def signing = {}
     signing.keyId = hasProperty('signing.keyId') ? signing.keyId : System.getenv('GPG_KEY_ID')
     signing.password = hasProperty('signing.password') ? signing.keyId : System.getenv('GPG_PASSPHRASE')
     

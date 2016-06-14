@@ -1,8 +1,8 @@
 language: java
 jdk:
 - oraclejdk8
-install: gradle assemble --debug
-script: gradle test --debug
+install: gradle assemble --info
+script: gradle test --info
 cache:
   directories:
   - "$HOME/.gradle"

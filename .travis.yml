@@ -5,23 +5,29 @@ jdk:
 
 before_install:
 - chmod +x ./gradlew
-- chmod +x ./cd/before-deploy.sh
-- chmod +x ./cd/deploy.sh
- 
+
 install: ./gradlew --daemon assemble --info
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+  
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
 
 before_script:
   - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
+  - sh -e /etc/init.d/xvfb start    
   - sleep 3 # give xvfb some time to start
 
 script: ./gradlew --daemon check --info
 
-cache:
-  directories:
-  - "$HOME/.gradle"
-  
+      
 after_success:
+- chmod +x ./cd/before-deploy.sh
+- chmod +x ./cd/deploy.sh
 - ./cd/before-deploy.sh
 - ./cd/deploy.sh
 

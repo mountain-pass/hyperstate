@@ -24,6 +24,12 @@ public class Parameter {
         this.value = value;
     }
 
+    public Parameter(String identifier, String type, String value,
+            String label) {
+        this(identifier, type, value);
+        this.label = label;
+    }
+
     private String identifier;
 
     private String[] natures = {};

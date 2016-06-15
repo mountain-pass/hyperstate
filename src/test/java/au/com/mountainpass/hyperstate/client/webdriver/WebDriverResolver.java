@@ -289,9 +289,10 @@ public class WebDriverResolver implements Resolver {
             private Object getNatures() {
                 waitTillLoaded(5);
 
-                return new HashSet<String>(
+                HashSet<String> rval = new HashSet<String>(
                         Arrays.asList(webDriver.findElement(By.tagName("html"))
                                 .getAttribute("class").split("\\s+")));
+                return rval;
             }
 
             private Object getActions(WebDriverResolver resolver) {
@@ -316,8 +317,10 @@ public class WebDriverResolver implements Resolver {
 
             private void waitTillLoaded(long timeoutInSeconds) {
                 (new WebDriverWait(webDriver, timeoutInSeconds))
-                        .until(ExpectedConditions
-                                .visibilityOfElementLocated(By.id("loaded")));
+                        .until(ExpectedConditions.invisibilityOfElementLocated(
+                                By.className("loading")));
+                (new WebDriverWait(webDriver, 1)).until(ExpectedConditions
+                        .invisibilityOfElementLocated(By.className("loading")));
             }
 
             private Action<?> getAction(WebDriverResolver resolver,

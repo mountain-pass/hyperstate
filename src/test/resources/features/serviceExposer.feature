@@ -4,6 +4,7 @@ Feature: Service Exposer
     As a service developer
     I want to have REST services automatically created for my domain entity classes
 
+@tom
 Scenario: Get Controller Root
     Given a Hyperstate controller "hyperstateTestController" at "/hyperstateTest"
     When request is made to "/hyperstateTest"

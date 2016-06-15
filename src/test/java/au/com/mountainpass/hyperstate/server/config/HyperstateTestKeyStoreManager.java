@@ -73,9 +73,9 @@ public class HyperstateTestKeyStoreManager {
         Date expiryDate = new Date(
                 System.currentTimeMillis() + (1000L * 60 * 60 * 24));
         BigInteger serialNumber = BigInteger
-                .valueOf(Math.abs(new SecureRandom().nextInt())); // serial
-                                                                  // number for
-                                                                  // certificate
+                .valueOf(Math.abs((long) (new SecureRandom().nextInt()))); // serial
+        // number for
+        // certificate
 
         X509V1CertificateGenerator certGen = new X509V1CertificateGenerator();
         X500Principal dnName = new X500Principal("CN=" + domainName);

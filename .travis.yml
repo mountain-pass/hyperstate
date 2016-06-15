@@ -8,9 +8,9 @@ before_install:
 - chmod +x ./cd/before-deploy.sh
 - chmod +x ./cd/deploy.sh
  
-install: gradle assemble --info
+install: ./gradlew --daemon assemble --info
 
-script: gradle test --info
+script: ./gradlew --daemon check --info
 
 cache:
   directories:

@@ -1,9 +1,11 @@
 buildscript {
     ext { 
         springBootVersion = '1.3.2.RELEASE'
-        foo = { test = "1"} 
     }
     repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
         jcenter()
         mavenCentral()
         maven { url "https://repo.spring.io/milestone" }
@@ -24,6 +26,8 @@ ext{
     if (!hasProperty('ossrhPassword')) {
         ossrhPassword = ''
     }
+
+    qaReportsDir = file("${buildDir}/qaReports")
 
     // TODO: Increase these, but needs to be set per subproject
     limits = [
@@ -52,10 +56,8 @@ apply plugin: 'jacoco'
 //apply plugin: 'pmd'
 //apply plugin: 'jdepend'
 
-
 group = "au.com.mountain-pass"
 archivesBaseName = "hyperstate"
-//version = "1-SNAPSHOT"
 
 compileJava.options.compilerArgs.add '-parameters'
 compileTestJava.options.compilerArgs.add '-parameters'
@@ -161,33 +163,55 @@ task sourcesJar(type: Jar) {
 
 
 test {
+    enabled = false
 }
 
 
 task unitTest(type: Test) {
     testClassesDir = sourceSets.test.output.classesDir
     classpath = sourceSets.test.runtimeClasspath
-    ext.outputDir = "${buildDir}/test-results-ut"
+    ext.outputDir = "${buildDir}/test-results"
     outputs.dir file(outputDir)
-    systemProperty 'cucumber.options',  "--plugin json:${outputDir}/cucumber.json --plugin html:${outputDir}/html --plugin junit:${outputDir}/TEST-cucumber.xml"
+    reports.junitXml.destination = file("${outputDir}/${name}/junit")
+    reports.html.destination = file("${outputDir}/${name}/junit/html")
+    binResultsDir = file("${outputDir}/${name}/junit/binary")
+    jacoco {
+        append = false
+        destinationFile = file("${outputDir}/${name}/jacoco/${name}.exec")
+    }
+    systemProperty 'cucumber.options',  "--plugin json:${outputDir}/${name}/bdd/${archivesBaseName}.json --plugin html:${outputDir}/${name}/bdd/html --plugin junit:${outputDir}/${name}/bdd/TEST-${archivesBaseName}.xml"
 }
 
 
 task integrationTest(type: Test, dependsOn : unitTest) {
     testClassesDir = sourceSets.test.output.classesDir
     classpath = sourceSets.test.runtimeClasspath
-    ext.outputDir = "${buildDir}/test-results-it"
+    ext.outputDir = "${buildDir}/test-results"
     outputs.dir file(outputDir)
-    systemProperty 'cucumber.options',  "--plugin json:${outputDir}/cucumber.json --plugin html:${outputDir}/html --plugin junit:${outputDir}/TEST-cucumber.xml"
+    reports.junitXml.destination = file("${outputDir}/${name}/junit")
+    reports.html.destination = file("${outputDir}/${name}/junit/html")
+    binResultsDir = file("${outputDir}/${name}/junit/binary")
+    jacoco {
+        append = false
+        destinationFile = file("${outputDir}/${name}/jacoco/${name}.exec")
+    }
+    systemProperty 'cucumber.options',  "--plugin json:${outputDir}/${name}/bdd/${archivesBaseName}.json --plugin html:${outputDir}/${name}/bdd/html --plugin junit:${outputDir}/${name}/bdd/TEST-${archivesBaseName}.xml"
     systemProperty 'spring.profiles.active', 'integration'
 }
 
 task uiIntegrationTest(type: Test, dependsOn : integrationTest) {
     testClassesDir = sourceSets.test.output.classesDir
     classpath = sourceSets.test.runtimeClasspath
-    ext.outputDir = "${buildDir}/test-results-ui"
+    ext.outputDir = "${buildDir}/test-results"
     outputs.dir file(outputDir)
-    systemProperty 'cucumber.options',  "--plugin json:${outputDir}/cucumber.json --plugin html:${outputDir}/html --plugin junit:${outputDir}/TEST-cucumber.xml"
+    reports.junitXml.destination = file("${outputDir}/${name}/junit")
+    reports.html.destination = file("${outputDir}/${name}/junit/html")
+    binResultsDir = file("${outputDir}/${name}/junit/binary")
+    jacoco {
+        append = false
+        destinationFile = file("${outputDir}/${name}/jacoco/${name}.exec")
+    }
+    systemProperty 'cucumber.options',  "--plugin json:${outputDir}/${name}/bdd/${archivesBaseName}.json --plugin html:${outputDir}/${name}/bdd/html --plugin junit:${outputDir}/${name}/bdd/TEST-${archivesBaseName}.xml"
     systemProperty 'spring.profiles.active', 'ui-integration'
 }
 
@@ -200,17 +224,26 @@ tasks.withType(Test) {
     include "**/*Tests.class" // whatever Ant pattern matches your test class files
 }
 
-jacoco { toolVersion = "0.7.4.201502262128" }
+jacoco {
+    toolVersion = "0.7.4.201502262128"
+    reportsDir = file("${buildDir}/test-results/jacoco")
+}
+
+
 
 jacocoTestReport {
+    executionData = fileTree(dir: "${buildDir}", include: '**/jacoco/*.exec')
+    
     reports {
         xml.enabled true
+        xml.destination "${buildDir}/test-results/jacoco/${archivesBaseName}.xml"
         csv.enabled false
         html.enabled true
+        html.destination "${buildDir}/test-results/jacoco/html"
     }
 
     doLast {
-        def report = file("${jacoco.reportsDir}/test/jacocoTestReport.xml")
+        def report = reports.xml.destination
         logger.lifecycle("Checking coverage results: ${report}")
 
         def parser = new XmlParser()
@@ -265,21 +298,17 @@ jacocoTestReport {
     }
 }
 
-test { jacoco { append = false } }
+
 
 check.dependsOn jacocoTestReport
 
-task testReportsJar(type: Jar) {
-    classifier = 'testReports'
-    from test, jacocoTestReport
+task qaReportsJar(type: Jar, dependsOn : check) {
+    classifier = 'qaReports'
+    from file("${buildDir}/test-results")
 }
 
-def someTestReport = file("${buildDir}/test-results-ut/TEST-cucumber.xml")
-
-
-
 artifacts { 
-    archives javadocJar, sourcesJar, testReportsJar
+    archives javadocJar, sourcesJar, qaReportsJar
 }
 
 signing { 

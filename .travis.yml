@@ -1,14 +1,24 @@
 language: java
+
 jdk:
-- oraclejdk8
+ - oraclejdk8
+
+before_install:
+- chmod +x ./gradlew
+- chmod +x ./cd/before-deploy.sh
+- chmod +x ./cd/deploy.sh
+ 
 install: gradle assemble --info
+
 script: gradle test --info
+
 cache:
   directories:
   - "$HOME/.gradle"
 after_success:
-- "./cd/before-deploy.sh"
-- "./cd/deploy.sh"
+- ./cd/before-deploy.sh
+- ./cd/deploy.sh
+
 env:
   global:
   - secure: eizdd/hlxl+Oz1y0jvjgGxpUZtSlbYIP2M3tkzLMdpTdVzjW1jCY89W94UtVhaHEX9s6d1MGsuEND/UuMy+rr4k7sBKtzC1ieUNEPtxFMZl/hzfQKc16QDyQUnEJ6dydm+7FTwYmNnsaD5wIfvQnt5CgaNQXhajtlQarltzvUotEcYc6FE0BF0no4KSDODc/MFChGlCpJ3NDIMHFEn+pgQHu/gbUzlbmFjlq0j151mms3N2R9vKNAT7zRj70W+TAiwv18+Mh8TV1usDItDLEAxXbE3zGQGRX32BQSv6lCwnLelnroOM9FLDsaDaOI3u2JKPaC/DYNBZaihq0kD5KBx0iFpsg9WP2quZetMiwWfQ0KkHDudTAdqxEKmbvOLWfjFYi5hMMhjnLRVVKlDfeKeGI6T+xtr4ub36GuiRZ2gp4N396Q0QBCmh83MMdEuDIvuFBMD00tm0o3s9L441fvl9BFpJIosEKrBib3iPFJEi0IP2QpoeOULRgVI2qJvn5bMu2IHjuB2OlivOLlfpaQkCjI6+1CPOb+2lMt425qqroLtuE7+Ax2Hto0ejETRGSAxNT/prDIiXEGqfjfPRQUmCx+CwYdh21/MfKkgEKuRJwe932VMNKOlsbF3UF3S/llgCRMQbVju7ewpeRAlorTlr64xdYOUgw66OyJTncxVk=

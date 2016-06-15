@@ -11,8 +11,8 @@ before_install:
 install: ./gradlew --daemon assemble --info
 
 before_script:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
   - sleep 3 # give xvfb some time to start
 
 script: ./gradlew --daemon check --info
@@ -20,6 +20,7 @@ script: ./gradlew --daemon check --info
 cache:
   directories:
   - "$HOME/.gradle"
+  
 after_success:
 - ./cd/before-deploy.sh
 - ./cd/deploy.sh

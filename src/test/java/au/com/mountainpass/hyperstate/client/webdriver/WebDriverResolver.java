@@ -318,9 +318,10 @@ public class WebDriverResolver implements Resolver {
             private void waitTillLoaded(long timeoutInSeconds) {
                 (new WebDriverWait(webDriver, timeoutInSeconds))
                         .until(ExpectedConditions.invisibilityOfElementLocated(
-                                By.className("loading")));
-                (new WebDriverWait(webDriver, 1)).until(ExpectedConditions
-                        .invisibilityOfElementLocated(By.className("loading")));
+                                By.id("loading")));
+                (new WebDriverWait(webDriver, timeoutInSeconds))
+                        .until(ExpectedConditions
+                                .visibilityOfElementLocated(By.id("loaded")));
             }
 
             private Action<?> getAction(WebDriverResolver resolver,

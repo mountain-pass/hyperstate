@@ -1,6 +1,7 @@
 package au.com.mountainpass.hyperstate.client.webdriver;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ public class WebDriverTestConfiguration {
             throws ClassNotFoundException, NoSuchMethodException,
             SecurityException, InstantiationException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
-        return webDriverFactory.createWebDriver();
+        WebDriver driver = webDriverFactory.createWebDriver();
+        driver.manage().timeouts().setScriptTimeout(15, TimeUnit.SECONDS);
+        return driver;
     }
 }

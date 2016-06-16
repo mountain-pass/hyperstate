@@ -2,6 +2,13 @@
 
 set -e
 
+CD_DIR=`dirname $0`
+PROP_FILE=$CD_DIR/../gradle.properties
+
 if [ "$TRAVIS_BRANCH" = 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
-    ./gradlew --daemon uploadArchives "-Psigning.keyId=$GPG_KEY_ID" "-Psigning.password=$GPG_PASS" "-Psigning.secretKeyRingFile=cd/codesigning.gpg" --info
+    echo "signing.keyId=$GPG_KEY_ID" >> $PROP_FILE
+    echo "signing.password=$GPG_PASS" >> $PROP_FILE
+    echo "signing.secretKeyRingFile=$CD_DIR/codesigning.gpg" >> $PROP_FILE
+    ls ~/.gnupg/
+    ./gradlew --daemon uploadArchives --info
 fi

@@ -14,29 +14,23 @@ buildscript {
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.11.3'
+        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
     }
 }
 
 plugins { id "io.spring.dependency-management" version "0.5.4.RELEASE" }
 
 ext{
-    if (!hasProperty('ossrhUsername')) {
-        ossrhUsername = ''
-    }
-    if (!hasProperty('ossrhPassword')) {
-        ossrhPassword = ''
-    }
-
     qaReportsDir = file("${buildDir}/qaReports")
 
     // TODO: Increase these, but needs to be set per subproject
     limits = [
-        'instruction': 0,
-        'branch'     : 0,
-        'line'       : 0,
-        'complexity' : 0,
-        'method'     : 0,
-        'class'      : 0
+        'instruction': 40.23,
+        'branch'     : 23.76,
+        'line'       : 41.65,
+        'complexity' : 37.5,
+        'method'     : 47.44,
+        'class'      : 67.86
     ]
 }
 
@@ -51,6 +45,7 @@ apply plugin: 'announce'
 apply plugin: 'com.github.ben-manes.versions'
 apply plugin: 'maven'
 apply plugin: 'signing'
+apply plugin: 'io.codearte.nexus-staging'
 apply plugin: 'jacoco'
 //apply plugin: 'findbugs'
 //apply plugin: 'pmd'
@@ -312,7 +307,7 @@ artifacts {
 }
 
 signing { 
-    required { gradle.taskGraph.hasTask("uploadArchives") }
+    required { gradle.taskGraph.hasTask(":uploadArchives") }
     sign configurations.archives
 }
 
@@ -356,11 +351,11 @@ uploadArchives {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
             repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
+                authentication(userName: hasProperty('ossrhUsername') ? getProperty('ossrhUsername') : '', password: hasProperty('ossrhPassword') ? getProperty('ossrhPassword') : '')
             }
 
             snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
+                authentication(userName: hasProperty('ossrhUsername') ? getProperty('ossrhUsername') : '', password: hasProperty('ossrhPassword') ? getProperty('ossrhPassword') : '')
             }
 
             pom.project {
@@ -393,6 +388,11 @@ uploadArchives {
             }
         }
     }
+}
+
+nexusStaging {
+    username = hasProperty('ossrhUsername') ? getProperty('ossrhUsername') : ''
+    password = hasProperty('ossrhPassword') ? getProperty('ossrhPassword') : ''
 }
 
 bootRepackage {

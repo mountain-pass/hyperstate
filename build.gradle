@@ -142,7 +142,7 @@ eclipseProject {
     }
 }
 
-task wrapper(type: Wrapper) { gradleVersion = '2.9' }
+task wrapper(type: Wrapper) { gradleVersion = '2.10' }
 
 
 

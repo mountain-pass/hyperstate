@@ -32,6 +32,8 @@ after_success:
 - chmod +x ./cd/before-deploy.sh
 - chmod +x ./cd/deploy.sh
 - "./cd/before-deploy.sh"
+- ./gradlew --daemon jar javadocJar qaReportsJar sourcesJar
+- jdk_switcher use oraclejdk7
 - "./cd/deploy.sh"
 
 env:

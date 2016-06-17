@@ -9,7 +9,7 @@ if [ "$TRAVIS_BRANCH" = 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; the
     echo "signing.keyId=$GPG_KEY_ID" >> $PROP_FILE
     echo "signing.password=$GPG_PASS" >> $PROP_FILE
     echo "signing.secretKeyRingFile=cd/codesigning.gpg" >> $PROP_FILE
-    ./gradlew --daemon assemble
+    ./gradlew --daemon jar javadocJar qaReportsJar sourcesJar
     jdk_switcher use oraclejdk7
     ./gradlew uploadArchives --stacktrace
 fi

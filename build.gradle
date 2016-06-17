@@ -304,12 +304,12 @@ task qaReportsJar(type: Jar, dependsOn : check) {
 }
 
 artifacts { 
-    archives javadocJar, sourcesJar, qaReportsJar
+    archives jar, javadocJar, sourcesJar, qaReportsJar
 }
 
 signing { 
     required { gradle.taskGraph.hasTask(":uploadArchives") }
-    sign configurations.archives
+    sign jar, javadocJar, sourcesJar, qaReportsJar
 }
 
 task getNextVersion << {

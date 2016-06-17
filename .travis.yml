@@ -10,6 +10,7 @@ before_install:
 - sleep 3
 
 install:
+- java -Xmx32m -version
 - "./gradlew --daemon --info compileJava compileTestJava"
 
 before_cache:
@@ -32,17 +33,7 @@ after_success:
 - chmod +x ./cd/before-deploy.sh
 - chmod +x ./cd/deploy.sh
 - "./cd/before-deploy.sh"
-- ./gradlew --daemon jar
-- ./gradlew --daemon jar
-- ./gradlew --daemon javadoc
-- ./gradlew --daemon javadoc
-- ./gradlew --daemon javadocJar
-- ./gradlew --daemon javadocJar
-- ./gradlew --daemon qaReportsJar
-- ./gradlew --daemon qaReportsJar
-- ./gradlew --daemon sourcesJar
-- ./gradlew --daemon sourcesJar
-- jdk_switcher use oraclejdk7
+- ./gradlew --daemon assemble
 - "./cd/deploy.sh"
 
 env:

@@ -29,7 +29,6 @@ import au.com.mountainpass.hyperstate.core.Relationship;
 import au.com.mountainpass.hyperstate.core.Resolver;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.VanillaEntity;
-import au.com.mountainpass.hyperstate.server.HyperstateController;
 import au.com.mountainpass.hyperstate.server.config.HyperstateTestConfiguration;
 import au.com.mountainpass.hyperstate.server.entities.Account;
 import au.com.mountainpass.hyperstate.server.entities.AccountProperties;
@@ -181,7 +180,7 @@ public class StepDefs {
 
     @Given("^it is exposed at \"([^\"]*)\"$")
     public void it_is_exposed_at(String path) throws Throwable {
-        currentAccountBuilder.build(path);
+        currentAccountBuilder.build(path).get();
     }
 
     @When("^request is made to \"([^\"]*)\"$")

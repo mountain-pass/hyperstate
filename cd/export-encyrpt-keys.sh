@@ -2,9 +2,10 @@
 
 cd cd
 
-gpg2 --export --armor tom@windyroad.com.au > codesigning.asc
-gpg2 --export-secret-keys --armor tom@windyroad.com.au >> codesigning.asc
+FILE=codesigning.gpg
 
-travis encrypt-file codesigning.asc; 
+gpg2 --export-secret-key 46B22432 > $FILE
 
-rm codesigning.asc 
+travis encrypt-file $FILE 
+
+rm $FILE

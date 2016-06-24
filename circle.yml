@@ -14,9 +14,8 @@ dependencies:
 
 test:
   override:
-    - ./gradlew unitTest
-    - ./gradlew integrationTest
-    - ./gradlew uiIntegrationTest --debug
+    - case $CIRCLE_NODE_INDEX in 0) ./gradlew unitTest ;; 1) ./gradlew integrationTest ;; 2) ./gradlew uiIntegrationTest --debug ;; esac:
+        parallel: true
   post:
     - ./gradlew jacocoTestReport
 

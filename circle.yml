@@ -7,6 +7,7 @@ machine:
 dependencies: 
   override:
     - ./gradlew wrapper
+    - ./gradlew dependencies
   cache_directories:
     - "~/.gradle/caches/"
     - "~/.gradle/wrapper/"

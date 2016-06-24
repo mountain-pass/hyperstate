@@ -1,0 +1,26 @@
+machine:
+  timezone:
+    Australia/Sydney
+  java:
+    version: oraclejdk8
+    
+dependencies: 
+  override:
+    - ./gradlew wrapper
+  cache_directories:
+    - "~/.gradle/caches/"
+    - "~/.gradle/wrapper/"
+
+test:
+  override:
+    - ./gradlew unitTest
+    - ./gradlew integrationTest
+    - ./gradlew uiIntegrationTest
+  post:
+    - ./gradlew jacocoTestReport
+
+deployment:
+  production:
+    branch: master
+    commands:
+      - ./cd/deploy.sh

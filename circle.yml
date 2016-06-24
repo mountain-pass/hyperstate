@@ -16,7 +16,7 @@ test:
   override:
     - ./gradlew unitTest
     - ./gradlew integrationTest
-    - ./gradlew uiIntegrationTest
+    - ./gradlew uiIntegrationTest --debug
   post:
     - ./gradlew jacocoTestReport
 

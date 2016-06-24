@@ -25,3 +25,8 @@ deployment:
     branch: master
     commands:
       - ./cd/deploy.sh
+
+      
+general:
+  artifacts:
+    - "build/test-results" 

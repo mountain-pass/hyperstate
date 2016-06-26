@@ -1,5 +1,5 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/au.com.mountain-pass/hyperstate/badge.svg)](https://maven-badges.herokuapp.com/maven-central/au.com.mountain-pass/hyperstate)
-[![Build Status](https://circleci.com/gh/mountain-pass/hyperstate.svg?style=svg)](https://circleci.com/gh/mountain-pass/hyperstate)
+[![Build Status](https://snap-ci.com/mountain-pass/hyperstate/branch/master/build_image)](https://snap-ci.com/mountain-pass/hyperstate/branch/master)
 
 # hyperstate
 A Hypermedia as the Engine of Application State (HATEOAS) library

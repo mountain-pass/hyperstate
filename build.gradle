@@ -182,7 +182,7 @@ task unitTest(type: Test) {
 }
 
 
-task integrationTest(type: Test, dependsOn : unitTest) {
+task integrationTest(type: Test) {
     testClassesDir = sourceSets.test.output.classesDir
     classpath = sourceSets.test.runtimeClasspath
     ext.outputDir = "${buildDir}/test-results"
@@ -198,7 +198,7 @@ task integrationTest(type: Test, dependsOn : unitTest) {
     systemProperty 'spring.profiles.active', 'integration'
 }
 
-task uiIntegrationTest(type: Test, dependsOn : integrationTest) {
+task uiIntegrationTest(type: Test) {
     testClassesDir = sourceSets.test.output.classesDir
     classpath = sourceSets.test.runtimeClasspath
     ext.outputDir = "${buildDir}/test-results"

@@ -33,8 +33,10 @@ ext{
         'complexity' : 37.5,
         'method'     : 47.44,
         'class'      : 67.86
-    ]
+    ]    
 }
+
+
 
 
 
@@ -355,11 +357,11 @@ uploadArchives {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
             repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
-                authentication(userName: hasProperty('ossrhUsername') ? getProperty('ossrhUsername') : '', password: hasProperty('ossrhPassword') ? getProperty('ossrhPassword') : '')
+                authentication(userName: project.hasProperty('ossrhUsername') ? project.getProperty('ossrhUsername') : '', password: project.hasProperty('ossrhPassword') ? project.getProperty('ossrhPassword') : '')
             }
 
             snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
-                authentication(userName: hasProperty('ossrhUsername') ? getProperty('ossrhUsername') : '', password: hasProperty('ossrhPassword') ? getProperty('ossrhPassword') : '')
+                authentication(userName: project.hasProperty('ossrhUsername') ? project.getProperty('ossrhUsername') : '', password: project.hasProperty('ossrhPassword') ? project.getProperty('ossrhPassword') : '')
             }
 
             pom.project {
@@ -395,8 +397,8 @@ uploadArchives {
 }
 
 nexusStaging {
-    username = hasProperty('ossrhUsername') ? getProperty('ossrhUsername') : ''
-    password = hasProperty('ossrhPassword') ? getProperty('ossrhPassword') : ''
+    username = project.hasProperty('ossrhUsername') ? project.getProperty('ossrhUsername') : ''
+    password = project.hasProperty('ossrhPassword') ? project.getProperty('ossrhPassword') : ''
 }
 
 bootRepackage {

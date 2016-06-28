@@ -14,7 +14,7 @@ buildscript {
     dependencies {
         classpath 'org.bouncycastle:bcpkix-jdk15on:1.54'
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.11.3'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.12.0'
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
         classpath 'org.standardout:gradle-versioneye-plugin:1.4.0'
     }

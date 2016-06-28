@@ -12,7 +12,7 @@ buildscript {
         maven { url "https://repo.spring.io/snapshot" }
     }
     dependencies {
-        classpath 'org.bouncycastle:bcpkix-jdk15on:1.52'
+        classpath 'org.bouncycastle:bcpkix-jdk15on:1.54'
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.11.3'
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
@@ -86,7 +86,7 @@ repositories {
 configurations { providedRuntime }
 
 dependencies {
-    compile 'org.bouncycastle:bcpkix-jdk15on:1.52'
+    compile 'org.bouncycastle:bcpkix-jdk15on:1.54'
 
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-actuator")

@@ -3,6 +3,7 @@
 [![Build Status](https://snap-ci.com/mountain-pass/hyperstate/branch/master/build_image)](https://snap-ci.com/mountain-pass/hyperstate/branch/master)
 [![Dependency Status](https://www.versioneye.com/user/projects/57722af8143be6003a072886/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/57722af8143be6003a072886)
 [![codecov](https://codecov.io/gh/mountain-pass/hyperstate/branch/master/graph/badge.svg)](https://codecov.io/gh/mountain-pass/hyperstate)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/90f8809f309e497c91e9a48cbcb4078b)](https://www.codacy.com/app/mountain-pass/hyperstate?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mountain-pass/hyperstate&amp;utm_campaign=Badge_Grade)
 
 # hyperstate
 A Hypermedia as the Engine of Application State (HATEOAS) library

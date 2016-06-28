@@ -16,6 +16,7 @@ buildscript {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.11.3'
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
+        classpath 'org.standardout:gradle-versioneye-plugin:1.4.0'
     }
 }
 
@@ -34,6 +35,8 @@ ext{
         'method'     : 47.44,
         'class'      : 67.86
     ]    
+    
+    
 }
 
 
@@ -54,6 +57,7 @@ apply plugin: 'jacoco'
 apply plugin: 'findbugs'
 //apply plugin: 'pmd'
 //apply plugin: 'jdepend'
+apply plugin: 'org.standardout.versioneye'
 
 group = "au.com.mountain-pass"
 archivesBaseName = "hyperstate"

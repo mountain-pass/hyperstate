@@ -1,6 +1,7 @@
 [![Stories in Ready](https://badge.waffle.io/mountain-pass/hyperstate.png?label=ready&title=Ready)](https://waffle.io/mountain-pass/hyperstate)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/au.com.mountain-pass/hyperstate/badge.svg)](https://maven-badges.herokuapp.com/maven-central/au.com.mountain-pass/hyperstate)
-[![Build Status](https://travis-ci.org/mountain-pass/hyperstate.svg?branch=master)](https://travis-ci.org/mountain-pass/hyperstate)
+[![Build Status](https://snap-ci.com/mountain-pass/hyperstate/branch/master/build_image)](https://snap-ci.com/mountain-pass/hyperstate/branch/master)
+[![Dependency Status](https://www.versioneye.com/user/projects/57722af8143be6003a072886/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/57722af8143be6003a072886)
 
 # hyperstate
 A Hypermedia as the Engine of Application State (HATEOAS) library

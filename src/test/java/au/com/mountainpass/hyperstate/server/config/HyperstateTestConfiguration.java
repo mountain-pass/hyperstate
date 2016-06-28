@@ -86,6 +86,19 @@ import au.com.mountainpass.hyperstate.client.SpringBeanHandlerInstantiator;
 public class HyperstateTestConfiguration implements
         ApplicationListener<EmbeddedServletContainerInitializedEvent> {
 
+    private static class CustomTomcatEmbeddedServletContainerFactory
+            extends TomcatEmbeddedServletContainerFactory {
+
+        public CustomTomcatEmbeddedServletContainerFactory() {
+        }
+
+        @Override
+        protected TomcatEmbeddedServletContainer getTomcatEmbeddedServletContainer(
+                Tomcat tomcat) {
+            return super.getTomcatEmbeddedServletContainer(tomcat);
+        }
+    }
+
     @Value("${au.com.mountainpass.hyperstate.test.proxy.max.connections.total:100}")
     private int proxyMaxConnectionsTotal;
 
@@ -257,14 +270,7 @@ public class HyperstateTestConfiguration implements
     public TomcatEmbeddedServletContainerFactory tomcatFactory()
             throws Exception {
         hyperstateTestKeyStoreManager();
-        return new TomcatEmbeddedServletContainerFactory() {
-
-            @Override
-            protected TomcatEmbeddedServletContainer getTomcatEmbeddedServletContainer(
-                    Tomcat tomcat) {
-                return super.getTomcatEmbeddedServletContainer(tomcat);
-            }
-        };
+        return new CustomTomcatEmbeddedServletContainerFactory();
     }
 
     @Bean

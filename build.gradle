@@ -23,7 +23,7 @@ plugins { id "io.spring.dependency-management" version "0.5.4.RELEASE" }
 
 
 ext{
-    qaReportsDir = file("${buildDir}/qaReports")
+    qaReportsDir = file("${buildDir}/test-results")
 
     // TODO: Increase these, but needs to be set per subproject
     limits = [
@@ -51,7 +51,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 apply plugin: 'io.codearte.nexus-staging'
 apply plugin: 'jacoco'
-//apply plugin: 'findbugs'
+apply plugin: 'findbugs'
 //apply plugin: 'pmd'
 //apply plugin: 'jdepend'
 
@@ -128,7 +128,6 @@ dependencies {
 eclipse {
     classpath {
         containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
-        containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7'
     }
 }
 
@@ -407,6 +406,23 @@ bootRepackage {
     enabled = false
 }
 
+findbugs {
+  ignoreFailures = true
+  toolVersion = "3.0.1"
+  sourceSets = [sourceSets.main]
+  reportsDir = file("$qaReportsDir/findbugs")
+  effort = "max"
+  reportLevel = "low"
+}
+
+
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled false
+        html.enabled true
+        //html.stylesheet resources.text.fromFile('config/xsl/findbugs-custom.xsl')
+    }
+}
 
 gradle.taskGraph.afterTask { Task task, TaskState state ->
     if (state.failure) {

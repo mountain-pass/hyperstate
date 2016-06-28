@@ -302,7 +302,7 @@ public class HyperstateTestConfiguration implements
                 .setConnectionManager(connectionManager)
                 .setDefaultRequestConfig(config)
                 .setSSLSocketFactory(sslSocketFactory())
-                .setSslcontext(sslContext()).disableRedirectHandling();
+                .setSSLContext(sslContext()).disableRedirectHandling();
     }
 
     // @Bean

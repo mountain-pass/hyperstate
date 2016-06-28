@@ -97,6 +97,7 @@ public class RestTemplateResolver implements Resolver {
                 .accept(MediaTypes.SIREN_JSON)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(body);
 
+        @SuppressWarnings("rawtypes")
         ListenableFuture<ResponseEntity<EntityWrapper>> responseFuture = restTemplate
                 .exchange(link.getAddress(), HttpMethod.GET, request,
                         EntityWrapper.class);

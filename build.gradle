@@ -102,8 +102,8 @@ dependencies {
     compile('commons-codec:commons-codec:1.10')
     compile 'org.apache.commons:commons-lang3:3.4'
 
-    compile("org.webjars:bootstrap:3.3.6")
-    compile("org.webjars:jquery:2.1.1")
+    compile("org.webjars:bootstrap:3.3.6") // when updating, don't forget to update index.html
+    compile("org.webjars:jquery:3.0.0") // when updating, don't forget to update index.html
     compile 'org.webjars.bower:angularjs:1.5.7' // when updating, don't forget to update index.html
 
 

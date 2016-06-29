@@ -98,8 +98,8 @@ dependencies {
     compile("org.eclipse.jdt:org.eclipse.jdt.annotation:2.0.0")
     compile('com.google.guava:guava:19.0')
 
-    compile("com.fasterxml.jackson.core:jackson-core")
-    compile('com.fasterxml.jackson.core:jackson-annotations')
+    compile("com.fasterxml.jackson.core:jackson-core:2.7.5")
+    compile('com.fasterxml.jackson.core:jackson-annotations:2.7.5')
 
     compile('org.apache.httpcomponents:httpasyncclient')
     compile('commons-codec:commons-codec:1.10')

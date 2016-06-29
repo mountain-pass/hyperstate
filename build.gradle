@@ -89,12 +89,9 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-actuator")
     compile("org.springframework.boot:spring-boot-starter-aop")
-    compile("org.springframework:spring-aop")
-    compile("org.aspectj:aspectjweaver")
-
-
-    compile 'org.springframework.hateoas:spring-hateoas'
+    compile("org.springframework.boot:spring-boot-starter-hateoas")
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
+
     compile("org.eclipse.jdt:org.eclipse.jdt.annotation:2.0.0")
     compile('com.google.guava:guava:19.0')
 
@@ -117,8 +114,6 @@ dependencies {
 
     testCompile 'org.seleniumhq.selenium:selenium-java:2.53.0'
 
-    // so we can generate self signed certs
-    testCompile 'org.bouncycastle:bcpkix-jdk15on:1.53'
 
     //compile('org.flywaydb:flyway-core')
     testCompile("com.h2database:h2:1.4.192")

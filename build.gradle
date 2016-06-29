@@ -115,7 +115,7 @@ dependencies {
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile "info.cukes:cucumber-java:1.2.4","info.cukes:cucumber-junit:1.2.4","info.cukes:cucumber-spring:1.2.4"
 
-    testCompile 'org.seleniumhq.selenium:selenium-java:2.48.2'
+    testCompile 'org.seleniumhq.selenium:selenium-java:2.53.0'
 
     // so we can generate self signed certs
     testCompile 'org.bouncycastle:bcpkix-jdk15on:1.53'

@@ -96,7 +96,7 @@ dependencies {
     compile 'org.springframework.hateoas:spring-hateoas'
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile("org.eclipse.jdt:org.eclipse.jdt.annotation:2.0.0")
-    compile('com.google.guava:guava:18.0')
+    compile('com.google.guava:guava:19.0')
 
     compile("com.fasterxml.jackson.core:jackson-core")
     compile('com.fasterxml.jackson.core:jackson-annotations')

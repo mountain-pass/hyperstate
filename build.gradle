@@ -101,7 +101,7 @@ dependencies {
     compile("com.fasterxml.jackson.core:jackson-core:2.7.5")
     compile('com.fasterxml.jackson.core:jackson-annotations:2.7.5')
 
-    compile('org.apache.httpcomponents:httpasyncclient')
+    compile('org.apache.httpcomponents:httpasyncclient:4.1.2')
     compile('commons-codec:commons-codec:1.10')
 
     compile("org.webjars:bootstrap:3.2.0")

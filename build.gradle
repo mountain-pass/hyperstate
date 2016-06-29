@@ -16,6 +16,7 @@ buildscript {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
         classpath 'org.standardout:gradle-versioneye-plugin:1.4.0'
+        
     }
 }
 
@@ -77,11 +78,15 @@ repositories {
     mavenCentral()
     maven { url "https://repo.spring.io/milestone" }
     maven { url "https://repo.spring.io/snapshot" }
+    maven { url "http://dl.bintray.com/typesafe/maven-releases" }
 
 }
 
 
-configurations { providedRuntime }
+configurations {
+    providedRuntime
+    codacy
+}
 
 dependencies {
     compile 'org.bouncycastle:bcpkix-jdk15on:1.54'
@@ -119,6 +124,8 @@ dependencies {
     testCompile("com.h2database:h2:1.4.192")
 
 
+    codacy group: 'com.codacy', name: 'codacy-coverage-reporter', version: '1.0.7'
+    //codacy group: 'com.typesafe.netty', name: 'netty-http-pipelining', version: '1.1.4' // needed for codacy
 }
 
 
@@ -418,6 +425,35 @@ tasks.withType(FindBugs) {
         xml.enabled false
         html.enabled true
         //html.stylesheet resources.text.fromFile('config/xsl/findbugs-custom.xsl')
+    }
+}
+
+task uploadCoverageToCodacy(type: JavaExec, dependsOn : jacocoTestReport) {
+   main = "com.codacy.CodacyCoverageReporter"
+   classpath = configurations.codacy
+   args = [
+            "-l",
+            "Java",
+            "-r",
+            "${buildDir}/test-results/jacoco/${archivesBaseName}.xml"
+           ]
+}
+
+task (codacyDepsize) << {
+def size = 0;
+configurations.codacy.collect { it.length() / (1024 * 1024) }.each { size += it }
+println "Total dependencies size: ${Math.round(size * 100) / 100} Mb"
+
+configurations
+        .codacy
+        .sort { -it.length() }
+        .each { println "${it.name} : ${Math.round(it.length() / (1024) * 100) / 100} kb" }
+}
+
+task (codacyLocs) << {
+    configurations.codacy.each {
+        String jarName = it
+        println jarName
     }
 }
 

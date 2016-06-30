@@ -17,3 +17,11 @@
     - a chart of feature cycle time
 - It might also make sense to take the list of committed features and the list of passing features in the release to
   produce a feature coverage report for documented features vs what's actually been released
+  
+  
+## IDE
+
+- It would make life much easier for devs if we had a gradle task that would open the project in a IDE
+  like eclipse or idea, by downloading the IDE and configureing it accordign to all the quality checks defined in the
+  gradle config. e.g. for eclipse, it would automatically install the checkstyle plugin and configure the formatter
+  accordingly.

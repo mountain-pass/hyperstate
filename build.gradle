@@ -30,7 +30,7 @@ ext{
     limits = [
         'instruction': 40.23,
         'branch'     : 23.76,
-        'line'       : 41.65,
+        'line'       : 40.9,
         'complexity' : 37.5,
         'method'     : 47.44,
         'class'      : 67.86
@@ -53,11 +53,11 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 apply plugin: 'io.codearte.nexus-staging'
 apply plugin: 'jacoco'
+apply plugin: 'org.standardout.versioneye'
 apply plugin: 'findbugs'
 apply plugin: 'checkstyle'
-//apply plugin: 'pmd'
-//apply plugin: 'jdepend'
-apply plugin: 'org.standardout.versioneye'
+apply plugin: 'pmd'
+apply plugin: 'jdepend'
 
 group = "au.com.mountain-pass"
 archivesBaseName = "hyperstate"
@@ -473,17 +473,20 @@ tasks.withType(Checkstyle) {
     }
 }
 
-/*
-task checkstyleReport(dependsOn : checkstyle) {
-    if (file("$qaReportsDir/checkstyle/main.xml").exists()) {
-        ant.xslt(in: "$qaReportsDir/checkstyle/main.xml",
-        style:"${project.projectDir}/config/checkstyle/checkstyle.xsl",
-        out:"$qaReportsDir/checkstyle/main.html")
-    }
+pmd {
+    ruleSets = [
+        "java-basic",
+        "java-braces"
+    ]
+    ignoreFailures=true
+    reportsDir=file("$qaReportsDir/pmd")
 }
 
-check.dependsOn checkstyleReport
-*/     
+jdepend { 
+    ignoreFailures=true 
+    reportsDir=file("$qaReportsDir/jdepend")
+    
+} 
 
 gradle.taskGraph.afterTask { Task task, TaskState state ->
     if (state.failure) {

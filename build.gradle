@@ -16,6 +16,7 @@ buildscript {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
         classpath 'org.standardout:gradle-versioneye-plugin:1.4.0'
+        classpath 'org.ajoberstar:gradle-git:1.5.1-rc.2'
         
     }
 }
@@ -490,6 +491,23 @@ jdepend {
     reportsDir=file("$qaReportsDir/jdepend")
     
 } 
+
+import org.ajoberstar.gradle.git.tasks.GitTag
+import org.ajoberstar.gradle.git.tasks.GitPush
+
+task createTag(type: GitTag) {
+   repoPath = rootDir
+   tagName = "${project.version.toString()}"
+   message = "Application release ${project.version.toString()}"
+}
+
+task pushTag(type: GitPush, dependsOn: createTag) {
+   namesOrSpecs = ["${project.version.toString()}"]
+}
+
+uploadArchives.finalizedBy pushTag
+
+
 
 gradle.taskGraph.afterTask { Task task, TaskState state ->
     if (state.failure) {

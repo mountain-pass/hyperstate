@@ -126,7 +126,10 @@ dependencies {
 
 
     codacy group: 'com.codacy', name: 'codacy-coverage-reporter', version: '1.0.7'
-    //codacy group: 'com.typesafe.netty', name: 'netty-http-pipelining', version: '1.1.4' // needed for codacy
+    
+    checkstyle 'com.puppycrawl.tools:checkstyle:7.0'
+    jdepend 'org.apache.ant:ant-jdepend:1.9.7'
+    pmd 'net.sourceforge.pmd:pmd-java:5.5.0'
 }
 
 

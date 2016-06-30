@@ -5,11 +5,11 @@ import au.com.mountainpass.hyperstate.core.Relationship;
 
 public class CreatedEntity extends LinkedEntity {
 
-  public CreatedEntity(EntityWrapper<?> entity) {
+  public CreatedEntity(final EntityWrapper<?> entity) {
     super(entity.getLink(Relationship.SELF), entity.getLabel(), entity.getNatures());
   }
 
-  public CreatedEntity(Link link) {
+  public CreatedEntity(final Link link) {
     super(link);
   }
 

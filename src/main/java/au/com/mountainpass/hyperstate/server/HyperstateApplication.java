@@ -17,37 +17,35 @@ import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 
 //@Component
 public class HyperstateApplication extends EntityWrapper<Properties> {
-    private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+  @Autowired
+  ApplicationContext context;
 
-    public HyperstateApplication() {
-        super(new Properties());
+  private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+
+  @Autowired
+  EntityRepository repository;
+
+  public HyperstateApplication() {
+    super(new Properties());
+  }
+
+  @Autowired
+  public HyperstateApplication(final EntityRepository repository) {
+    super("/", System.getProperties(), "Hyperstate Application");
+    LOGGER.debug(this.getLink(Relationship.SELF).getNatures().toString());
+  }
+
+  public CompletableFuture<CreatedEntity> addApplication(final String name, final String className)
+      throws BeansException, IllegalStateException, ClassNotFoundException {
+    final Class<?> type = Class.forName(className);
+    if (EntityWrapper.class.isAssignableFrom(type)) {
+      final EntityWrapper<?> entity = (EntityWrapper<?>) context.getAutowireCapableBeanFactory()
+          .createBean(type);
+      return repository.save(entity).thenApply(e -> new CreatedEntity(e));
+    } else {
+      throw new NotImplementedException("TODO: bad request - " + className
+          + " is not an instance of " + EntityWrapper.class.getCanonicalName());
     }
-
-    @Autowired
-    ApplicationContext context;
-
-    @Autowired
-    EntityRepository repository;
-
-    @Autowired
-    public HyperstateApplication(EntityRepository repository) {
-        super("/", System.getProperties(), "Hyperstate Application");
-        LOGGER.debug(this.getLink(Relationship.SELF).getNatures().toString());
-    }
-
-    public CompletableFuture<CreatedEntity> addApplication(String name,
-            String className) throws BeansException, IllegalStateException,
-                    ClassNotFoundException {
-        Class<?> type = Class.forName(className);
-        if (EntityWrapper.class.isAssignableFrom(type)) {
-            EntityWrapper<?> entity = (EntityWrapper<?>) context
-                    .getAutowireCapableBeanFactory().createBean(type);
-            return repository.save(entity).thenApply(e -> new CreatedEntity(e));
-        } else {
-            throw new NotImplementedException("TODO: bad request - " + className
-                    + " is not an instance of "
-                    + EntityWrapper.class.getCanonicalName());
-        }
-    }
+  }
 
 }

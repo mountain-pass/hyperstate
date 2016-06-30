@@ -25,21 +25,20 @@ import au.com.mountainpass.hyperstate.core.Resolver;
 @Profile(value = "integration")
 public class HyperstateTestMapper {
 
-    @Autowired
-    RestTemplateResolver restTemplateResolver;
+  @Autowired
+  ApplicationContext context;
 
-    @Autowired
-    ApplicationContext context;
+  @Autowired
+  RestTemplateResolver restTemplateResolver;
 
-    @PostConstruct
-    public void fixOm() {
-        ObjectMapper om = context.getBean(ObjectMapper.class);
-        om.addMixIn(Action.class, ActionMixin.class);
-        om.addMixIn(Link.class, LinkMixin.class);
-        om.addMixIn(EntityRelationship.class, EntityRelationshipMixin.class);
-        om.addMixIn(NavigationalRelationship.class,
-                NavigationalRelationshipMixin.class);
-        om.setInjectableValues(new InjectableValues.Std()
-                .addValue(Resolver.class, restTemplateResolver));
-    }
+  @PostConstruct
+  public void fixOm() {
+    final ObjectMapper om = context.getBean(ObjectMapper.class);
+    om.addMixIn(Action.class, ActionMixin.class);
+    om.addMixIn(Link.class, LinkMixin.class);
+    om.addMixIn(EntityRelationship.class, EntityRelationshipMixin.class);
+    om.addMixIn(NavigationalRelationship.class, NavigationalRelationshipMixin.class);
+    om.setInjectableValues(
+        new InjectableValues.Std().addValue(Resolver.class, restTemplateResolver));
+  }
 }

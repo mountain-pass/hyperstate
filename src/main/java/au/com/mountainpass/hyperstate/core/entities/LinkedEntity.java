@@ -17,68 +17,67 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import au.com.mountainpass.hyperstate.core.Link;
 
 public class LinkedEntity extends Entity {
-    private Link link;
+  private final Link link;
 
-    @Autowired
-    public void setApplicationContext(ApplicationContext context) {
-        AutowiredAnnotationBeanPostProcessor bpp = new AutowiredAnnotationBeanPostProcessor();
-        bpp.setBeanFactory(context.getAutowireCapableBeanFactory());
-        bpp.processInjection(this.link);
-    }
+  public LinkedEntity(final Link link) {
+    this.link = link;
+  }
 
-    public LinkedEntity(Link link) {
-        this.link = link;
-    }
+  public LinkedEntity(final Link link, final String label, final Set<String> natures) {
+    this.link = link;
+    setNatures(natures);
+    setTitle(label);
+  }
 
-    // public LinkedEntity(@JsonProperty("href") URI address,
-    // @JsonProperty("title") String label,
-    // @JsonProperty("class") Set<String> natures) {
-    // this.link = new RestLink(address, natures, label);
-    // setNatures(natures);
-    // setTitle(label);
-    // }
+  // public LinkedEntity(@JsonProperty("href") URI address,
+  // @JsonProperty("title") String label,
+  // @JsonProperty("class") Set<String> natures) {
+  // this.link = new RestLink(address, natures, label);
+  // setNatures(natures);
+  // setTitle(label);
+  // }
 
-    public LinkedEntity(Link link, String label, String... natures) {
-        this.link = link;
-        setNatures(new HashSet<String>(Arrays.asList(natures)));
-        setTitle(label);
-    }
+  public LinkedEntity(final Link link, final String label, final String... natures) {
+    this.link = link;
+    setNatures(new HashSet<String>(Arrays.asList(natures)));
+    setTitle(label);
+  }
 
-    public LinkedEntity(Link link, String label, Set<String> natures) {
-        this.link = link;
-        setNatures(natures);
-        setTitle(label);
-    }
+  @Override
+  @JsonProperty("href")
+  public URI getAddress() {
+    return link.getAddress();
+  }
 
-    @Override
-    public <K, T extends EntityWrapper<K>> T resolve(Class<T> type) {
-        return link.resolve(type);
-    }
+  @JsonIgnore
+  public Link getLink() {
+    return link;
+  }
 
-    @Override
-    public <K, T extends EntityWrapper<K>> T resolve(
-            ParameterizedTypeReference<T> type) {
-        return link.resolve(type);
-    }
+  @Override
+  public <K, T extends EntityWrapper<K>> T reload(final Class<T> type) {
+    throw new NotImplementedException("TODO");
+  }
 
-    @JsonIgnore
-    public Link getLink() {
-        return link;
-    }
+  @Override
+  public <K, T extends EntityWrapper<K>> T resolve(final Class<T> type) {
+    return link.resolve(type);
+  }
 
-    @Override
-    @JsonProperty("href")
-    public URI getAddress() {
-        return link.getAddress();
-    }
+  @Override
+  public <K, T extends EntityWrapper<K>> T resolve(final ParameterizedTypeReference<T> type) {
+    return link.resolve(type);
+  }
 
-    @Override
-    public LinkedEntity toLinkedEntity() {
-        return this;
-    }
+  @Autowired
+  public void setApplicationContext(final ApplicationContext context) {
+    final AutowiredAnnotationBeanPostProcessor bpp = new AutowiredAnnotationBeanPostProcessor();
+    bpp.setBeanFactory(context.getAutowireCapableBeanFactory());
+    bpp.processInjection(this.link);
+  }
 
-    @Override
-    public <K, T extends EntityWrapper<K>> T reload(Class<T> type) {
-        throw new NotImplementedException("TODO");
-    }
+  @Override
+  public LinkedEntity toLinkedEntity() {
+    return this;
+  }
 }

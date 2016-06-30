@@ -18,13 +18,13 @@ public class Account extends EntityWrapper<AccountProperties> {
     super(new AccountProperties());
   }
 
-  protected Account(Account src) {
+  protected Account(final Account src) {
     super(src);
     this.context = src.context;
     this.repository = src.repository;
   }
 
-  public Account(String path, AccountProperties properties, String title) {
+  public Account(final String path, final AccountProperties properties, final String title) {
     super(path, properties, title, "Account");
   }
 

@@ -17,39 +17,39 @@ import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 @Component
 public class RepositoryResolver implements Resolver {
 
-    @Autowired
-    EntityRepository repository;
+  @Autowired
+  EntityRepository repository;
 
-    @Override
-    public CompletableFuture<CreatedEntity> create(Link link,
-            Map<String, Object> filteredParameters) {
-        throw new NotImplementedException("todo");
-    }
+  @Override
+  public CompletableFuture<CreatedEntity> create(final Link link,
+      final Map<String, Object> filteredParameters) {
+    throw new NotImplementedException("todo");
+  }
 
-    @Override
-    public CompletableFuture<Void> delete(Link link,
-            Map<String, Object> filteredParameters) {
-        throw new NotImplementedException("todo");
+  @Override
+  public CompletableFuture<Void> delete(final Link link,
+      final Map<String, Object> filteredParameters) {
+    throw new NotImplementedException("todo");
 
-    }
+  }
 
-    @Override
-    public CompletableFuture<EntityWrapper<?>> get(Link link,
-            Map<String, Object> filteredParameters) {
-        throw new NotImplementedException("todo");
-    }
+  @Override
+  public CompletableFuture<EntityWrapper<?>> get(final Link link,
+      final Map<String, Object> filteredParameters) {
+    throw new NotImplementedException("todo");
+  }
 
-    @Override
-    public CompletableFuture<UpdatedEntity> update(Link link,
-            Map<String, Object> filteredParameters) {
-        throw new NotImplementedException("todo");
-    }
+  @Override
+  public <E extends EntityWrapper<?>> CompletableFuture<E> get(final String path,
+      final Class<E> type) {
 
-    @Override
-    public <E extends EntityWrapper<?>> CompletableFuture<E> get(String path,
-            Class<E> type) {
+    return repository.findOne(path, type);
+  }
 
-        return repository.findOne(path, type);
-    }
+  @Override
+  public CompletableFuture<UpdatedEntity> update(final Link link,
+      final Map<String, Object> filteredParameters) {
+    throw new NotImplementedException("todo");
+  }
 
 }

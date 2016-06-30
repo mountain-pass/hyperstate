@@ -17,22 +17,10 @@ public class EntityRelationship extends Relationship {
   protected EntityRelationship() {
   }
 
-  public EntityRelationship(Entity entity, String... natures) {
+  public EntityRelationship(final Entity entity, final String... natures) {
     super(natures);
     this.entity = entity;
   }
-
-  @Autowired
-  public void setApplicationContext(ApplicationContext context) {
-    AutowiredAnnotationBeanPostProcessor bpp = new AutowiredAnnotationBeanPostProcessor();
-    bpp.setBeanFactory(context.getAutowireCapableBeanFactory());
-    bpp.processInjection(this.entity);
-  }
-
-  // public EntityRelationship(Link link, String label, String[] natures) {
-  // super(natures);
-  // this.entity = new LinkedEntity(link, label, null);
-  // }
 
   /**
    * @return the entity
@@ -42,8 +30,20 @@ public class EntityRelationship extends Relationship {
     return entity;
   }
 
+  // public EntityRelationship(Link link, String label, String[] natures) {
+  // super(natures);
+  // this.entity = new LinkedEntity(link, label, null);
+  // }
+
   @JsonUnwrapped
   public LinkedEntity getEntityLink() {
     return entity.toLinkedEntity();
+  }
+
+  @Autowired
+  public void setApplicationContext(final ApplicationContext context) {
+    final AutowiredAnnotationBeanPostProcessor bpp = new AutowiredAnnotationBeanPostProcessor();
+    bpp.setBeanFactory(context.getAutowireCapableBeanFactory());
+    bpp.processInjection(this.entity);
   }
 }

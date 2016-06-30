@@ -20,17 +20,18 @@ public class AutowiringDeserializer extends DelegatingDeserializer {
 
   ApplicationContext context;
 
-  public AutowiringDeserializer(ApplicationContext context, JsonDeserializer<?> delegatee) {
+  public AutowiringDeserializer(final ApplicationContext context,
+      final JsonDeserializer<?> delegatee) {
     super(delegatee);
     this.context = context;
   }
 
   @Override
-  public Object deserialize(JsonParser jp, DeserializationContext ctxt)
+  public Object deserialize(final JsonParser jp, final DeserializationContext ctxt)
       throws IOException, JsonProcessingException {
-    Object result = super.deserialize(jp, ctxt);
+    final Object result = super.deserialize(jp, ctxt);
 
-    AutowiredAnnotationBeanPostProcessor bpp = new AutowiredAnnotationBeanPostProcessor();
+    final AutowiredAnnotationBeanPostProcessor bpp = new AutowiredAnnotationBeanPostProcessor();
     bpp.setBeanFactory(context.getAutowireCapableBeanFactory());
     bpp.processInjection(result);
 
@@ -38,7 +39,7 @@ public class AutowiringDeserializer extends DelegatingDeserializer {
   }
 
   @Override
-  protected JsonDeserializer<?> newDelegatingInstance(JsonDeserializer<?> newDelegatee) {
+  protected JsonDeserializer<?> newDelegatingInstance(final JsonDeserializer<?> newDelegatee) {
     return this;
   }
 

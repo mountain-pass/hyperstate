@@ -10,75 +10,75 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class Parameter {
 
-    protected Parameter() {
-    }
+  private String identifier;
 
-    public Parameter(@JsonProperty("name") String identifier) {
-        this.identifier = identifier;
-        this.type = "text";
-    }
+  @Nullable
+  private String label;
 
-    public Parameter(String identifier, String type, String value) {
-        this(identifier);
-        this.type = type == null ? "text" : type;
-        this.value = value;
-    }
+  private final String[] natures = {};
 
-    public Parameter(String identifier, String type, String value,
-            String label) {
-        this(identifier, type, value);
-        this.label = label;
-    }
+  private String type;
 
-    private String identifier;
+  @Nullable
+  private String value;
 
-    private String[] natures = {};
+  protected Parameter() {
+  }
 
-    private String type;
+  public Parameter(@JsonProperty("name") final String identifier) {
+    this.identifier = identifier;
+    this.type = "text";
+  }
 
-    @Nullable
-    private String value;
+  public Parameter(final String identifier, final String type, final String value) {
+    this(identifier);
+    this.type = type == null ? "text" : type;
+    this.value = value;
+  }
 
-    @Nullable
-    private String label;
+  public Parameter(final String identifier, final String type, final String value,
+      final String label) {
+    this(identifier, type, value);
+    this.label = label;
+  }
 
-    /**
-     * @return the identifier
-     */
-    @JsonProperty("name")
-    public String getIdentifier() {
-        return identifier;
-    }
+  /**
+   * @return the identifier
+   */
+  @JsonProperty("name")
+  public String getIdentifier() {
+    return identifier;
+  }
 
-    /**
-     * @return the natures
-     */
-    @JsonProperty("class")
-    public String[] getNatures() {
-        return natures;
-    }
+  /**
+   * @return the label
+   */
+  @JsonProperty("title")
+  public String getLabel() {
+    return label;
+  }
 
-    /**
-     * @return the type
-     */
-    @JsonProperty("type")
-    public String getType() {
-        return type;
-    }
+  /**
+   * @return the natures
+   */
+  @JsonProperty("class")
+  public String[] getNatures() {
+    return natures;
+  }
 
-    /**
-     * @return the value
-     */
-    public String getValue() {
-        return value;
-    }
+  /**
+   * @return the type
+   */
+  @JsonProperty("type")
+  public String getType() {
+    return type;
+  }
 
-    /**
-     * @return the label
-     */
-    @JsonProperty("title")
-    public String getLabel() {
-        return label;
-    }
+  /**
+   * @return the value
+   */
+  public String getValue() {
+    return value;
+  }
 
 }

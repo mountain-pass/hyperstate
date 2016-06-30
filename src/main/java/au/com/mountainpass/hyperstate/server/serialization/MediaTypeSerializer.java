@@ -11,21 +11,20 @@ import com.fasterxml.jackson.databind.ser.std.StdScalarSerializer;
 
 public class MediaTypeSerializer extends StdScalarSerializer<MediaType> {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 7394975417633676662L;
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 7394975417633676662L;
 
-    public MediaTypeSerializer() {
-        super(MediaType.class);
-    }
+  public MediaTypeSerializer() {
+    super(MediaType.class);
+  }
 
-    @Override
-    public void serialize(MediaType value, JsonGenerator jgen,
-            SerializerProvider provider)
-                    throws IOException, JsonGenerationException {
-        jgen.writeString(value.toString());
+  @Override
+  public void serialize(final MediaType value, final JsonGenerator jgen,
+      final SerializerProvider provider) throws IOException, JsonGenerationException {
+    jgen.writeString(value.toString());
 
-    }
+  }
 
 }

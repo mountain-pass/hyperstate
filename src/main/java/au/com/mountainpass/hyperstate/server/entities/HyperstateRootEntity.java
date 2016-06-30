@@ -9,15 +9,12 @@ import au.com.mountainpass.hyperstate.server.HyperstateController;
 
 public class HyperstateRootEntity extends VanillaEntity {
 
-    protected HyperstateRootEntity() {
-    }
+  protected HyperstateRootEntity() {
+  }
 
-    public HyperstateRootEntity(ApplicationContext context,
-            Class<? extends HyperstateController> controllerClass) {
-        super(AnnotationUtils
-                .findAnnotation(controllerClass, RequestMapping.class)
-                .value()[0],
-                controllerClass.getSimpleName(),
-                HyperstateRootEntity.class.getSimpleName());
-    }
+  public HyperstateRootEntity(final ApplicationContext context,
+      final Class<? extends HyperstateController> controllerClass) {
+    super(AnnotationUtils.findAnnotation(controllerClass, RequestMapping.class).value()[0],
+        controllerClass.getSimpleName(), HyperstateRootEntity.class.getSimpleName());
+  }
 }

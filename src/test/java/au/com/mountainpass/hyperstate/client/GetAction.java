@@ -13,20 +13,20 @@ import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 
 public class GetAction extends Action<EntityWrapper<?>> {
 
-    public GetAction(Resolver resolver, String identifier, Link link,
-            Parameter[] fields) {
-        super(resolver, identifier, link, fields);
-    }
+  public GetAction(final Resolver resolver, final String identifier, final Link link,
+      final Parameter[] fields) {
+    super(resolver, identifier, link, fields);
+  }
 
-    @Override
-    public CompletableFuture<EntityWrapper<?>> doInvoke(Resolver resolver,
-            Map<String, Object> filteredParameters) {
-        return resolver.get(getLink(), filteredParameters);
-    }
+  @Override
+  public CompletableFuture<EntityWrapper<?>> doInvoke(final Resolver resolver,
+      final Map<String, Object> filteredParameters) {
+    return resolver.get(getLink(), filteredParameters);
+  }
 
-    @Override
-    public HttpMethod getNature() {
-        return HttpMethod.GET;
-    }
+  @Override
+  public HttpMethod getNature() {
+    return HttpMethod.GET;
+  }
 
 }

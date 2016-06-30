@@ -41,10 +41,10 @@ import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 
 public abstract class HyperstateController {
 
-  private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
-
   @Autowired
   private ApplicationContext context;
+
+  private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
   @Autowired
   private EntityRepository repository;
@@ -53,13 +53,41 @@ public abstract class HyperstateController {
 
   }
 
-  protected CompletableFuture<EntityWrapper<?>> getEntity(String identifier) {
-    RequestMapping requestMapping = AnnotationUtils.findAnnotation(this.getClass(),
-        RequestMapping.class);
-    return repository.findOne(identifier);
+  @RequestMapping(value = "**", method = RequestMethod.DELETE, produces = {
+      "application/vnd.siren+json",
+      "application/json" }, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+  @ResponseBody
+  @Async
+  public CompletableFuture<ResponseEntity<?>> delete(final HttpServletRequest request)
+      throws URISyntaxException, NoSuchMethodException, SecurityException, ScriptException,
+      IllegalAccessException, IllegalArgumentException, InvocationTargetException,
+      InterruptedException, ExecutionException {
+    final String url = (String) request
+        .getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+    return getEntity(url).thenApplyAsync(entity -> {
+      if (entity == null) {
+        return ResponseEntity.noContent().build();
+      }
+      final Optional<Action<?>> actionOptional = entity.getActions().stream()
+          .filter(e -> e.getNature().equals(HttpMethod.DELETE)).findAny();
+
+      if (!actionOptional.isPresent()) {
+        deleteEntity(entity);
+      } else {
+        try {
+          final Action<?> action = actionOptional.get();
+          final CompletableFuture<?> invocationResult = action.invoke(new HashMap<>());
+          invocationResult.join();
+        } catch (final Exception e) {
+          LOGGER.error(e.getMessage(), e);
+          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+      }
+      return ResponseEntity.noContent().build();
+    });
   }
 
-  protected CompletableFuture<Void> deleteEntity(EntityWrapper<?> entity) {
+  protected CompletableFuture<Void> deleteEntity(final EntityWrapper<?> entity) {
     return repository.delete(entity);
   }
 
@@ -68,7 +96,7 @@ public abstract class HyperstateController {
   @ResponseBody
   @Async
   public CompletableFuture<ResponseEntity<?>> get(
-      @RequestParam Map<String, Object> allRequestParams, final HttpServletRequest request) {
+      @RequestParam final Map<String, Object> allRequestParams, final HttpServletRequest request) {
     String url = (String) request
         .getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
     if (!allRequestParams.isEmpty()) {
@@ -85,10 +113,27 @@ public abstract class HyperstateController {
     });
   }
 
+  protected CompletableFuture<EntityWrapper<?>> getEntity(final String identifier) {
+    final RequestMapping requestMapping = AnnotationUtils.findAnnotation(this.getClass(),
+        RequestMapping.class);
+    return repository.findOne(identifier);
+  }
+
+  public CompletableFuture<EntityWrapper<?>> getRoot() {
+    return getEntity(getRootPath());
+  }
+
+  private String getRootPath() {
+    final RequestMapping requestMapping = AnnotationUtils.findAnnotation(this.getClass(),
+        RequestMapping.class);
+
+    return requestMapping.value()[0];
+  }
+
   @RequestMapping(value = "**", method = RequestMethod.GET, produces = { "text/html",
       "application/xhtml+xml" })
   public String html(final HttpServletRequest request) {
-    String path = (String) request
+    final String path = (String) request
         .getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
     if ("/index.html".equals(path)) {
       throw new NotImplementedException(
@@ -98,93 +143,65 @@ public abstract class HyperstateController {
     return "/index.html";
   }
 
+  @ExceptionHandler(value = Exception.class)
+  public ResponseEntity<?> onException(final Exception e) {
+    LOGGER.error(e.getLocalizedMessage(), e);
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+  }
+
   @RequestMapping(value = "**", method = RequestMethod.POST, produces = {
       "application/vnd.siren+json",
       "application/json" }, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   @ResponseBody
-  public ResponseEntity<?> post(@RequestParam MultiValueMap<String, Object> allRequestParams,
+  public ResponseEntity<?> post(@RequestParam final MultiValueMap<String, Object> allRequestParams,
       final HttpServletRequest request) throws URISyntaxException, NoSuchMethodException,
           SecurityException, ScriptException, IllegalAccessException, IllegalArgumentException,
           InvocationTargetException, InterruptedException, ExecutionException {
-    String path = (String) request
+    final String path = (String) request
         .getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-    EntityWrapper<?> entity = getEntity(path).get();
+    final EntityWrapper<?> entity = getEntity(path).get();
     if (entity == null) {
       return ResponseEntity.notFound().build();
     }
 
-    Object actionName = allRequestParams.getFirst("action");
+    final Object actionName = allRequestParams.getFirst("action");
     if (actionName == null) {
       // todo add body with classes indicating what is missing
       return ResponseEntity.badRequest().build();
     }
-    Action<?> action = entity.getAction(actionName.toString());
+    final Action<?> action = entity.getAction(actionName.toString());
     if (action == null) {
       // todo add body with classes indicating what is missing
       return ResponseEntity.badRequest().build();
     }
     // todo: post actions should have a link return value
     // todo: automatically treat actions that return links as POST actions
-    Entity result = (Entity) action.invoke(allRequestParams.toSingleValueMap()).get();
+    final Entity result = (Entity) action.invoke(allRequestParams.toSingleValueMap()).get();
     return ResponseEntity.created(result.getAddress()).build();
-  }
-
-  @RequestMapping(value = "**", method = RequestMethod.DELETE, produces = {
-      "application/vnd.siren+json",
-      "application/json" }, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-  @ResponseBody
-  @Async
-  public CompletableFuture<ResponseEntity<?>> delete(final HttpServletRequest request)
-      throws URISyntaxException, NoSuchMethodException, SecurityException, ScriptException,
-      IllegalAccessException, IllegalArgumentException, InvocationTargetException,
-      InterruptedException, ExecutionException {
-    String url = (String) request
-        .getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-    return getEntity(url).thenApplyAsync(entity -> {
-      if (entity == null) {
-        return ResponseEntity.noContent().build();
-      }
-      Optional<Action<?>> actionOptional = entity.getActions().stream()
-          .filter(e -> e.getNature().equals(HttpMethod.DELETE)).findAny();
-
-      if (!actionOptional.isPresent()) {
-        deleteEntity(entity);
-      } else {
-        try {
-          Action<?> action = actionOptional.get();
-          CompletableFuture<?> invocationResult = action.invoke(new HashMap<>());
-          invocationResult.join();
-        } catch (Exception e) {
-          LOGGER.error(e.getMessage(), e);
-          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-      }
-      return ResponseEntity.noContent().build();
-    });
   }
 
   @RequestMapping(value = "**", method = RequestMethod.PUT, produces = {
       "application/vnd.siren+json",
       "application/json" }, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   @ResponseBody
-  public ResponseEntity<?> put(@RequestParam MultiValueMap<String, Object> queryParams,
+  public ResponseEntity<?> put(@RequestParam final MultiValueMap<String, Object> queryParams,
 
   final HttpServletRequest request) throws IllegalAccessException, IllegalArgumentException,
       InvocationTargetException, URISyntaxException, InterruptedException, ExecutionException {
-    String url = (String) request
+    final String url = (String) request
         .getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-    EntityWrapper<?> entity = getEntity(url).get();
+    final EntityWrapper<?> entity = getEntity(url).get();
     if (entity == null) {
       return ResponseEntity.notFound().build();
     }
-    MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+    final MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
     params.putAll(queryParams);
-    String actionName = (String) queryParams.getFirst("action");
+    final String actionName = (String) queryParams.getFirst("action");
     if (actionName == null) {
       // todo add body with classes indicating what is missing
       return ResponseEntity.badRequest().build();
     }
-    au.com.mountainpass.hyperstate.core.Action<?> action = entity.getAction(actionName);
+    final au.com.mountainpass.hyperstate.core.Action<?> action = entity.getAction(actionName);
     if (action == null) {
       // todo add body with classes indicating what is missing
       return ResponseEntity.badRequest().build();
@@ -193,23 +210,6 @@ public abstract class HyperstateController {
     action.invoke(params.toSingleValueMap());
     // todo: automatically treat actions that return void as PUT actions
     return ResponseEntity.noContent().location(entity.getAddress()).build();
-  }
-
-  @ExceptionHandler(value = Exception.class)
-  public ResponseEntity<?> onException(Exception e) {
-    LOGGER.error(e.getLocalizedMessage(), e);
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-  }
-
-  public CompletableFuture<EntityWrapper<?>> getRoot() {
-    return getEntity(getRootPath());
-  }
-
-  private String getRootPath() {
-    RequestMapping requestMapping = AnnotationUtils.findAnnotation(this.getClass(),
-        RequestMapping.class);
-
-    return requestMapping.value()[0];
   }
 
 }

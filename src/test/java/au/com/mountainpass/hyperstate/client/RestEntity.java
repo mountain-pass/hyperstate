@@ -12,42 +12,39 @@ import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 
 public class RestEntity<T> extends EntityWrapper<T> {
 
-    private Collection<EntityRelationship> entities = new ArrayList<>();
+  private final Collection<EntityRelationship> entities = new ArrayList<>();
 
-    public RestEntity(T properties) {
-        super(properties);
-        throw new NotImplementedException("dead?");
-    }
+  public RestEntity(final ApplicationContext context, final String path, final T properties,
+      final String title) {
+    super(path, properties, title);
+  }
 
-    public RestEntity(ApplicationContext context, String path, T properties,
-            String title) {
-        super(path, properties, title);
-    }
+  public RestEntity(final T properties) {
+    super(properties);
+    throw new NotImplementedException("dead?");
+  }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see au.com.mountainpass.hateoas.core.ResolvedEntity#getEntities(int)
-     */
-    @Override
-    public CompletableFuture<Collection<EntityRelationship>> getEntities(
-            int page) {
-        return CompletableFuture.supplyAsync(() -> this.entities);
-    }
+  /*
+   * (non-Javadoc)
+   * 
+   * @see au.com.mountainpass.hateoas.core.ResolvedEntity#getEntities(int)
+   */
+  @Override
+  public CompletableFuture<Collection<EntityRelationship>> getEntities(final int page) {
+    return CompletableFuture.supplyAsync(() -> this.entities);
+  }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * au.com.mountainpass.hateoas.core.ResolvedEntity#setEntities(java.util.
-     * Collection)
-     */
-    // @Override
-    // public void setEntities(Collection<EntityRelationship>
-    // entityRelationships)
-    // throws IllegalAccessException, IllegalArgumentException,
-    // InvocationTargetException {
-    // this.entities.addAll(entityRelationships);
-    // }
+  /*
+   * (non-Javadoc)
+   * 
+   * @see au.com.mountainpass.hateoas.core.ResolvedEntity#setEntities(java.util. Collection)
+   */
+  // @Override
+  // public void setEntities(Collection<EntityRelationship>
+  // entityRelationships)
+  // throws IllegalAccessException, IllegalArgumentException,
+  // InvocationTargetException {
+  // this.entities.addAll(entityRelationships);
+  // }
 
 }

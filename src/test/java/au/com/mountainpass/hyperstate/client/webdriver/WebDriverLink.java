@@ -11,47 +11,47 @@ import cucumber.api.PendingException;
 
 public class WebDriverLink extends Link {
 
-    private WebElement webElement;
-    private WebDriverResolver resolver;
+  private WebDriverResolver resolver;
+  private final WebElement webElement;
 
-    public WebDriverLink(WebElement webElement) {
-        this.webElement = webElement;
-    }
+  public WebDriverLink(final WebDriverResolver resolver, final WebElement webElement) {
+    this.webElement = webElement;
+    this.resolver = resolver;
+  }
 
-    public WebDriverLink(WebDriverResolver resolver, WebElement webElement) {
-        this.webElement = webElement;
-        this.resolver = resolver;
-    }
+  public WebDriverLink(final WebElement webElement) {
+    this.webElement = webElement;
+  }
 
-    @Override
-    public <T> T resolve(Class<T> type) {
-        webElement.click();
-        return resolver.createProxy(type);
-    }
+  @Override
+  public URI getAddress() {
+    return URI.create(this.resolver.getUrl());
+  }
 
-    @Override
-    public <T> T resolve(ParameterizedTypeReference<T> type) {
-        // TODO Auto-generated method stub
-        throw new PendingException();
-    }
+  @Override
+  public String getPath() {
+    return this.resolver.getUrl();
+  }
 
-    @Override
-    public MediaType getRepresentationFormat() {
-        throw new PendingException();
-    }
+  @Override
+  public MediaType getRepresentationFormat() {
+    throw new PendingException();
+  }
 
-    @Override
-    public URI getAddress() {
-        return URI.create(this.resolver.getUrl());
-    }
+  public WebElement getWebElement() {
+    return this.webElement;
+  }
 
-    public WebElement getWebElement() {
-        return this.webElement;
-    }
+  @Override
+  public <T> T resolve(final Class<T> type) {
+    webElement.click();
+    return resolver.createProxy(type);
+  }
 
-    @Override
-    public String getPath() {
-        return this.resolver.getUrl();
-    }
+  @Override
+  public <T> T resolve(final ParameterizedTypeReference<T> type) {
+    // TODO Auto-generated method stub
+    throw new PendingException();
+  }
 
 }

@@ -14,25 +14,12 @@ import au.com.mountainpass.hyperstate.core.MediaTypes;
 @Configuration
 public class WebConfiguration extends WebMvcConfigurerAdapter {
 
-  @Override
-  public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-    configurer.favorPathExtension(true).favorParameter(true).parameterName("mediaType")
-        .ignoreAcceptHeader(false).useJaf(false).defaultContentType(MediaType.TEXT_HTML)
-        .mediaType("json", MediaType.APPLICATION_JSON).mediaType("html", MediaType.TEXT_HTML)
-        .mediaType("siren", MediaTypes.SIREN_JSON);
-  }
-
-  @Override
-  public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
-    configurer.enable();
-  }
-
-  private static final String[] SERVLET_RESOURCE_LOCATIONS = { "/" };
-
   private static final String[] CLASSPATH_RESOURCE_LOCATIONS = { "classpath:/META-INF/resources/",
       "classpath:/resources/", "classpath:/static/", "classpath:/public/" };
 
   private static final String[] RESOURCE_LOCATIONS;
+
+  private static final String[] SERVLET_RESOURCE_LOCATIONS = { "/" };
 
   static {
     RESOURCE_LOCATIONS = new String[CLASSPATH_RESOURCE_LOCATIONS.length
@@ -44,7 +31,13 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
   }
 
   @Override
-  public void addResourceHandlers(ResourceHandlerRegistry registry) {
+  public void addInterceptors(final InterceptorRegistry registry) {
+    registry.addInterceptor(new ResponseHeaderInterceptor());
+    SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
+  }
+
+  @Override
+  public void addResourceHandlers(final ResourceHandlerRegistry registry) {
     if (!registry.hasMappingForPattern("/webjars/**")) {
       registry.addResourceHandler("/webjars/**")
           .addResourceLocations("classpath:/META-INF/resources/webjars/");
@@ -55,9 +48,16 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
   }
 
   @Override
-  public void addInterceptors(InterceptorRegistry registry) {
-    registry.addInterceptor(new ResponseHeaderInterceptor());
-    SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
+  public void configureContentNegotiation(final ContentNegotiationConfigurer configurer) {
+    configurer.favorPathExtension(true).favorParameter(true).parameterName("mediaType")
+        .ignoreAcceptHeader(false).useJaf(false).defaultContentType(MediaType.TEXT_HTML)
+        .mediaType("json", MediaType.APPLICATION_JSON).mediaType("html", MediaType.TEXT_HTML)
+        .mediaType("siren", MediaTypes.SIREN_JSON);
+  }
+
+  @Override
+  public void configureDefaultServletHandling(final DefaultServletHandlerConfigurer configurer) {
+    configurer.enable();
   }
 
 }

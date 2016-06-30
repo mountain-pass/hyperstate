@@ -13,16 +13,15 @@ import org.springframework.context.annotation.Profile;
 @Profile("ui-integration")
 public class WebDriverTestConfiguration {
 
-    @Autowired
-    private WebDriverFactory webDriverFactory;
+  @Autowired
+  private WebDriverFactory webDriverFactory;
 
-    @Bean(destroyMethod = "quit")
-    public WebDriver webDriver()
-            throws ClassNotFoundException, NoSuchMethodException,
-            SecurityException, InstantiationException, IllegalAccessException,
-            IllegalArgumentException, InvocationTargetException {
-        WebDriver driver = webDriverFactory.createWebDriver();
-        driver.manage().timeouts().setScriptTimeout(15, TimeUnit.SECONDS);
-        return driver;
-    }
+  @Bean(destroyMethod = "quit")
+  public WebDriver webDriver() throws ClassNotFoundException, NoSuchMethodException,
+      SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException,
+      InvocationTargetException {
+    final WebDriver driver = webDriverFactory.createWebDriver();
+    driver.manage().timeouts().setScriptTimeout(15, TimeUnit.SECONDS);
+    return driver;
+  }
 }

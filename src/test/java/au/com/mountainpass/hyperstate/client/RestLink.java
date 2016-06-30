@@ -20,73 +20,72 @@ import au.com.mountainpass.hyperstate.core.MediaTypes;
 
 public class RestLink extends Link {
 
-    URI address;
+  URI address;
 
-    @Nullable
-    MediaType representationFormat = MediaTypes.SIREN_JSON;
+  @Nullable
+  MediaType representationFormat = MediaTypes.SIREN_JSON;
 
-    private RestTemplate restTemplate;
+  private RestTemplate restTemplate;
 
-    public RestLink() {
-    }
+  public RestLink() {
+  }
 
-    public RestLink(URI address) {
-        this.address = address;
-    }
+  public RestLink(final URI address) {
+    this.address = address;
+  }
 
-    public RestLink(URI address, String label) {
-        super(label);
-        this.address = address;
-    }
+  public RestLink(final URI address, final String label) {
+    super(label);
+    this.address = address;
+  }
 
-    public RestLink(URI address, String label, Set<String> natures) {
-        super(label, natures);
-        this.address = address;
-    }
+  public RestLink(final URI address, final String label, final Set<String> natures) {
+    super(label, natures);
+    this.address = address;
+  }
 
-    @Autowired
-    public void setRestTemplate(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
+  @Override
+  @JsonProperty("href")
+  public URI getAddress() {
+    return address;
+  }
 
-    @Override
-    public <T> T resolve(Class<T> type) {
-        RequestEntity<Void> request = RequestEntity.get(address)
-                .accept(getRepresentationFormat()).build();
-        ResponseEntity<T> response = restTemplate.exchange(address,
-                HttpMethod.GET, request, type);
-        return response.getBody();
-    }
+  @Override
+  @JsonIgnore
+  public String getPath() {
+    return address.toString();
+  }
 
-    @Override
-    public <T> T resolve(ParameterizedTypeReference<T> type) {
-        RequestEntity<Void> request = RequestEntity.get(address)
-                .accept(getRepresentationFormat()).build();
-        ResponseEntity<T> response = restTemplate.exchange(address,
-                HttpMethod.GET, request, type);
-        return response.getBody();
-    }
+  @Override
+  public MediaType getRepresentationFormat() {
+    return representationFormat == null ? MediaTypes.SIREN_JSON : representationFormat;
+  }
 
-    @Override
-    public MediaType getRepresentationFormat() {
-        return representationFormat == null ? MediaTypes.SIREN_JSON
-                : representationFormat;
-    }
+  @Override
+  public <T> T resolve(final Class<T> type) {
+    final RequestEntity<Void> request = RequestEntity.get(address).accept(getRepresentationFormat())
+        .build();
+    final ResponseEntity<T> response = restTemplate.exchange(address, HttpMethod.GET, request,
+        type);
+    return response.getBody();
+  }
 
-    @Override
-    @JsonProperty("href")
-    public URI getAddress() {
-        return address;
-    }
+  @Override
+  public <T> T resolve(final ParameterizedTypeReference<T> type) {
+    final RequestEntity<Void> request = RequestEntity.get(address).accept(getRepresentationFormat())
+        .build();
+    final ResponseEntity<T> response = restTemplate.exchange(address, HttpMethod.GET, request,
+        type);
+    return response.getBody();
+  }
 
-    public void setAddress(URI address) {
-        this.address = address;
-    }
+  public void setAddress(final URI address) {
+    this.address = address;
+  }
 
-    @Override
-    @JsonIgnore
-    public String getPath() {
-        return address.toString();
-    }
+  @Autowired
+  public void setRestTemplate(final RestTemplate restTemplate) {
+    this.restTemplate = restTemplate;
+  }
 
 }

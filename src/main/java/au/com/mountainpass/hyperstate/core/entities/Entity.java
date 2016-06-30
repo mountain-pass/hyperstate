@@ -14,13 +14,17 @@ public abstract class Entity extends Labelled {
   public Entity() {
   }
 
-  public Entity(Entity entity) {
+  public Entity(final Entity entity) {
     super(entity);
   }
 
-  public Entity(String label, String... natures) {
+  public Entity(final String label, final String... natures) {
     super(label, natures);
   }
+
+  public abstract URI getAddress() throws URISyntaxException;
+
+  public abstract <K, T extends EntityWrapper<K>> T reload(Class<T> type);
 
   public abstract <K, T extends EntityWrapper<K>> T resolve(Class<T> type);
 
@@ -28,9 +32,5 @@ public abstract class Entity extends Labelled {
 
   @JsonIgnore
   public abstract LinkedEntity toLinkedEntity();
-
-  public abstract URI getAddress() throws URISyntaxException;
-
-  public abstract <K, T extends EntityWrapper<K>> T reload(Class<T> type);
 
 }

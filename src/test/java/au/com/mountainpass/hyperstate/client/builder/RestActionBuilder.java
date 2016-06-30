@@ -21,45 +21,16 @@ import au.com.mountainpass.hyperstate.core.Resolver;
 
 public class RestActionBuilder {
 
+  private Parameter[] fields = {};
+  private URI href;
   private String identifier;
   private HttpMethod method;
-  private URI href;
-  private Parameter[] fields = {};
 
-  private Resolver resolver;
+  private final Resolver resolver;
 
   @JsonCreator
-  public RestActionBuilder(@JacksonInject Resolver resolver) {
+  public RestActionBuilder(@JacksonInject final Resolver resolver) {
     this.resolver = resolver;
-  }
-
-  @PostConstruct
-  public void postConstruct() {
-
-  }
-
-  @JsonProperty("method")
-  public RestActionBuilder setMethod(HttpMethod method) {
-    this.method = method;
-    return this;
-  }
-
-  @JsonProperty("name")
-  public RestActionBuilder setName(String identifier) {
-    this.identifier = identifier;
-    return this;
-  }
-
-  @JsonProperty("href")
-  public RestActionBuilder setHref(URI href) {
-    this.href = href;
-    return this;
-  }
-
-  @JsonProperty("fields")
-  public RestActionBuilder setFields(Parameter[] fields) {
-    this.fields = fields;
-    return this;
   }
 
   public Action<?> build() {
@@ -75,5 +46,34 @@ public class RestActionBuilder {
     default:
       return null;
     }
+  }
+
+  @PostConstruct
+  public void postConstruct() {
+
+  }
+
+  @JsonProperty("fields")
+  public RestActionBuilder setFields(final Parameter[] fields) {
+    this.fields = fields;
+    return this;
+  }
+
+  @JsonProperty("href")
+  public RestActionBuilder setHref(final URI href) {
+    this.href = href;
+    return this;
+  }
+
+  @JsonProperty("method")
+  public RestActionBuilder setMethod(final HttpMethod method) {
+    this.method = method;
+    return this;
+  }
+
+  @JsonProperty("name")
+  public RestActionBuilder setName(final String identifier) {
+    this.identifier = identifier;
+    return this;
   }
 }

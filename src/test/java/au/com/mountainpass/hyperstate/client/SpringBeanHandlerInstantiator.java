@@ -19,87 +19,80 @@ import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
 @Component
 public class SpringBeanHandlerInstantiator extends HandlerInstantiator {
 
-    private ApplicationContext applicationContext;
+  private final ApplicationContext applicationContext;
 
-    @Autowired
-    public SpringBeanHandlerInstantiator(
-            ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
+  @Autowired
+  public SpringBeanHandlerInstantiator(final ApplicationContext applicationContext) {
+    this.applicationContext = applicationContext;
+  }
 
-    private Object findInstance(Class<?> type) {
+  /*
+   * (non-Javadoc)
+   * 
+   * @see com.fasterxml.jackson.databind.cfg.HandlerInstantiator#
+   * deserializerInstance(com.fasterxml.jackson.databind. DeserializationConfig,
+   * com.fasterxml.jackson.databind.introspect.Annotated, java.lang.Class)
+   */
+  @Override
+  public JsonDeserializer<?> deserializerInstance(final DeserializationConfig config,
+      final Annotated annotated, final Class<?> deserClass) {
+    return (JsonDeserializer<?>) findInstance(deserClass);
+  }
 
-        return BeanUtils.instantiateClass(type);
-    }
+  private Object findInstance(final Class<?> type) {
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.fasterxml.jackson.databind.cfg.HandlerInstantiator#
-     * deserializerInstance(com.fasterxml.jackson.databind.
-     * DeserializationConfig,
-     * com.fasterxml.jackson.databind.introspect.Annotated, java.lang.Class)
-     */
-    @Override
-    public JsonDeserializer<?> deserializerInstance(
-            DeserializationConfig config, Annotated annotated,
-            Class<?> deserClass) {
-        return (JsonDeserializer<?>) findInstance(deserClass);
-    }
+    return BeanUtils.instantiateClass(type);
+  }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.fasterxml.jackson.databind.cfg.HandlerInstantiator#
-     * keyDeserializerInstance(com.fasterxml.jackson.databind.
-     * DeserializationConfig,
-     * com.fasterxml.jackson.databind.introspect.Annotated, java.lang.Class)
-     */
-    @Override
-    public KeyDeserializer keyDeserializerInstance(DeserializationConfig config,
-            Annotated annotated, Class<?> keyDeserClass) {
-        return (KeyDeserializer) findInstance(keyDeserClass);
-    }
+  /*
+   * (non-Javadoc)
+   * 
+   * @see com.fasterxml.jackson.databind.cfg.HandlerInstantiator#
+   * keyDeserializerInstance(com.fasterxml.jackson.databind. DeserializationConfig,
+   * com.fasterxml.jackson.databind.introspect.Annotated, java.lang.Class)
+   */
+  @Override
+  public KeyDeserializer keyDeserializerInstance(final DeserializationConfig config,
+      final Annotated annotated, final Class<?> keyDeserClass) {
+    return (KeyDeserializer) findInstance(keyDeserClass);
+  }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.fasterxml.jackson.databind.cfg.HandlerInstantiator#serializerInstance
-     * (com.fasterxml.jackson.databind.SerializationConfig,
-     * com.fasterxml.jackson.databind.introspect.Annotated, java.lang.Class)
-     */
-    @Override
-    public JsonSerializer<?> serializerInstance(SerializationConfig config,
-            Annotated annotated, Class<?> serClass) {
-        return (JsonSerializer<?>) findInstance(serClass);
-    }
+  /*
+   * (non-Javadoc)
+   * 
+   * @see com.fasterxml.jackson.databind.cfg.HandlerInstantiator#serializerInstance
+   * (com.fasterxml.jackson.databind.SerializationConfig,
+   * com.fasterxml.jackson.databind.introspect.Annotated, java.lang.Class)
+   */
+  @Override
+  public JsonSerializer<?> serializerInstance(final SerializationConfig config,
+      final Annotated annotated, final Class<?> serClass) {
+    return (JsonSerializer<?>) findInstance(serClass);
+  }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.fasterxml.jackson.databind.cfg.HandlerInstantiator#
-     * typeResolverBuilderInstance(com.fasterxml.jackson.databind.cfg.
-     * MapperConfig, com.fasterxml.jackson.databind.introspect.Annotated,
-     * java.lang.Class)
-     */
-    @Override
-    public TypeResolverBuilder<?> typeResolverBuilderInstance(
-            MapperConfig<?> config, Annotated annotated,
-            Class<?> builderClass) {
-        return (TypeResolverBuilder<?>) findInstance(builderClass);
-    }
+  /*
+   * (non-Javadoc)
+   * 
+   * @see com.fasterxml.jackson.databind.cfg.HandlerInstantiator#
+   * typeIdResolverInstance(com.fasterxml.jackson.databind.cfg.MapperConfig,
+   * com.fasterxml.jackson.databind.introspect.Annotated, java.lang.Class)
+   */
+  @Override
+  public TypeIdResolver typeIdResolverInstance(final MapperConfig<?> config,
+      final Annotated annotated, final Class<?> resolverClass) {
+    return (TypeIdResolver) findInstance(resolverClass);
+  }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.fasterxml.jackson.databind.cfg.HandlerInstantiator#
-     * typeIdResolverInstance(com.fasterxml.jackson.databind.cfg.MapperConfig,
-     * com.fasterxml.jackson.databind.introspect.Annotated, java.lang.Class)
-     */
-    @Override
-    public TypeIdResolver typeIdResolverInstance(MapperConfig<?> config,
-            Annotated annotated, Class<?> resolverClass) {
-        return (TypeIdResolver) findInstance(resolverClass);
-    }
+  /*
+   * (non-Javadoc)
+   * 
+   * @see com.fasterxml.jackson.databind.cfg.HandlerInstantiator#
+   * typeResolverBuilderInstance(com.fasterxml.jackson.databind.cfg. MapperConfig,
+   * com.fasterxml.jackson.databind.introspect.Annotated, java.lang.Class)
+   */
+  @Override
+  public TypeResolverBuilder<?> typeResolverBuilderInstance(final MapperConfig<?> config,
+      final Annotated annotated, final Class<?> builderClass) {
+    return (TypeResolverBuilder<?>) findInstance(builderClass);
+  }
 }

@@ -12,13 +12,14 @@ import au.com.mountainpass.hyperstate.core.Resolver;
 
 public class DeleteAction extends Action<Void> {
 
-  public DeleteAction(Resolver resolver, String identifier, Link link, Parameter[] fields) {
+  public DeleteAction(final Resolver resolver, final String identifier, final Link link,
+      final Parameter[] fields) {
     super(resolver, identifier, link, fields);
   }
 
   @Override
-  public CompletableFuture<Void> doInvoke(Resolver resolver,
-      Map<String, Object> filteredParameters) {
+  public CompletableFuture<Void> doInvoke(final Resolver resolver,
+      final Map<String, Object> filteredParameters) {
     return resolver.delete(getLink(), filteredParameters);
   }
 

@@ -9,25 +9,23 @@ import org.springframework.web.servlet.ModelAndView;
 
 public class ResponseHeaderInterceptor implements HandlerInterceptor {
 
-    @Override
-    public boolean preHandle(HttpServletRequest request,
-            HttpServletResponse response, Object handler) throws Exception {
-        response.setHeader(HttpHeaders.VARY, "Accept");
-        return true;
-    }
+  @Override
+  public void afterCompletion(final HttpServletRequest request, final HttpServletResponse response,
+      final Object handler, final Exception ex) throws Exception {
 
-    @Override
-    public void postHandle(HttpServletRequest request,
-            HttpServletResponse response, Object handler,
-            ModelAndView modelAndView) throws Exception {
+  }
 
-    }
+  @Override
+  public void postHandle(final HttpServletRequest request, final HttpServletResponse response,
+      final Object handler, final ModelAndView modelAndView) throws Exception {
 
-    @Override
-    public void afterCompletion(HttpServletRequest request,
-            HttpServletResponse response, Object handler, Exception ex)
-                    throws Exception {
+  }
 
-    }
+  @Override
+  public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response,
+      final Object handler) throws Exception {
+    response.setHeader(HttpHeaders.VARY, "Accept");
+    return true;
+  }
 
 }

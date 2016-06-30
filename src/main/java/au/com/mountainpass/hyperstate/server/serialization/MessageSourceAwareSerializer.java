@@ -17,33 +17,32 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 @Component
 public class MessageSourceAwareSerializer extends JsonSerializer<String> {
 
-    @Autowired
-    private MessageSource messageSource;
+  @Autowired
+  private MessageSource messageSource;
 
-    public MessageSourceAwareSerializer() {
-    }
+  public MessageSourceAwareSerializer() {
+  }
 
-    @Override
-    public void serialize(String value, JsonGenerator jgen,
-            SerializerProvider provider)
-                    throws IOException, JsonProcessingException {
-        if (messageSource == null) {
-            jgen.writeString(value);
-        } else {
-            jgen.writeString(interpolate(value));
-        }
+  public String interpolate(final CharSequence value) {
+    final Pattern patt = Pattern.compile("\\{(.*?)\\}");
+    final Matcher m = patt.matcher(value);
+    final StringBuffer sb = new StringBuffer(value.length());
+    while (m.find()) {
+      final String code = m.group(1);
+      m.appendReplacement(sb, Matcher
+          .quoteReplacement(messageSource.getMessage(code, null, LocaleContextHolder.getLocale())));
     }
+    m.appendTail(sb);
+    return sb.toString();
+  }
 
-    public String interpolate(CharSequence value) {
-        Pattern patt = Pattern.compile("\\{(.*?)\\}");
-        Matcher m = patt.matcher(value);
-        StringBuffer sb = new StringBuffer(value.length());
-        while (m.find()) {
-            String code = m.group(1);
-            m.appendReplacement(sb, Matcher.quoteReplacement(messageSource
-                    .getMessage(code, null, LocaleContextHolder.getLocale())));
-        }
-        m.appendTail(sb);
-        return sb.toString();
+  @Override
+  public void serialize(final String value, final JsonGenerator jgen,
+      final SerializerProvider provider) throws IOException, JsonProcessingException {
+    if (messageSource == null) {
+      jgen.writeString(value);
+    } else {
+      jgen.writeString(interpolate(value));
     }
+  }
 }

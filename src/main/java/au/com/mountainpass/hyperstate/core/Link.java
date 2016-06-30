@@ -13,27 +13,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 abstract public class Link extends Labelled {
 
-    public Link() {
-    }
+  public Link() {
+  }
 
-    public Link(String label, Set<String> natures) {
-        super(label, natures);
-    }
+  public Link(final String label) {
+    super(label);
+  }
 
-    public Link(String label) {
-        super(label);
-    }
+  public Link(final String label, final Set<String> natures) {
+    super(label, natures);
+  }
 
-    public abstract <T> T resolve(Class<T> type);
+  @JsonProperty("href")
+  public abstract URI getAddress();
 
-    public abstract <T> T resolve(ParameterizedTypeReference<T> type);
+  @JsonIgnore
+  public abstract String getPath();
 
-    @JsonProperty("type")
-    public abstract MediaType getRepresentationFormat();
+  @JsonProperty("type")
+  public abstract MediaType getRepresentationFormat();
 
-    @JsonProperty("href")
-    public abstract URI getAddress();
+  public abstract <T> T resolve(Class<T> type);
 
-    @JsonIgnore
-    public abstract String getPath();
+  public abstract <T> T resolve(ParameterizedTypeReference<T> type);
 }

@@ -13,23 +13,23 @@ import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 
 public class UpdateAction extends Action<UpdatedEntity> {
 
-    public UpdateAction(Resolver resolver, String identifier, Link link,
-            Parameter[] fields) {
-        super(resolver, identifier, link, fields);
-    }
+  public UpdateAction(final Resolver resolver, final String identifier, final Link link,
+      final Parameter[] fields) {
+    super(resolver, identifier, link, fields);
+  }
 
-    @Override
-    public CompletableFuture<UpdatedEntity> doInvoke(Resolver resolver,
-            Map<String, Object> filteredParameters) {
-        return resolver.update(getLink(), filteredParameters);
-    }
+  @Override
+  public CompletableFuture<UpdatedEntity> doInvoke(final Resolver resolver,
+      final Map<String, Object> filteredParameters) {
+    return resolver.update(getLink(), filteredParameters);
+  }
 
-    /**
-     * @return the nature
-     */
-    @Override
-    public HttpMethod getNature() {
-        return HttpMethod.PUT;
-    }
+  /**
+   * @return the nature
+   */
+  @Override
+  public HttpMethod getNature() {
+    return HttpMethod.PUT;
+  }
 
 }

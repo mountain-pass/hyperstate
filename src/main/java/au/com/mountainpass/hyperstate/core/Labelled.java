@@ -15,86 +15,86 @@ import au.com.mountainpass.hyperstate.server.serialization.MessageSourceAwareSer
 
 abstract public class Labelled {
 
-    private Set<String> natures = new HashSet<>();
+  @Nullable
+  String label = null;
 
-    @Nullable
-    String label = null;
+  private Set<String> natures = new HashSet<>();
 
-    public Labelled() {
+  public Labelled() {
+  }
+
+  public Labelled(final Labelled labelled) {
+    this();
+    this.label = labelled.label;
+    this.natures = labelled.natures;
+  }
+
+  public Labelled(final String label, final Set<String> natures) {
+    this.label = label;
+    this.natures = natures;
+  }
+
+  public Labelled(final String label, final String... natures) {
+    this.label = label;
+    this.natures.addAll(Arrays.asList(natures));
+  }
+
+  /**
+   * @return the label
+   */
+  @JsonSerialize(using = MessageSourceAwareSerializer.class)
+  @JsonProperty("title")
+  public String getLabel() {
+    return label;
+  }
+
+  /**
+   * @return the natures
+   */
+  @JsonProperty("class")
+  public Set<String> getNatures() {
+    return natures;
+  }
+
+  public boolean hasNature(final String nature) {
+    return this.getNatures().contains(nature);
+  }
+
+  private String interpolate(final String value, final String... args) {
+    if (args.length == 0) {
+      return value;
+    } else {
+      final Pattern patt = Pattern.compile("\\{(.*?)\\}");
+      final Matcher m = patt.matcher(value);
+      final StringBuffer sb = new StringBuffer(value.length());
+      for (int i = 0; m.find(); ++i) {
+        final String code = m.group(1);
+        m.appendReplacement(sb, Matcher.quoteReplacement(args[i]));
+      }
+      m.appendTail(sb);
+      return sb.toString();
     }
+  }
 
-    public Labelled(Labelled labelled) {
-        this();
-        this.label = labelled.label;
-        this.natures = labelled.natures;
-    }
+  void setLabel(final String template, final String... args) {
+    label = interpolate(template, args);
+  }
 
-    void setLabel(String template, String... args) {
-        label = interpolate(template, args);
-    }
+  /**
+   * @param natures
+   *          the natures to set
+   */
+  @JsonProperty("class")
+  public void setNatures(final Set<String> natures) {
+    this.natures = natures;
+  }
 
-    private String interpolate(String value, String... args) {
-        if (args.length == 0) {
-            return value;
-        } else {
-            Pattern patt = Pattern.compile("\\{(.*?)\\}");
-            Matcher m = patt.matcher(value);
-            StringBuffer sb = new StringBuffer(value.length());
-            for (int i = 0; m.find(); ++i) {
-                String code = m.group(1);
-                m.appendReplacement(sb, Matcher.quoteReplacement(args[i]));
-            }
-            m.appendTail(sb);
-            return sb.toString();
-        }
-    }
-
-    public Labelled(String label, Set<String> natures) {
-        this.label = label;
-        this.natures = natures;
-    }
-
-    public Labelled(String label, String... natures) {
-        this.label = label;
-        this.natures.addAll(Arrays.asList(natures));
-    }
-
-    /**
-     * @return the natures
-     */
-    @JsonProperty("class")
-    public Set<String> getNatures() {
-        return natures;
-    }
-
-    /**
-     * @param natures
-     *            the natures to set
-     */
-    @JsonProperty("class")
-    public void setNatures(Set<String> natures) {
-        this.natures = natures;
-    }
-
-    /**
-     * @return the label
-     */
-    @JsonSerialize(using = MessageSourceAwareSerializer.class)
-    @JsonProperty("title")
-    public String getLabel() {
-        return label;
-    }
-
-    /**
-     * @param title
-     *            the label to set
-     */
-    public void setTitle(String title) {
-        this.label = title;
-    }
-
-    public boolean hasNature(String nature) {
-        return this.getNatures().contains(nature);
-    }
+  /**
+   * @param title
+   *          the label to set
+   */
+  public void setTitle(final String title) {
+    this.label = title;
+  }
 
 }

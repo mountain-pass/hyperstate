@@ -14,26 +14,26 @@ public class AccountProperties implements Serializable {
    */
   private static final long serialVersionUID = -5101362070340337389L;
 
+  private String creationDate;
+
   @JsonIgnore
   private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+
+  private String username;
 
   public AccountProperties() {
   }
 
-  public AccountProperties(String username, String creationDate) {
+  public AccountProperties(final String username, final String creationDate) {
     this.username = username;
     this.creationDate = creationDate;
   }
 
-  private String username;
-
-  private String creationDate;
+  public String getCreationDate() {
+    return this.creationDate;
+  }
 
   public String getUsername() {
     return this.username;
-  }
-
-  public String getCreationDate() {
-    return this.creationDate;
   }
 }

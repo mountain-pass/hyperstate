@@ -39,35 +39,41 @@ import au.com.mountainpass.hyperstate.core.Relationship;
 @JsonPropertyOrder({ "class", "properties", "entities", "actions", "links", "title" })
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class EntityWrapper<T> extends Entity implements Identifiable<String> {
-  private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
-
   private static final int PAGE_SIZE = 10;
 
   private Map<String, Action<?>> actions = new HashMap<>();
 
   private Collection<EntityRelationship> entities = null;
 
+  private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+
   @JsonProperty("links")
   private Set<NavigationalRelationship> navigationalRelationships = new HashSet<>();
 
-  T properties;
-
   private String path;
+
+  T properties;
 
   private EntityRepository repository;
 
-  protected EntityWrapper(@JsonProperty("properties") T properties) {
-    this.properties = properties;
+  public EntityWrapper(final EntityWrapper<T> src) {
+    super(src);
+    this.properties = src.properties;
+    this.path = src.path;
+    this.actions = src.actions;
+    this.entities = src.entities;
+    this.navigationalRelationships = src.navigationalRelationships;
   }
 
-  protected EntityWrapper(String path, T properties, String label, String... natures) {
+  protected EntityWrapper(final String path, final T properties, final String label,
+      final String... natures) {
     super(label, natures);
     this.properties = properties;
     this.path = path;
     add(new NavigationalRelationship(new JavaLink(this), Relationship.SELF));
-    Method[] methods = this.getClass().getMethods();
-    for (Method method : methods) {
-      HttpMethod httpMethod = JavaAction.determineMethodNature(method);
+    final Method[] methods = this.getClass().getMethods();
+    for (final Method method : methods) {
+      final HttpMethod httpMethod = JavaAction.determineMethodNature(method);
       if (httpMethod != null) {
         switch (httpMethod) {
         case DELETE:
@@ -93,20 +99,15 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
     // }
   }
 
-  public EntityWrapper(EntityWrapper<T> src) {
-    super(src);
-    this.properties = src.properties;
-    this.path = src.path;
-    this.actions = src.actions;
-    this.entities = src.entities;
-    this.navigationalRelationships = src.navigationalRelationships;
+  protected EntityWrapper(@JsonProperty("properties") final T properties) {
+    this.properties = properties;
   }
 
-  public void add(NavigationalRelationship navigationalRelationship) {
+  public void add(final NavigationalRelationship navigationalRelationship) {
     navigationalRelationships.add(navigationalRelationship);
   }
 
-  public Action<?> getAction(String identifier) {
+  public Action<?> getAction(final String identifier) {
     return actions.get(identifier);
   }
 
@@ -115,21 +116,17 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
     return ImmutableSet.copyOf(actions.values());
   }
 
+  @Override
+  @JsonIgnore
+  public URI getAddress() {
+    return getLink(Relationship.SELF).getAddress();
+  }
+
   public CompletableFuture<Collection<EntityRelationship>> getEntities() {
     return getEntities(0);
   }
 
-  @JsonProperty("entities")
-  private Collection<EntityRelationship> getEntitiesAndJoin() throws IllegalAccessException,
-      IllegalArgumentException, InvocationTargetException, URISyntaxException {
-    return getEntities().join();
-  }
-
-  public void setRepository(EntityRepository repository) {
-    this.repository = repository;
-  }
-
-  public CompletableFuture<Collection<EntityRelationship>> getEntities(int page) {
+  public CompletableFuture<Collection<EntityRelationship>> getEntities(final int page) {
     if (entities != null) {
       return CompletableFuture.supplyAsync(() -> entities);
     }
@@ -142,9 +139,21 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
     return CompletableFuture.supplyAsync(() -> rval);
   }
 
-  public Link getLink(String rel) {
-    Optional<NavigationalRelationship> link = getLinks().stream().filter(l -> l.hasNature(rel))
-        .findAny();
+  @JsonProperty("entities")
+  private Collection<EntityRelationship> getEntitiesAndJoin() throws IllegalAccessException,
+      IllegalArgumentException, InvocationTargetException, URISyntaxException {
+    return getEntities().join();
+  }
+
+  @Override
+  @JsonIgnore
+  public String getId() {
+    return this.path;
+  }
+
+  public Link getLink(final String rel) {
+    final Optional<NavigationalRelationship> link = getLinks().stream()
+        .filter(l -> l.hasNature(rel)).findAny();
     if (link.isPresent()) {
       return link.get().getLink();
     } else {
@@ -161,25 +170,18 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
   }
 
   @Override
-  public <K, L extends EntityWrapper<K>> L reload(Class<L> type) {
+  public <K, L extends EntityWrapper<K>> L reload(final Class<L> type) {
     return (L) this;
   }
 
   @Override
-  public <K, L extends EntityWrapper<K>> L resolve(Class<L> type) {
+  public <K, L extends EntityWrapper<K>> L resolve(final Class<L> type) {
     return (L) this;
   }
 
   @Override
-  public <K, L extends EntityWrapper<K>> L resolve(ParameterizedTypeReference<L> type) {
+  public <K, L extends EntityWrapper<K>> L resolve(final ParameterizedTypeReference<L> type) {
     return (L) this;
-  }
-
-  public void setActions(Action<?>[] actions) {
-    for (Action<?> action : actions) {
-      this.actions.put(action.getIdentifier(), action);
-    }
-
   }
 
   // @Autowired
@@ -191,31 +193,30 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
   // bpp.processInjection(properties);
   // }
 
-  public void setEntities(Collection<EntityRelationship> entityRelationships) {
-    this.entities = entityRelationships;
+  public void setActions(final Action<?>[] actions) {
+    for (final Action<?> action : actions) {
+      this.actions.put(action.getIdentifier(), action);
+    }
+
   }
 
-  @Override
-  public LinkedEntity toLinkedEntity() {
-    LinkedEntity linkedEntity = new LinkedEntity(getLink(Relationship.SELF), getLabel(),
-        getNatures());
-    return linkedEntity;
+  public void setEntities(final Collection<EntityRelationship> entityRelationships) {
+    this.entities = entityRelationships;
   }
 
   // public <L extends EntityWrapper<T>> L refresh() {
   // return (L) getLink(Relationship.SELF).resolve(this.getClass());
   // }
 
-  @Override
-  @JsonIgnore
-  public URI getAddress() {
-    return getLink(Relationship.SELF).getAddress();
+  public void setRepository(final EntityRepository repository) {
+    this.repository = repository;
   }
 
   @Override
-  @JsonIgnore
-  public String getId() {
-    return this.path;
+  public LinkedEntity toLinkedEntity() {
+    final LinkedEntity linkedEntity = new LinkedEntity(getLink(Relationship.SELF), getLabel(),
+        getNatures());
+    return linkedEntity;
   }
 
 }

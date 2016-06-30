@@ -34,122 +34,102 @@ import au.com.mountainpass.hyperstate.server.config.HyperstateTestConfiguration;
 @Primary
 public class RestTemplateResolver implements Resolver {
 
-    @Autowired
-    private AsyncRestTemplate restTemplate;
+  @Autowired
+  private AsyncRestTemplate restTemplate;
 
-    @Autowired
-    private ApplicationContext applicationContext;
+  @Autowired
+  private ApplicationContext applicationContext;
 
-    @Override
-    public CompletableFuture<CreatedEntity> create(Link link,
-            Map<String, Object> filteredParameters) {
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>(
-                filteredParameters.size());
-        for (Entry<String, Object> entry : filteredParameters.entrySet()) {
-            body.add(entry.getKey(), entry.getValue());
-        }
-        RequestEntity<?> request = RequestEntity.post(link.getAddress())
-                .accept(MediaTypes.SIREN_JSON)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(body);
-        ListenableFuture<URI> locationFuture = restTemplate
-                .postForLocation(link.getAddress(), request);
-        return FutureConverter.convert(locationFuture).thenApplyAsync(uri -> {
-            CreatedEntity linkedEntity = new CreatedEntity(new RestLink(uri));
-            AutowiredAnnotationBeanPostProcessor bpp = new AutowiredAnnotationBeanPostProcessor();
-            bpp.setBeanFactory(
-                    applicationContext.getAutowireCapableBeanFactory());
-            bpp.processInjection(linkedEntity);
+  @Override
+  public CompletableFuture<CreatedEntity> create(Link link,
+      Map<String, Object> filteredParameters) {
+    MultiValueMap<String, Object> body = new LinkedMultiValueMap<>(filteredParameters.size());
+    for (Entry<String, Object> entry : filteredParameters.entrySet()) {
+      body.add(entry.getKey(), entry.getValue());
+    }
+    RequestEntity<?> request = RequestEntity.post(link.getAddress()).accept(MediaTypes.SIREN_JSON)
+        .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(body);
+    ListenableFuture<URI> locationFuture = restTemplate.postForLocation(link.getAddress(), request);
+    return FutureConverter.convert(locationFuture).thenApplyAsync(uri -> {
+      CreatedEntity linkedEntity = new CreatedEntity(new RestLink(uri));
+      AutowiredAnnotationBeanPostProcessor bpp = new AutowiredAnnotationBeanPostProcessor();
+      bpp.setBeanFactory(applicationContext.getAutowireCapableBeanFactory());
+      bpp.processInjection(linkedEntity);
 
-            return linkedEntity;
+      return linkedEntity;
+    });
+  }
+
+  @Override
+  public CompletableFuture<Void> delete(Link link, Map<String, Object> filteredParameters) {
+    MultiValueMap<String, Object> body = new LinkedMultiValueMap<>(filteredParameters.size());
+    for (Entry<String, Object> entry : filteredParameters.entrySet()) {
+      body.add(entry.getKey(), entry.getValue());
+    }
+    RequestEntity<?> request = RequestEntity.put(link.getAddress()).accept(MediaTypes.SIREN_JSON)
+        .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(body);
+
+    ListenableFuture<ResponseEntity<Void>> responseFuture = restTemplate.exchange(link.getAddress(),
+        HttpMethod.DELETE, request, Void.class);
+    return FutureConverter.convert(responseFuture).thenApplyAsync(response -> {
+      return response.getBody();
+    });
+  }
+
+  @Override
+  public CompletableFuture<EntityWrapper<?>> get(Link link,
+      Map<String, Object> filteredParameters) {
+    MultiValueMap<String, Object> body = new LinkedMultiValueMap<>(filteredParameters.size());
+    for (Entry<String, Object> entry : filteredParameters.entrySet()) {
+      body.add(entry.getKey(), entry.getValue());
+    }
+    RequestEntity<?> request = RequestEntity.put(link.getAddress()).accept(MediaTypes.SIREN_JSON)
+        .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(body);
+
+    @SuppressWarnings("rawtypes")
+    ListenableFuture<ResponseEntity<EntityWrapper>> responseFuture = restTemplate
+        .exchange(link.getAddress(), HttpMethod.GET, request, EntityWrapper.class);
+    return FutureConverter.convert(responseFuture).thenApplyAsync(response -> {
+      return response.getBody();
+    });
+
+  }
+
+  @Override
+  public CompletableFuture<UpdatedEntity> update(Link link,
+      Map<String, Object> filteredParameters) {
+    MultiValueMap<String, Object> body = new LinkedMultiValueMap<>(filteredParameters.size());
+    for (Entry<String, Object> entry : filteredParameters.entrySet()) {
+      body.add(entry.getKey(), entry.getValue());
+    }
+    RequestEntity<?> request = RequestEntity.put(link.getAddress()).accept(MediaTypes.SIREN_JSON)
+        .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(body);
+
+    ListenableFuture<ResponseEntity<Void>> responseFuture = restTemplate.exchange(link.getAddress(),
+        HttpMethod.PUT, request, Void.class);
+    return FutureConverter.convert(responseFuture).thenApplyAsync(response -> {
+      UpdatedEntity linkedEntity = new UpdatedEntity(
+          new RestLink(response.getHeaders().getLocation()));
+      AutowiredAnnotationBeanPostProcessor bpp = new AutowiredAnnotationBeanPostProcessor();
+      bpp.setBeanFactory(applicationContext.getAutowireCapableBeanFactory());
+      bpp.processInjection(linkedEntity);
+
+      return linkedEntity;
+    });
+  }
+
+  @Autowired
+  HyperstateTestConfiguration config;
+
+  @Override
+  public <E extends EntityWrapper<?>> CompletableFuture<E> get(String path, Class<E> type) {
+    URI rootUrl = config.getBaseUri().resolve(path);
+
+    return FutureConverter.convert(restTemplate.exchange(rootUrl, HttpMethod.GET, null, type))
+        .thenApply(r -> {
+          return r.getBody();
         });
-    }
 
-    @Override
-    public CompletableFuture<Void> delete(Link link,
-            Map<String, Object> filteredParameters) {
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>(
-                filteredParameters.size());
-        for (Entry<String, Object> entry : filteredParameters.entrySet()) {
-            body.add(entry.getKey(), entry.getValue());
-        }
-        RequestEntity<?> request = RequestEntity.put(link.getAddress())
-                .accept(MediaTypes.SIREN_JSON)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(body);
-
-        ListenableFuture<ResponseEntity<Void>> responseFuture = restTemplate
-                .exchange(link.getAddress(), HttpMethod.DELETE, request,
-                        Void.class);
-        return FutureConverter.convert(responseFuture)
-                .thenApplyAsync(response -> {
-                    return response.getBody();
-                });
-    }
-
-    @Override
-    public CompletableFuture<EntityWrapper<?>> get(Link link,
-            Map<String, Object> filteredParameters) {
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>(
-                filteredParameters.size());
-        for (Entry<String, Object> entry : filteredParameters.entrySet()) {
-            body.add(entry.getKey(), entry.getValue());
-        }
-        RequestEntity<?> request = RequestEntity.put(link.getAddress())
-                .accept(MediaTypes.SIREN_JSON)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(body);
-
-        @SuppressWarnings("rawtypes")
-        ListenableFuture<ResponseEntity<EntityWrapper>> responseFuture = restTemplate
-                .exchange(link.getAddress(), HttpMethod.GET, request,
-                        EntityWrapper.class);
-        return FutureConverter.convert(responseFuture)
-                .thenApplyAsync(response -> {
-                    return response.getBody();
-                });
-
-    }
-
-    @Override
-    public CompletableFuture<UpdatedEntity> update(Link link,
-            Map<String, Object> filteredParameters) {
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>(
-                filteredParameters.size());
-        for (Entry<String, Object> entry : filteredParameters.entrySet()) {
-            body.add(entry.getKey(), entry.getValue());
-        }
-        RequestEntity<?> request = RequestEntity.put(link.getAddress())
-                .accept(MediaTypes.SIREN_JSON)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(body);
-
-        ListenableFuture<ResponseEntity<Void>> responseFuture = restTemplate
-                .exchange(link.getAddress(), HttpMethod.PUT, request,
-                        Void.class);
-        return FutureConverter.convert(responseFuture)
-                .thenApplyAsync(response -> {
-                    UpdatedEntity linkedEntity = new UpdatedEntity(
-                            new RestLink(response.getHeaders().getLocation()));
-                    AutowiredAnnotationBeanPostProcessor bpp = new AutowiredAnnotationBeanPostProcessor();
-                    bpp.setBeanFactory(
-                            applicationContext.getAutowireCapableBeanFactory());
-                    bpp.processInjection(linkedEntity);
-
-                    return linkedEntity;
-                });
-    }
-
-    @Autowired
-    HyperstateTestConfiguration config;
-
-    @Override
-    public <E extends EntityWrapper<?>> CompletableFuture<E> get(String path,
-            Class<E> type) {
-        URI rootUrl = config.getBaseUri().resolve(path);
-
-        return FutureConverter.convert(
-                restTemplate.exchange(rootUrl, HttpMethod.GET, null, type))
-                .thenApply(r -> {
-                    return r.getBody();
-                });
-
-    }
+  }
 
 }

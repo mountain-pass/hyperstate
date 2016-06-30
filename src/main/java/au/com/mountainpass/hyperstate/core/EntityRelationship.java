@@ -12,38 +12,38 @@ import au.com.mountainpass.hyperstate.core.entities.LinkedEntity;
 
 public class EntityRelationship extends Relationship {
 
-    private Entity entity;
+  private Entity entity;
 
-    protected EntityRelationship() {
-    }
+  protected EntityRelationship() {
+  }
 
-    public EntityRelationship(Entity entity, String... natures) {
-        super(natures);
-        this.entity = entity;
-    }
+  public EntityRelationship(Entity entity, String... natures) {
+    super(natures);
+    this.entity = entity;
+  }
 
-    @Autowired
-    public void setApplicationContext(ApplicationContext context) {
-        AutowiredAnnotationBeanPostProcessor bpp = new AutowiredAnnotationBeanPostProcessor();
-        bpp.setBeanFactory(context.getAutowireCapableBeanFactory());
-        bpp.processInjection(this.entity);
-    }
+  @Autowired
+  public void setApplicationContext(ApplicationContext context) {
+    AutowiredAnnotationBeanPostProcessor bpp = new AutowiredAnnotationBeanPostProcessor();
+    bpp.setBeanFactory(context.getAutowireCapableBeanFactory());
+    bpp.processInjection(this.entity);
+  }
 
-    // public EntityRelationship(Link link, String label, String[] natures) {
-    // super(natures);
-    // this.entity = new LinkedEntity(link, label, null);
-    // }
+  // public EntityRelationship(Link link, String label, String[] natures) {
+  // super(natures);
+  // this.entity = new LinkedEntity(link, label, null);
+  // }
 
-    /**
-     * @return the entity
-     */
-    @JsonIgnore
-    public Entity getEntity() {
-        return entity;
-    }
+  /**
+   * @return the entity
+   */
+  @JsonIgnore
+  public Entity getEntity() {
+    return entity;
+  }
 
-    @JsonUnwrapped
-    public LinkedEntity getEntityLink() {
-        return entity.toLinkedEntity();
-    }
+  @JsonUnwrapped
+  public LinkedEntity getEntityLink() {
+    return entity.toLinkedEntity();
+  }
 }

@@ -21,6 +21,7 @@ buildscript {
 
 plugins { 
     id "io.spring.dependency-management" version "0.5.7.RELEASE"
+    id "co.riiid.gradle" version "0.4.2"
 }
 
 
@@ -491,6 +492,20 @@ jdepend {
     reportsDir=file("$qaReportsDir/jdepend")
     
 } 
+
+github {
+    owner = 'mountain-pass'
+    repo = 'hyperstate'
+    token = githubToken
+    tagName = '${project.version}'
+    targetCommitish = 'master'
+    name = 'v${project.version}'
+    body = """Release """
+    assets = configurations.archives.allArtifacts.files.files
+    prerelease = true
+}
+
+uploadArchives.finalizedBy githubRelease
 
 
 gradle.taskGraph.afterTask { Task task, TaskState state ->

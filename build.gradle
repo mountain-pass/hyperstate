@@ -1,128 +1,498 @@
 buildscript {
-    ext { 
-        springBootVersion = '1.3.5.RELEASE'
-    }
-    repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-        jcenter()
-        mavenCentral()
-        maven { url "https://repo.spring.io/milestone" }
-        maven { url "https://repo.spring.io/snapshot" }
-    }
-    dependencies {
-        classpath 'org.bouncycastle:bcpkix-jdk15on:1.54'
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
-        classpath 'org.standardout:gradle-versioneye-plugin:1.4.0'
-    }
-    
-    
+  ext {  springBootVersion = '1.3.5.RELEASE' }
+  repositories {
+    maven { url "https://plugins.gradle.org/m2/" }
+    jcenter()
+    mavenCentral()
+    maven { url "https://repo.spring.io/milestone" }
+    maven { url "https://repo.spring.io/snapshot" }
+  }
+  dependencies {
+    classpath 'org.bouncycastle:bcpkix-jdk15on:1.54'
+    classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
+    classpath 'org.standardout:gradle-versioneye-plugin:1.4.0'
+  }
 }
 
 
-plugins { 
-    id "io.spring.dependency-management" version "0.5.7.RELEASE"
-    id "co.riiid.gradle" version "0.4.2"
+plugins {
+  id "io.spring.dependency-management" version "0.5.7.RELEASE"
+  id "co.riiid.gradle" version "0.4.2"
 }
 
-
-
-
-
-
-
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-apply plugin: 'spring-boot'
-apply plugin: 'io.spring.dependency-management'
-apply plugin: 'announce'
 apply plugin: 'maven'
-apply plugin: 'signing'
 apply plugin: 'io.codearte.nexus-staging'
-apply plugin: 'jacoco'
-apply plugin: 'org.standardout.versioneye'
-apply plugin: 'findbugs'
-apply plugin: 'checkstyle'
-apply plugin: 'pmd'
-apply plugin: 'jdepend'
-
+apply plugin: 'announce'
 
 group = "au.com.mountain-pass"
 archivesBaseName = "hyperstate"
 
 gradle.taskGraph.whenReady {taskGraph ->
-    if (taskGraph.hasTask(uploadArchives)) {
-        URL url = new URL( "https://oss.sonatype.org/service/local/artifact/maven/redirect?g=${project.group}&a=${archivesBaseName}&v=LATEST&r=releases" )
-        HttpURLConnection conn = url.openConnection();
-        conn.setInstanceFollowRedirects(false);
-        def code = conn.getResponseCode();
-        if( code == 404 ) {
-            version = 1
-        }
-        else {
-            String location = conn.getHeaderField("Location")
-            logger.debug("latest library location : " + location)
-            String currentVersion = location.replaceAll(~/.*-(.*?)\.jar/, '$1')
-            logger.debug("currentVersion : " + currentVersion)
-            
-            version = Integer.parseInt(currentVersion) + 1
-            logger.debug("nextVersion : " + version)
-        
-        }
-    } else {
-        version = 'LOCAL'
+  if (taskGraph.hasTask(uploadArchives)) {
+    URL url = new URL( "https://oss.sonatype.org/service/local/artifact/maven/redirect?g=${project.group}&a=${archivesBaseName}&v=LATEST&r=releases" )
+    HttpURLConnection conn = url.openConnection();
+    conn.setInstanceFollowRedirects(false);
+    def code = conn.getResponseCode();
+    if( code == 404 ) {
+      version = 1
     }
-    if(taskGraph.hasTask(uploadSnapshotArchives)) {
-        version = version + "-SNAPSHOT"
+    else {
+      String location = conn.getHeaderField("Location")
+      logger.debug("latest library location : " + location)
+      String currentVersion = location.replaceAll(~/.*-(.*?)\.jar/, '$1')
+      logger.debug("currentVersion : " + currentVersion)
+
+      version = Integer.parseInt(currentVersion) + 1
+      logger.debug("nextVersion : " + version)
     }
-    logger.lifecycle("${archivesBaseName} version: " + version)
+  } else {
+    version = 'LOCAL'
+  }
+  if(taskGraph.hasTask(uploadSnapshotArchives)) {
+    version = version + "-SNAPSHOT"
+  }
+  logger.lifecycle("${archivesBaseName} version: " + version)
 }
 
-ext{
-  qaReportsDir = file("${buildDir}/test-results")
+allprojects {
+  apply plugin: 'eclipse'
+  apply plugin: 'idea'
 
-  // TODO: Increase these, but needs to be set per subproject
-  limits = [
+
+  ext{
+    qaReportsDir = file("${buildDir}/test-results")
+  }
+
+  repositories {
+    jcenter()
+    mavenCentral()
+    maven { url "https://repo.spring.io/milestone" }
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "http://dl.bintray.com/typesafe/maven-releases" }
+  }
+
+
+  configurations {
+    providedRuntime
+    codacy
+  }
+}
+
+subprojects {
+  apply plugin: 'signing'
+  apply plugin: 'java'
+  apply plugin: 'spring-boot'
+  apply plugin: 'io.spring.dependency-management'
+  apply plugin: 'jacoco'
+  apply plugin: 'org.standardout.versioneye'
+  apply plugin: 'findbugs'
+  apply plugin: 'checkstyle'
+  apply plugin: 'pmd'
+  apply plugin: 'jdepend'
+
+
+
+
+
+  ext{
+    // TODO: Increase these, but needs to be set per subproject
+    limits = [
       'instruction': 40.23,
       'branch'     : 23.76,
       'line'       : 40.9,
       'complexity' : 37.5,
       'method'     : 47.44,
       'class'      : 67.86
-  ]
-  
-  
+    ]
+  }
+
+
+  compileJava.options.compilerArgs.add '-parameters'
+  compileTestJava.options.compilerArgs.add '-parameters'
+
+
+  jar { baseName = "${archivesBaseName}" }
+
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
+
+
+  dependencies {
+    codacy group: 'com.codacy', name: 'codacy-coverage-reporter', version: '1.0.7'
+
+    checkstyle 'com.puppycrawl.tools:checkstyle:7.0'
+    jdepend 'org.apache.ant:ant-jdepend:1.9.7'
+    pmd 'net.sourceforge.pmd:pmd-java:5.5.0'
+  }
+
+
+  eclipse {
+    classpath { containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER') }
+  }
+
+  eclipseProject {
+    doLast {
+      // https://discuss.gradle.org/t/how-to-write-properties-to-3rd-party-eclipse-settings-files/6499/2
+
+      def props = new Properties()
+      file(".settings/org.eclipse.jdt.core.prefs").withInputStream { stream ->
+        props.load(stream)
+      }
+      props.setProperty("org.eclipse.jdt.core.compiler.codegen.methodParameters", "generate")
+      file(".settings/org.eclipse.jdt.core.prefs").withOutputStream { stream ->
+        props.store(stream, null)
+      }
+    }
+  }
+
+  task wrapper(type: Wrapper) { gradleVersion = '2.14' }
+
+
+
+  task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+  }
+
+  task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+  }
+
+
+
+  test { enabled = false }
+
+
+  task unitTest(type: Test) {
+    testClassesDir = sourceSets.test.output.classesDir
+    classpath = sourceSets.test.runtimeClasspath
+    ext.outputDir = "${buildDir}/test-results"
+    outputs.dir file(outputDir)
+    reports.junitXml.destination = file("${outputDir}/${name}/junit")
+    reports.html.destination = file("${outputDir}/${name}/junit/html")
+    binResultsDir = file("${outputDir}/${name}/junit/binary")
+    jacoco {
+      append = false
+      destinationFile = file("${outputDir}/${name}/jacoco/${name}.exec")
+    }
+    systemProperty 'cucumber.options',  "--plugin json:${outputDir}/${name}/bdd/${archivesBaseName}.json --plugin html:${outputDir}/${name}/bdd/html --plugin junit:${outputDir}/${name}/bdd/TEST-${archivesBaseName}.xml"
+  }
+
+
+  task integrationTest(type: Test) {
+    testClassesDir = sourceSets.test.output.classesDir
+    classpath = sourceSets.test.runtimeClasspath
+    ext.outputDir = "${buildDir}/test-results"
+    outputs.dir file(outputDir)
+    reports.junitXml.destination = file("${outputDir}/${name}/junit")
+    reports.html.destination = file("${outputDir}/${name}/junit/html")
+    binResultsDir = file("${outputDir}/${name}/junit/binary")
+    jacoco {
+      append = false
+      destinationFile = file("${outputDir}/${name}/jacoco/${name}.exec")
+    }
+    systemProperty 'cucumber.options',  "--plugin json:${outputDir}/${name}/bdd/${archivesBaseName}.json --plugin html:${outputDir}/${name}/bdd/html --plugin junit:${outputDir}/${name}/bdd/TEST-${archivesBaseName}.xml"
+    systemProperty 'spring.profiles.active', 'integration'
+  }
+
+  task uiIntegrationTest(type: Test) {
+    testClassesDir = sourceSets.test.output.classesDir
+    classpath = sourceSets.test.runtimeClasspath
+    ext.outputDir = "${buildDir}/test-results"
+    outputs.dir file(outputDir)
+    reports.junitXml.destination = file("${outputDir}/${name}/junit")
+    reports.html.destination = file("${outputDir}/${name}/junit/html")
+    binResultsDir = file("${outputDir}/${name}/junit/binary")
+    jacoco {
+      append = false
+      destinationFile = file("${outputDir}/${name}/jacoco/${name}.exec")
+    }
+    systemProperty 'cucumber.options',  "--plugin json:${outputDir}/${name}/bdd/${archivesBaseName}.json --plugin html:${outputDir}/${name}/bdd/html --plugin junit:${outputDir}/${name}/bdd/TEST-${archivesBaseName}.xml"
+    systemProperty 'spring.profiles.active', 'ui-integration'
+  }
+
+  test.dependsOn {
+    tasks.findAll { task -> task.name.endsWith('Test') }
+  }
+
+  tasks.withType(Test) {
+    scanForTestClasses = false
+    include "**/*Tests.class" // whatever Ant pattern matches your test class files
+  }
+
+  jacoco {
+    toolVersion = "0.7.7.201606060606"
+    reportsDir = file("${buildDir}/test-results/jacoco")
+  }
+
+
+
+  jacocoTestReport {
+    executionData = fileTree(dir: "${buildDir}", include: '**/jacoco/*.exec')
+
+    reports {
+      xml.enabled true
+      xml.destination "${buildDir}/test-results/jacoco/${archivesBaseName}.xml"
+      csv.enabled false
+      html.enabled true
+      html.destination "${buildDir}/test-results/jacoco/html"
+    }
+
+    doLast {
+      def report = reports.xml.destination
+      logger.lifecycle("Checking coverage results: ${report}")
+
+      def parser = new XmlParser()
+      parser.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+      parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false)
+      def results = parser.parse(report)
+
+      def percentage = {
+        if( it == null ) {
+          return 100
+        }
+        def covered = it.'@covered' as Double
+        def missed = it.'@missed' as Double
+        ((covered / (covered + missed)) * 100).round(2)
+      }
+
+      def counters = results.counter
+      def metrics = [:]
+      metrics << [
+        'instruction': percentage(counters.find { it.'@type'.equals('INSTRUCTION') }),
+        'branch'     : percentage(counters.find { it.'@type'.equals('BRANCH') }),
+        'line'       : percentage(counters.find { it.'@type'.equals('LINE') }),
+        'complexity' : percentage(counters.find { it.'@type'.equals('COMPLEXITY') }),
+        'method'     : percentage(counters.find { it.'@type'.equals('METHOD') }),
+        'class'      : percentage(counters.find { it.'@type'.equals('CLASS') })
+      ]
+
+
+      def failures = []
+      def success = []
+      metrics.each {
+        def limit = limits[it.key]
+        if (it.value < limit) {
+          failures.add("- ${it.key} coverage rate is: ${it.value}%, minimum is ${limit}%")
+        }
+        else {
+          success.add("- ${it.key} coverage rate is: ${it.value}%, minimum is ${limit}%")
+        }
+      }
+
+      logger.quiet("------------------ Code Coverage Passes -----------------------")
+      success.each { logger.quiet(it) }
+      logger.quiet("---------------------------------------------------------------")
+      if (failures) {
+        logger.quiet("------------------ Code Coverage Failed -----------------------")
+        failures.each { logger.quiet(it) }
+        logger.quiet("---------------------------------------------------------------")
+        throw new GradleException("Code coverage failed")
+      } else{
+        logger.quiet("Passed Code Coverage Checks")
+      }
+    }
+  }
+
+
+
+  check.dependsOn jacocoTestReport
+
+  task qaReportsJar(type: Jar, dependsOn : check) {
+    classifier = 'qaReports'
+    from file("${buildDir}/test-results")
+  }
+
+  artifacts {
+    archives jar, javadocJar, sourcesJar, qaReportsJar
+  }
+
+
+  bootRepackage { enabled = false }
+
+  findbugs {
+    ignoreFailures = true
+    toolVersion = "3.0.1"
+    sourceSets = [sourceSets.main]
+    reportsDir = file("$qaReportsDir/findbugs")
+    effort = "max"
+    reportLevel = "low"
+  }
+
+
+  tasks.withType(FindBugs) {
+    reports {
+      xml.enabled false
+      html.enabled true
+      //html.stylesheet resources.text.fromFile('config/xsl/findbugs-custom.xsl')
+    }
+  }
+
+  task uploadCoverageToCodacy(type: JavaExec, dependsOn : jacocoTestReport) {
+    main = "com.codacy.CodacyCoverageReporter"
+    classpath = configurations.codacy
+    args = [
+      "-l",
+      "Java",
+      "-r",
+      "${buildDir}/test-results/jacoco/${archivesBaseName}.xml"
+    ]
+  }
+
+  task (codacyDepsize) << {
+    def size = 0;
+    configurations.codacy.collect { it.length() / (1024 * 1024) }.each { size += it }
+    println "Total dependencies size: ${Math.round(size * 100) / 100} Mb"
+
+    configurations
+        .codacy
+        .sort { -it.length() }
+        .each { println "${it.name} : ${Math.round(it.length() / (1024) * 100) / 100} kb" }
+  }
+
+  task (codacyLocs) << {
+    configurations.codacy.each {
+      String jarName = it
+      println jarName
+    }
+  }
+
+
+  checkstyle {
+    ignoreFailures=true
+    configFile=file("${rootProject.projectDir}/config/checkstyle/checkstyle.xml")
+    reportsDir=file("$qaReportsDir/checkstyle")
+  }
+
+  tasks.withType(Checkstyle) {
+    reports {
+      xml.enabled true
+      html.enabled true
+      html.stylesheet resources.text.fromFile("${rootProject.projectDir}/config/checkstyle/checkstyle.xsl")
+    }
+  }
+
+  pmd {
+    ruleSets = [
+      "java-basic",
+      "java-braces"
+    ]
+    ignoreFailures=true
+    reportsDir=file("$qaReportsDir/pmd")
+  }
+
+  jdepend {
+    ignoreFailures=true
+    reportsDir=file("$qaReportsDir/jdepend")
+
+  }
+
+  signing {
+    required { gradle.taskGraph.hasTask(":uploadArchives") }
+    sign jar, javadocJar, sourcesJar, qaReportsJar
+  }
+
+
 }
 
 
-compileJava.options.compilerArgs.add '-parameters'
-compileTestJava.options.compilerArgs.add '-parameters'
+task uploadSnapshotArchives() << { }
 
+uploadSnapshotArchives.finalizedBy uploadArchives
 
-jar { baseName = 'hyperstate' }
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+        authentication(userName: project.hasProperty('ossrhUsername') ? project.getProperty('ossrhUsername') : '', password: project.hasProperty('ossrhPassword') ? project.getProperty('ossrhPassword') : '')
+      }
 
-repositories {
-    jcenter()
-    mavenCentral()
-    maven { url "https://repo.spring.io/milestone" }
-    maven { url "https://repo.spring.io/snapshot" }
-    maven { url "http://dl.bintray.com/typesafe/maven-releases" }
+      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+        authentication(userName: project.hasProperty('ossrhUsername') ? project.getProperty('ossrhUsername') : '', password: project.hasProperty('ossrhPassword') ? project.getProperty('ossrhPassword') : '')
+      }
 
+      pom.project {
+        name 'Hyperstate'
+        packaging 'jar'
+        // optionally artifactId can be defined here
+        description 'A Hypermedia as the Engine of Application State (HATEOAS) library'
+        url 'https://github.com/mountain-pass/hyperstate'
+
+        scm {
+          connection 'scm:git:https://github.com/mountain-pass/hyperstate'
+          developerConnection 'scm:git:https://github.com/mountain-pass/hyperstate'
+          url 'https://github.com/mountain-pass/hyperstate'
+        }
+
+        licenses {
+          license {
+            name 'The Apache License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+          }
+        }
+
+        developers {
+          developer {
+            id 'tompahoward'
+            name 'Tom Howard'
+            email 'tom@windyroad.com.au'
+          }
+        }
+      }
+    }
+  }
+}
+
+nexusStaging {
+  username = project.hasProperty('ossrhUsername') ? project.getProperty('ossrhUsername') : ''
+  password = project.hasProperty('ossrhPassword') ? project.getProperty('ossrhPassword') : ''
+  numberOfRetries = 10
+  delayBetweenRetriesInMillis = 5000
 }
 
 
-configurations {
-    providedRuntime
-    codacy
+github {
+  owner = 'mountain-pass'
+  repo = 'hyperstate'
+  token = project.hasProperty('githubToken') ? project.getProperty('githubToken') : 'NOTSET'
+  tagName = "${version}"
+  targetCommitish = 'master'
+  name = "v${version}"
+  body = """Release"""
+  assets = configurations.archives.allArtifacts.files.filter { !it.name.endsWith('asc') }.files
+  prerelease = true
+  draft = true
 }
 
-dependencies {
+tasks.getByName("githubRelease") {
+  doFirst {
+    project.github.tagName = version
+    project.github.name = "v${version}"
+    println "TAG: " + project.github.tagName
+    println "NAME: " + project.github.name
+    println "Assests: " +  project.github.assets
+  }
+}
+
+closeAndPromoteRepository.finalizedBy githubRelease
+
+
+project(":hyperstate-core"){
+  archivesBaseName = "hyperstate-core"
+  dependencies {
+  }
+
+}
+
+project(":hyperstate-server"){
+
+
+  archivesBaseName = "hyperstate-server"
+  dependencies {
     compile 'org.bouncycastle:bcpkix-jdk15on:1.54'
 
     compile("org.springframework.boot:spring-boot-starter-web")
@@ -158,394 +528,20 @@ dependencies {
     testCompile("com.h2database:h2:1.4.192")
 
 
-    codacy group: 'com.codacy', name: 'codacy-coverage-reporter', version: '1.0.7'
-    
-    checkstyle 'com.puppycrawl.tools:checkstyle:7.0'
-    jdepend 'org.apache.ant:ant-jdepend:1.9.7'
-    pmd 'net.sourceforge.pmd:pmd-java:5.5.0'
-}
-
-
-eclipse {
-    classpath {
-        containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
-    }
-}
-
-eclipseProject {
-    doLast {
-        // https://discuss.gradle.org/t/how-to-write-properties-to-3rd-party-eclipse-settings-files/6499/2
-
-        def props = new Properties()
-        file(".settings/org.eclipse.jdt.core.prefs").withInputStream { stream ->
-            props.load(stream)
-        }
-        props.setProperty("org.eclipse.jdt.core.compiler.codegen.methodParameters", "generate")
-        file(".settings/org.eclipse.jdt.core.prefs").withOutputStream { stream ->
-            props.store(stream, null)
-        }
-    }
-}
-
-task wrapper(type: Wrapper) { gradleVersion = '2.14' }
-
-
-
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-
-
-test {
-    enabled = false
-}
-
-
-task unitTest(type: Test) {
-    testClassesDir = sourceSets.test.output.classesDir
-    classpath = sourceSets.test.runtimeClasspath
-    ext.outputDir = "${buildDir}/test-results"
-    outputs.dir file(outputDir)
-    reports.junitXml.destination = file("${outputDir}/${name}/junit")
-    reports.html.destination = file("${outputDir}/${name}/junit/html")
-    binResultsDir = file("${outputDir}/${name}/junit/binary")
-    jacoco {
-        append = false
-        destinationFile = file("${outputDir}/${name}/jacoco/${name}.exec")
-    }
-    systemProperty 'cucumber.options',  "--plugin json:${outputDir}/${name}/bdd/${archivesBaseName}.json --plugin html:${outputDir}/${name}/bdd/html --plugin junit:${outputDir}/${name}/bdd/TEST-${archivesBaseName}.xml"
-}
-
-
-task integrationTest(type: Test) {
-    testClassesDir = sourceSets.test.output.classesDir
-    classpath = sourceSets.test.runtimeClasspath
-    ext.outputDir = "${buildDir}/test-results"
-    outputs.dir file(outputDir)
-    reports.junitXml.destination = file("${outputDir}/${name}/junit")
-    reports.html.destination = file("${outputDir}/${name}/junit/html")
-    binResultsDir = file("${outputDir}/${name}/junit/binary")
-    jacoco {
-        append = false
-        destinationFile = file("${outputDir}/${name}/jacoco/${name}.exec")
-    }
-    systemProperty 'cucumber.options',  "--plugin json:${outputDir}/${name}/bdd/${archivesBaseName}.json --plugin html:${outputDir}/${name}/bdd/html --plugin junit:${outputDir}/${name}/bdd/TEST-${archivesBaseName}.xml"
-    systemProperty 'spring.profiles.active', 'integration'
-}
-
-task uiIntegrationTest(type: Test) {
-    testClassesDir = sourceSets.test.output.classesDir
-    classpath = sourceSets.test.runtimeClasspath
-    ext.outputDir = "${buildDir}/test-results"
-    outputs.dir file(outputDir)
-    reports.junitXml.destination = file("${outputDir}/${name}/junit")
-    reports.html.destination = file("${outputDir}/${name}/junit/html")
-    binResultsDir = file("${outputDir}/${name}/junit/binary")
-    jacoco {
-        append = false
-        destinationFile = file("${outputDir}/${name}/jacoco/${name}.exec")
-    }
-    systemProperty 'cucumber.options',  "--plugin json:${outputDir}/${name}/bdd/${archivesBaseName}.json --plugin html:${outputDir}/${name}/bdd/html --plugin junit:${outputDir}/${name}/bdd/TEST-${archivesBaseName}.xml"
-    systemProperty 'spring.profiles.active', 'ui-integration'
-}
-
-test.dependsOn {
-    tasks.findAll { task -> task.name.endsWith('Test') }
-}
-
-tasks.withType(Test) {
-    scanForTestClasses = false
-    include "**/*Tests.class" // whatever Ant pattern matches your test class files
-}
-
-jacoco {
-    toolVersion = "0.7.7.201606060606"
-    reportsDir = file("${buildDir}/test-results/jacoco")
-}
-
-
-
-jacocoTestReport {
-    executionData = fileTree(dir: "${buildDir}", include: '**/jacoco/*.exec')
-    
-    reports {
-        xml.enabled true
-        xml.destination "${buildDir}/test-results/jacoco/${archivesBaseName}.xml"
-        csv.enabled false
-        html.enabled true
-        html.destination "${buildDir}/test-results/jacoco/html"
-    }
-
-    doLast {
-        def report = reports.xml.destination
-        logger.lifecycle("Checking coverage results: ${report}")
-
-        def parser = new XmlParser()
-        parser.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-        parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false)
-        def results = parser.parse(report)
-
-        def percentage = {
-            if( it == null ) {
-                return 100
-            }
-            def covered = it.'@covered' as Double
-            def missed = it.'@missed' as Double
-            ((covered / (covered + missed)) * 100).round(2)
-        }
-
-        def counters = results.counter
-        def metrics = [:]
-        metrics << [
-            'instruction': percentage(counters.find { it.'@type'.equals('INSTRUCTION') }),
-            'branch'     : percentage(counters.find { it.'@type'.equals('BRANCH') }),
-            'line'       : percentage(counters.find { it.'@type'.equals('LINE') }),
-            'complexity' : percentage(counters.find { it.'@type'.equals('COMPLEXITY') }),
-            'method'     : percentage(counters.find { it.'@type'.equals('METHOD') }),
-            'class'      : percentage(counters.find { it.'@type'.equals('CLASS') })
-        ]
-
-
-        def failures = []
-        def success = []
-        metrics.each {
-            def limit = limits[it.key]
-            if (it.value < limit) {
-                failures.add("- ${it.key} coverage rate is: ${it.value}%, minimum is ${limit}%")
-            }
-            else {
-                success.add("- ${it.key} coverage rate is: ${it.value}%, minimum is ${limit}%")
-            }
-        }
-
-        logger.quiet("------------------ Code Coverage Passes -----------------------")
-        success.each { logger.quiet(it) }
-        logger.quiet("---------------------------------------------------------------")
-        if (failures) {
-            logger.quiet("------------------ Code Coverage Failed -----------------------")
-            failures.each { logger.quiet(it) }
-            logger.quiet("---------------------------------------------------------------")
-            throw new GradleException("Code coverage failed")
-        } else{
-            logger.quiet("Passed Code Coverage Checks")
-        }
-    }
-}
-
-
-
-check.dependsOn jacocoTestReport
-
-task qaReportsJar(type: Jar, dependsOn : check) {
-    classifier = 'qaReports'
-    from file("${buildDir}/test-results")
-}
-
-artifacts { 
-    archives jar, javadocJar, sourcesJar, qaReportsJar
-}
-
-signing { 
-    required { gradle.taskGraph.hasTask(":uploadArchives") }
-    sign jar, javadocJar, sourcesJar, qaReportsJar
-}
-
-task uploadSnapshotArchives() << { }
-
-uploadSnapshotArchives.finalizedBy uploadArchives
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
-                authentication(userName: project.hasProperty('ossrhUsername') ? project.getProperty('ossrhUsername') : '', password: project.hasProperty('ossrhPassword') ? project.getProperty('ossrhPassword') : '')
-            }
-
-            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
-                authentication(userName: project.hasProperty('ossrhUsername') ? project.getProperty('ossrhUsername') : '', password: project.hasProperty('ossrhPassword') ? project.getProperty('ossrhPassword') : '')
-            }
-
-            pom.project {
-                name 'Hyperstate'
-                packaging 'jar'
-                // optionally artifactId can be defined here
-                description 'A Hypermedia as the Engine of Application State (HATEOAS) library'
-                url 'https://github.com/mountain-pass/hyperstate'
-
-                scm {
-                    connection 'scm:git:https://github.com/mountain-pass/hyperstate'
-                    developerConnection 'scm:git:https://github.com/mountain-pass/hyperstate'
-                    url 'https://github.com/mountain-pass/hyperstate'
-                }
-
-                licenses {
-                    license {
-                        name 'The Apache License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id 'tompahoward'
-                        name 'Tom Howard'
-                        email 'tom@windyroad.com.au'
-                    }
-                }
-            }
-        }
-    }
-}
-
-nexusStaging {
-    username = project.hasProperty('ossrhUsername') ? project.getProperty('ossrhUsername') : ''
-    password = project.hasProperty('ossrhPassword') ? project.getProperty('ossrhPassword') : ''
-    numberOfRetries = 10
-    delayBetweenRetriesInMillis = 5000
-}
-
-bootRepackage {
-    enabled = false
-}
-
-findbugs {
-  ignoreFailures = true
-  toolVersion = "3.0.1"
-  sourceSets = [sourceSets.main]
-  reportsDir = file("$qaReportsDir/findbugs")
-  effort = "max"
-  reportLevel = "low"
-}
-
-
-tasks.withType(FindBugs) {
-    reports {
-        xml.enabled false
-        html.enabled true
-        //html.stylesheet resources.text.fromFile('config/xsl/findbugs-custom.xsl')
-    }
-}
-
-task uploadCoverageToCodacy(type: JavaExec, dependsOn : jacocoTestReport) {
-   main = "com.codacy.CodacyCoverageReporter"
-   classpath = configurations.codacy
-   args = [
-            "-l",
-            "Java",
-            "-r",
-            "${buildDir}/test-results/jacoco/${archivesBaseName}.xml"
-           ]
-}
-
-task (codacyDepsize) << {
-def size = 0;
-configurations.codacy.collect { it.length() / (1024 * 1024) }.each { size += it }
-println "Total dependencies size: ${Math.round(size * 100) / 100} Mb"
-
-configurations
-        .codacy
-        .sort { -it.length() }
-        .each { println "${it.name} : ${Math.round(it.length() / (1024) * 100) / 100} kb" }
-}
-
-task (codacyLocs) << {
-    configurations.codacy.each {
-        String jarName = it
-        println jarName
-    }
-}
-
- 
-checkstyle {
-    ignoreFailures=true
-    configFile=file("${project.projectDir}/config/checkstyle/checkstyle.xml")
-    reportsDir=file("$qaReportsDir/checkstyle")
-}
-
-tasks.withType(Checkstyle) {
-    reports {
-        xml.enabled true
-        html.enabled true
-        html.stylesheet resources.text.fromFile("${project.projectDir}/config/checkstyle/checkstyle.xsl")
-    }
-}
-
-pmd {
-    ruleSets = [
-        "java-basic",
-        "java-braces"
-    ]
-    ignoreFailures=true
-    reportsDir=file("$qaReportsDir/pmd")
-}
-
-jdepend { 
-    ignoreFailures=true 
-    reportsDir=file("$qaReportsDir/jdepend")
-    
-} 
-
-github {
-    owner = 'mountain-pass'
-    repo = 'hyperstate'
-    token = project.hasProperty('githubToken') ? project.getProperty('githubToken') : 'NOTSET'
-    tagName = "${version}"
-    targetCommitish = 'master'
-    name = "v${version}"
-    body = """Release"""
-    assets = configurations.archives.allArtifacts.files.filter { !it.name.endsWith('asc') }.files
-    prerelease = true
-    draft = true
-}
-
-tasks.getByName("githubRelease") {
-    doFirst {
-        project.github.tagName = version
-        project.github.name = "v${version}"
-        println "TAG: " + project.github.tagName
-        println "NAME: " + project.github.name
-        println "Assests: " +  project.github.assets
-    }
-}
-
-closeAndPromoteRepository.finalizedBy githubRelease
-
-
-
-project(":hyperstate-core"){
-    apply plugin: 'java'
-    dependencies {
-    }
-}
-
-project(":hyperstate-server"){
-    apply plugin: 'java'
-    dependencies {
-        compile project(":hyperstate-core")
-    }
+    compile project(":hyperstate-core")
+  }
 }
 
 project(":hyperstate-client"){
-    apply plugin: 'java'
-    dependencies {
-        compile project(":hyperstate-core")
-    }
+  archivesBaseName = "hyperstate-client"
+  dependencies { compile project(":hyperstate-core") }
 }
 
 gradle.taskGraph.afterTask { Task task, TaskState state ->
-    if (state.failure) {
-        announce.announce("':${task.name}' FAILED", "local")
-    }
-    else {
-        announce.announce("':${task.name}' succeeded", "local")
-    }
+  if (state.failure) {
+    announce.announce("'${task.path}' FAILED", "local")
+  }
+  else {
+    announce.announce("'${task.path}' succeeded", "local")
+  }
 }

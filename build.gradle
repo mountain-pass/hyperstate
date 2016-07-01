@@ -515,11 +515,11 @@ tasks.getByName("githubRelease") {
         project.github.name = "v${version}"
         println "TAG: " + project.github.tagName
         println "NAME: " + project.github.name
+        println "Assests: " +  project.github.assets
     }
 }
 
-
-uploadArchives.finalizedBy githubRelease
+closeAndPromoteRepository.finalizedBy githubRelease
 
 
 gradle.taskGraph.afterTask { Task task, TaskState state ->

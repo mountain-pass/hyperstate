@@ -497,9 +497,9 @@ github {
     owner = 'mountain-pass'
     repo = 'hyperstate'
     token = project.hasProperty('githubToken') ? project.getProperty('githubToken') : 'NOTSET'
-    tagName = '${project.version}'
+    tagName = "${project.version}"
     targetCommitish = 'master'
-    name = 'v${project.version}'
+    name = "v${project.version}"
     body = """Release """
     assets = configurations.archives.allArtifacts.files.files
     prerelease = true

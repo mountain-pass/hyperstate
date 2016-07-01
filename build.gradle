@@ -504,7 +504,7 @@ github {
     targetCommitish = 'master'
     name = "v${version}"
     body = """Release"""
-    assets = configurations.archives.allArtifacts.files.files
+    assets = configurations.archives.allArtifacts.files.filter { !it.name.endsWith('asc') }.files
     prerelease = true
     draft = true
 }
@@ -519,7 +519,7 @@ tasks.getByName("githubRelease") {
     }
 }
 
-closeAndPromoteRepository.finalizedBy githubRelease
+closeRepository.dependsOn githubRelease
 
 
 gradle.taskGraph.afterTask { Task task, TaskState state ->

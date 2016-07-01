@@ -496,7 +496,7 @@ jdepend {
 github {
     owner = 'mountain-pass'
     repo = 'hyperstate'
-    token = githubToken
+    token = project.hasProperty('githubToken') ? project.getProperty('githubToken') : ''
     tagName = '${project.version}'
     targetCommitish = 'master'
     name = 'v${project.version}'

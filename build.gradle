@@ -17,7 +17,10 @@ buildscript {
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
         classpath 'org.standardout:gradle-versioneye-plugin:1.4.0'
     }
+    
+    
 }
+
 
 plugins { 
     id "io.spring.dependency-management" version "0.5.7.RELEASE"
@@ -63,6 +66,36 @@ apply plugin: 'jdepend'
 
 group = "au.com.mountain-pass"
 archivesBaseName = "hyperstate"
+
+gradle.taskGraph.whenReady {taskGraph ->
+    if (taskGraph.hasTask(uploadArchives)) {
+        URL url = new URL( "https://oss.sonatype.org/service/local/artifact/maven/redirect?g=${project.group}&a=${archivesBaseName}&v=LATEST&r=releases" )
+        HttpURLConnection conn = url.openConnection();
+        conn.setInstanceFollowRedirects(false);
+        def code = conn.getResponseCode();
+        if( code == 404 ) {
+            version = 1
+        }
+        else {
+            String location = conn.getHeaderField("Location")
+            logger.debug("latest library location : " + location)
+            String currentVersion = location.replaceAll(~/.*-(.*?)\.jar/, '$1')
+            logger.debug("currentVersion : " + currentVersion)
+            
+            version = Integer.parseInt(currentVersion) + 1
+            logger.debug("nextVersion : " + version)
+        
+        }
+    } else {
+        version = 'LOCAL'
+    }
+    if(taskGraph.hasTask(uploadSnapshotArchives)) {
+        version = version + "-SNAPSHOT"
+    }
+    logger.lifecycle("${archivesBaseName} version: " + version)
+}
+
+
 
 compileJava.options.compilerArgs.add '-parameters'
 compileTestJava.options.compilerArgs.add '-parameters'
@@ -326,37 +359,7 @@ signing {
     sign jar, javadocJar, sourcesJar, qaReportsJar
 }
 
-task getNextVersion << {
-    // get https://oss.sonatype.org/service/local/artifact/maven/redirect?g=au.com.mountain-pass&a=hyperstate&v=LATEST&r=public to
-    // get the URL for the most recent version (snapshot or release)
-    // get https://oss.sonatype.org/service/local/artifact/maven/redirect?g=au.com.mountain-pass&a=hyperstate&v=LATEST&r=releases to
-    // get the URL for the most recent version (release)
-    // we want to parse out the version from the latest release, add one and that gives us the next release version.
-    // if not found then the next release version is 1.
-    URL url = new URL( "https://oss.sonatype.org/service/local/artifact/maven/redirect?g=${project.group}&a=${archivesBaseName}&v=LATEST&r=releases" )
-    HttpURLConnection conn = url.openConnection();
-    conn.setInstanceFollowRedirects(false);
-    def code = conn.getResponseCode();
-    if( code == 404 ) {
-        project.version = 1
-    }
-    else {
-        // TODO
-        String location = conn.getHeaderField("Location")
-        logger.debug("latest library location : " + location)
-        String currentVersion = location.replaceAll(~/.*-(.*?)\.jar/, '$1')
-        logger.debug("currentVersion : " + currentVersion)
-            
-        project.version = Integer.parseInt(currentVersion) + 1
-        logger.debug("nextVersion : " + project.version)
-        
-    }
-    logger.info("version : " + project.version)
-}
-
-uploadArchives.dependsOn getNextVersion
-
-task uploadSnapshotArchives(dependsOn: getNextVersion) << { project.version = "${project.version}-SNAPSHOT" }
+task uploadSnapshotArchives() << { }
 
 uploadSnapshotArchives.finalizedBy uploadArchives
 
@@ -497,13 +500,24 @@ github {
     owner = 'mountain-pass'
     repo = 'hyperstate'
     token = project.hasProperty('githubToken') ? project.getProperty('githubToken') : 'NOTSET'
-    tagName = "${project.version}"
+    tagName = "${version}"
     targetCommitish = 'master'
-    name = "v${project.version}"
-    body = """Release """
+    name = "v${version}"
+    body = """Release"""
     assets = configurations.archives.allArtifacts.files.files
     prerelease = true
+    draft = true
 }
+
+tasks.getByName("githubRelease") {
+    doFirst {
+        project.github.tagName = version
+        project.github.name = "v${version}"
+        println "TAG: " + project.github.tagName
+        println "NAME: " + project.github.name
+    }
+}
+
 
 uploadArchives.finalizedBy githubRelease
 

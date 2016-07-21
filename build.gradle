@@ -521,7 +521,7 @@ project(":hyperstate-server"){
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile "info.cukes:cucumber-java:1.2.4","info.cukes:cucumber-junit:1.2.4","info.cukes:cucumber-spring:1.2.4"
 
-    testCompile 'org.seleniumhq.selenium:selenium-java:2.53.0'
+    testCompile 'org.seleniumhq.selenium:selenium-java:2.53.1'
 
 
     //compile('org.flywaydb:flyway-core')

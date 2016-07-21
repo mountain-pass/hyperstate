@@ -119,7 +119,7 @@ subprojects {
 
 
   dependencies {
-    codacy group: 'com.codacy', name: 'codacy-coverage-reporter', version: '1.0.7'
+    codacy group: 'com.codacy', name: 'codacy-coverage-reporter', version: '1.0.10'
 
     checkstyle 'com.puppycrawl.tools:checkstyle:7.0'
     jdepend 'org.apache.ant:ant-jdepend:1.9.7'

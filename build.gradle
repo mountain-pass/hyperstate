@@ -508,12 +508,12 @@ project(":hyperstate-server"){
   ext{
     // TODO: Increase these
     limits = [
-      'instruction': 35.03,
-      'branch'     : 12.5,
-      'line'       : 33.76,
-      'complexity' : 31.67,
-      'method'     : 47.5,
-      'class'      : 57.14
+      'instruction': 32.58,
+      'branch'     : 11.36,
+      'line'       : 31.61,
+      'complexity' : 30.3,
+      'method'     : 45.45,
+      'class'      : 55.56
     ]
   }
 

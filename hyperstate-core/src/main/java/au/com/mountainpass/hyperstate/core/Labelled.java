@@ -9,9 +9,6 @@ import java.util.regex.Pattern;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-import au.com.mountainpass.hyperstate.server.serialization.MessageSourceAwareSerializer;
 
 abstract public class Labelled {
 
@@ -42,8 +39,6 @@ abstract public class Labelled {
     /**
      * @return the label
      */
-    // TODO: use mixin here
-    @JsonSerialize(using = MessageSourceAwareSerializer.class)
     @JsonProperty("title")
     public String getLabel() {
         return label;

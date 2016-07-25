@@ -95,17 +95,6 @@ subprojects {
 
 
 
-  ext{
-    // TODO: Increase these, but needs to be set per subproject
-    limits = [
-      'instruction': 40.23,
-      'branch'     : 23.76,
-      'line'       : 40.9,
-      'complexity' : 37.5,
-      'method'     : 47.44,
-      'class'      : 67.86
-    ]
-  }
 
 
   compileJava.options.compilerArgs.add '-parameters'
@@ -483,7 +472,30 @@ closeAndPromoteRepository.finalizedBy githubRelease
 
 project(":hyperstate-core"){
   archivesBaseName = "hyperstate-core"
+  
+  ext{
+    // TODO: Increase these
+    limits = [
+      'instruction': 0,
+      'branch'     : 0,
+      'line'       : 0,
+      'complexity' : 0,
+      'method'     : 0,
+      'class'      : 0
+    ]
+  }
+
+  
   dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-hateoas")
+    compile("com.fasterxml.jackson.core:jackson-core:2.8.0")
+    compile('com.fasterxml.jackson.core:jackson-annotations:2.8.0')
+    compile('com.google.guava:guava:19.0')
+    compile("org.springframework.boot:spring-boot-starter-data-jpa")
+    compile("org.eclipse.jdt:org.eclipse.jdt.annotation:2.0.0")
+    compile 'org.apache.commons:commons-lang3:3.4'
+    
   }
 
 }
@@ -492,6 +504,20 @@ project(":hyperstate-server"){
 
 
   archivesBaseName = "hyperstate-server"
+  
+  ext{
+    // TODO: Increase these
+    limits = [
+      'instruction': 35.03,
+      'branch'     : 12.5,
+      'line'       : 33.76,
+      'complexity' : 31.67,
+      'method'     : 47.5,
+      'class'      : 57.14
+    ]
+  }
+
+  
   dependencies {
     compile 'org.bouncycastle:bcpkix-jdk15on:1.54'
 
@@ -502,14 +528,12 @@ project(":hyperstate-server"){
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
 
     compile("org.eclipse.jdt:org.eclipse.jdt.annotation:2.0.0")
-    compile('com.google.guava:guava:19.0')
 
     compile("com.fasterxml.jackson.core:jackson-core:2.8.0")
     compile('com.fasterxml.jackson.core:jackson-annotations:2.8.0')
 
     compile('org.apache.httpcomponents:httpasyncclient:4.1.2')
     compile('commons-codec:commons-codec:1.10')
-    compile 'org.apache.commons:commons-lang3:3.4'
 
     compile("org.webjars:bootstrap:3.3.6") // when updating, don't forget to update index.html
     compile("org.webjars:jquery:3.0.0") // when updating, don't forget to update index.html
@@ -529,11 +553,26 @@ project(":hyperstate-server"){
 
 
     compile project(":hyperstate-core")
+    
+    
   }
+  
+  
 }
 
 project(":hyperstate-client"){
   archivesBaseName = "hyperstate-client"
+  ext{
+    // TODO: Increase these
+    limits = [
+      'instruction': 0,
+      'branch'     : 0,
+      'line'       : 0,
+      'complexity' : 0,
+      'method'     : 0,
+      'class'      : 0
+    ]
+  }
   dependencies { compile project(":hyperstate-core") }
 }
 

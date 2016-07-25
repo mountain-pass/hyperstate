@@ -553,6 +553,7 @@ project(":hyperstate-server"){
 
 
     compile project(":hyperstate-core")
+    testCompile project(":hyperstate-client")
     
     
   }

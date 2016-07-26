@@ -4,13 +4,9 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.net.URI;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.slf4j.Logger;
@@ -32,6 +28,7 @@ import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.VanillaEntity;
 import au.com.mountainpass.hyperstate.server.config.HyperstateTestConfiguration;
 import au.com.mountainpass.hyperstate.server.entities.Account;
+import au.com.mountainpass.hyperstate.server.entities.AccountBuilder;
 import au.com.mountainpass.hyperstate.server.entities.AccountProperties;
 import cucumber.api.PendingException;
 import cucumber.api.java.Before;
@@ -44,53 +41,6 @@ import cucumber.api.java.en.When;
 @SpringApplicationConfiguration(classes = { HyperstateTestConfiguration.class })
 @WebIntegrationTest({ "server.port=0", "management.port=0" })
 public class StepDefs {
-
-    class AccountBuilder {
-
-        private String[] expectedActions;
-        private final Map<String, String> expectedLinks = new HashMap<String, String>();
-        private String path;
-        private final AccountProperties properties;
-
-        public AccountBuilder(final AccountProperties accountProperties) {
-            this.properties = accountProperties;
-        }
-
-        public CompletableFuture<Account> build(final String path)
-                throws InterruptedException, ExecutionException {
-            final Account entity = new Account(path, properties, "The Account");
-
-            final String[] actionNames = entity.getActions().stream()
-                    .map(a -> a.getLabel()).collect(Collectors.toList())
-                    .toArray(new String[] {});
-            assertThat(actionNames, equalTo(expectedActions));
-
-            final Map<String, String> actualLinks = new HashMap<>();
-
-            entity.getLinks().stream().forEach(nav -> {
-                for (final String rel : nav.getNature()) {
-                    actualLinks.put(rel, nav.getLink().getPath());
-                }
-            });
-
-            assertThat(actualLinks, equalTo(expectedLinks));
-            return repository.save(entity);
-        }
-
-        public void setExpectedActions(final String[] actions) {
-            this.expectedActions = actions;
-        }
-
-        public void setExpectedLinkAddress(final String rel,
-                final String path) {
-            this.expectedLinks.put(rel, path);
-        }
-
-        public void setPath(final String path) {
-            this.path = path;
-        }
-
-    }
 
     @Autowired
     HyperstateTestConfiguration config;
@@ -144,24 +94,24 @@ public class StepDefs {
         assertThat(entityName, equalTo("Account"));
         assertThat(properties.keySet(), contains("username", "creationDate"));
 
-        currentAccountBuilder = new AccountBuilder(new AccountProperties(
-                properties.get("username"), properties.get("creationDate")));
+        currentAccountBuilder = Account.builder()
+                .userName(properties.get("username"))
+                .creationDate(properties.get("creationDate"));
     }
 
     @Given("^it has no actions$")
     public void it_has_no_actions() throws Throwable {
-        currentAccountBuilder.setExpectedActions(new String[] {});
+        // noop
+    }
+
+    @Given("^it has no additional links$")
+    public void it_has_no_additional_links() throws Throwable {
+        // noop
     }
 
     @Given("^it is exposed at \"([^\"]*)\"$")
     public void it_is_exposed_at(final String path) throws Throwable {
-        currentAccountBuilder.build(path).get();
-    }
-
-    @Given("^it's only link is self link referencing \"([^\"]*)\"$")
-    public void it_s_only_link_is_self_link_referencing(final String path)
-            throws Throwable {
-        currentAccountBuilder.setExpectedLinkAddress(Relationship.SELF, path);
+        currentAccountBuilder.build(path, repository).get();
     }
 
     @Then("^it will have a self link referencing \"([^\"]*)\"$")

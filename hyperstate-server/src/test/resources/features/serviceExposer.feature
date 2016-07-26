@@ -1,4 +1,4 @@
-Feature: Service Exposer
+    Feature: Service Exposer
     In order minimise the code I need to write to produce a service
     and to ensure consistency for the services I create
     As a service developer
@@ -23,7 +23,7 @@ Scenario: Expose single domain entity
     | username     | tom        |
     | creationDate | 2016/01/15 |
     And it has no actions
-    And it's only link is self link referencing "/hyperstateTest/test/testAccount"
+    And it has no additional links
     And it is exposed at "/hyperstateTest/test/testAccount"
     When request is made to "/hyperstateTest/test/testAccount" for an "au.com.mountainpass.hyperstate.server.entities.Account"
     Then the response will be an "Account" domain entity with

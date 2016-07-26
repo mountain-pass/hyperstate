@@ -8,24 +8,29 @@ import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 
 public class Account extends EntityWrapper<AccountProperties> {
 
-  @Autowired
-  ApplicationContext context;
+    @Autowired
+    ApplicationContext context;
 
-  @Autowired
-  EntityRepository repository;
+    @Autowired
+    EntityRepository repository;
 
-  protected Account() {
-    super(new AccountProperties());
-  }
+    protected Account() {
+        super(new AccountProperties());
+    }
 
-  protected Account(final Account src) {
-    super(src);
-    this.context = src.context;
-    this.repository = src.repository;
-  }
+    protected Account(final Account src) {
+        super(src);
+        this.context = src.context;
+        this.repository = src.repository;
+    }
 
-  public Account(final String path, final AccountProperties properties, final String title) {
-    super(path, properties, title, "Account");
-  }
+    public Account(final AccountProperties properties, final String path,
+            final String title) {
+        super(path, properties, title, "Account");
+    }
+
+    public static AccountBuilder builder() {
+        return new AccountBuilder();
+    }
 
 }

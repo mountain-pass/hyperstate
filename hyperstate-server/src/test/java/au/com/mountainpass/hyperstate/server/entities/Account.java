@@ -8,6 +8,10 @@ import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 
 public class Account extends EntityWrapper<AccountProperties> {
 
+    public static AccountBuilder builder() {
+        return new AccountBuilder();
+    }
+
     @Autowired
     ApplicationContext context;
 
@@ -27,10 +31,6 @@ public class Account extends EntityWrapper<AccountProperties> {
     public Account(final AccountProperties properties, final String path,
             final String title) {
         super(path, properties, title, "Account");
-    }
-
-    public static AccountBuilder builder() {
-        return new AccountBuilder();
     }
 
 }

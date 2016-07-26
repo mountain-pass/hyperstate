@@ -23,9 +23,9 @@ public interface Resolver {
     public <E extends EntityWrapper<?>> CompletableFuture<E> get(String path,
             Class<E> type) throws URISyntaxException;
 
+    public void setBaseUri(URI baseUri);
+
     public CompletableFuture<UpdatedEntity> update(Link link,
             Map<String, Object> filteredParameters);
-
-    public void setBaseUri(URI baseUri);
 
 }

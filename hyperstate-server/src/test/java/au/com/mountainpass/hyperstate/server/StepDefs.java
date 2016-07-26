@@ -65,12 +65,6 @@ public class StepDefs {
     @Autowired
     private Resolver resolver;
 
-    @Before
-    public void before() {
-        URI baseUri = config.getBaseUri();
-        resolver.setBaseUri(baseUri);
-    }
-
     @Given("^a Hyperstate controller \"([^\"]*)\" at \"([^\"]*)\"$")
     public void a_Hyperstate_controller_at(final String beanName,
             final String path) throws Throwable {
@@ -97,6 +91,12 @@ public class StepDefs {
         currentAccountBuilder = Account.builder()
                 .userName(properties.get("username"))
                 .creationDate(properties.get("creationDate"));
+    }
+
+    @Before
+    public void before() {
+        URI baseUri = config.getBaseUri();
+        resolver.setBaseUri(baseUri);
     }
 
     @Given("^it has no actions$")

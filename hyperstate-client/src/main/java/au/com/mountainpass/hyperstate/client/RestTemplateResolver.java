@@ -36,10 +36,10 @@ public class RestTemplateResolver implements Resolver {
     @Autowired
     private ApplicationContext applicationContext;
 
+    private URI baseUri;
+
     @Autowired
     private AsyncRestTemplate restTemplate;
-
-    private URI baseUri;
 
     @Override
     public CompletableFuture<CreatedEntity> create(final Link link,
@@ -130,6 +130,15 @@ public class RestTemplateResolver implements Resolver {
         return baseUri;
     }
 
+    /**
+     * @param baseUri
+     *            the baseUri to set
+     */
+    @Override
+    public void setBaseUri(URI baseUri) {
+        this.baseUri = baseUri;
+    }
+
     @Override
     public CompletableFuture<UpdatedEntity> update(final Link link,
             final Map<String, Object> filteredParameters) {
@@ -157,14 +166,6 @@ public class RestTemplateResolver implements Resolver {
 
                     return linkedEntity;
                 });
-    }
-
-    /**
-     * @param baseUri
-     *            the baseUri to set
-     */
-    public void setBaseUri(URI baseUri) {
-        this.baseUri = baseUri;
     }
 
 }

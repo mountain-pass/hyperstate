@@ -26,13 +26,13 @@ public class AccountBuilder {
         return repository.save(entity);
     }
 
-    public AccountBuilder userName(String username) {
-        this.username = username;
+    public AccountBuilder creationDate(String creationDate) {
+        this.creationDate = creationDate;
         return this;
     }
 
-    public AccountBuilder creationDate(String creationDate) {
-        this.creationDate = creationDate;
+    public AccountBuilder userName(String username) {
+        this.username = username;
         return this;
     }
 

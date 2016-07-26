@@ -79,6 +79,8 @@ public class WebDriverResolver implements Resolver {
         };
     }
 
+    private URI baseUri;
+
     @Autowired
     HyperstateTestConfiguration config;
 
@@ -86,8 +88,6 @@ public class WebDriverResolver implements Resolver {
 
     @Autowired
     private WebDriver webDriver;
-
-    private URI baseUri;
 
     @Override
     public CompletableFuture<CreatedEntity> create(final Link link,
@@ -160,10 +160,6 @@ public class WebDriverResolver implements Resolver {
         return get(getBaseUri().resolve(path), type);
     }
 
-    private URI getBaseUri() {
-        return baseUri;
-    }
-
     public <T> CompletableFuture<T> get(final URI uri, final Class<T> klass) {
 
         return CompletableFuture.supplyAsync(() -> {
@@ -171,6 +167,10 @@ public class WebDriverResolver implements Resolver {
             final T proxy = createProxy(klass);
             return proxy;
         });
+    }
+
+    private URI getBaseUri() {
+        return baseUri;
     }
 
     public String getUrl() {
@@ -407,18 +407,19 @@ public class WebDriverResolver implements Resolver {
         return e;
     }
 
-    @Override
-    public CompletableFuture<UpdatedEntity> update(final Link link,
-            final Map<String, Object> filteredParameters) {
-        throw new PendingException();
-    }
-
     /**
      * @param baseUri
      *            the baseUri to set
      */
+    @Override
     public void setBaseUri(URI baseUri) {
         this.baseUri = baseUri;
+    }
+
+    @Override
+    public CompletableFuture<UpdatedEntity> update(final Link link,
+            final Map<String, Object> filteredParameters) {
+        throw new PendingException();
     }
 
 }

@@ -48,14 +48,14 @@ public class RepositoryResolver implements Resolver {
     }
 
     @Override
-    public CompletableFuture<UpdatedEntity> update(final Link link,
-            final Map<String, Object> filteredParameters) {
-        throw new NotImplementedException("todo");
+    public void setBaseUri(URI baseUri) {
+        // noop
     }
 
     @Override
-    public void setBaseUri(URI baseUri) {
-        // noop
+    public CompletableFuture<UpdatedEntity> update(final Link link,
+            final Map<String, Object> filteredParameters) {
+        throw new NotImplementedException("todo");
     }
 
 }

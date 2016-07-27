@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import au.com.mountainpass.hyperstate.core.Labelled;
-import au.com.mountainpass.hyperstate.server.mixins.LabelledMixin;
+import au.com.mountainpass.hyperstate.server.serialization.mixins.LabelledMixin;
 
 @Component
 public class ObjectMapperSerialisationUpdater {

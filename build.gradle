@@ -545,15 +545,13 @@ project(":hyperstate-server"){
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile "info.cukes:cucumber-java:1.2.4","info.cukes:cucumber-junit:1.2.4","info.cukes:cucumber-spring:1.2.4"
 
-    testCompile 'org.seleniumhq.selenium:selenium-java:2.53.1'
-
-
     //compile('org.flywaydb:flyway-core')
     testCompile("com.h2database:h2:1.4.192")
 
 
     compile project(":hyperstate-core")
     testCompile project(":hyperstate-client")
+    testCompile project(":hyperstate-client-webdriver")
     
     
   }
@@ -574,7 +572,30 @@ project(":hyperstate-client"){
       'class'      : 0
     ]
   }
-  dependencies { compile project(":hyperstate-core") }
+  dependencies { 
+    compile project(":hyperstate-core")    
+    
+  }
+}
+
+project(":hyperstate-client-webdriver"){
+  archivesBaseName = "hyperstate-client-webdriver"
+  ext{
+    // TODO: Increase these
+    limits = [
+      'instruction': 0,
+      'branch'     : 0,
+      'line'       : 0,
+      'complexity' : 0,
+      'method'     : 0,
+      'class'      : 0
+    ]
+  }
+  dependencies { 
+    compile 'org.seleniumhq.selenium:selenium-java:2.53.1'
+    compile project(":hyperstate-client")
+    
+  }
 }
 
 gradle.taskGraph.afterTask { Task task, TaskState state ->

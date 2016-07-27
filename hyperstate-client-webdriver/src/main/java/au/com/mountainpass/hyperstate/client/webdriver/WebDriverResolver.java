@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -45,8 +46,6 @@ import au.com.mountainpass.hyperstate.core.entities.Entity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.LinkedEntity;
 import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
-import au.com.mountainpass.hyperstate.server.config.HyperstateTestConfiguration;
-import cucumber.api.PendingException;
 
 @Component
 @Profile("ui-integration")
@@ -80,9 +79,6 @@ public class WebDriverResolver implements Resolver {
     }
 
     private URI baseUri;
-
-    @Autowired
-    HyperstateTestConfiguration config;
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
@@ -126,7 +122,7 @@ public class WebDriverResolver implements Resolver {
     @Override
     public CompletableFuture<Void> delete(final Link link,
             final Map<String, Object> filteredParameters) {
-        throw new PendingException();
+        throw new NotImplementedException("TODO");
     }
 
     @Override
@@ -150,7 +146,7 @@ public class WebDriverResolver implements Resolver {
             });
 
         } else {
-            throw new PendingException();
+            throw new NotImplementedException("TODO");
         }
     }
 
@@ -209,7 +205,8 @@ public class WebDriverResolver implements Resolver {
                     return new CreateAction(resolver, form.getAttribute("name"),
                             new WebDriverLink(resolver, form), fields);
                 default:
-                    throw new PendingException("unimplemented method: "
+
+                    throw new NotImplementedException("unimplemented method: "
                             + form.getAttribute("method"));
                 }
             }
@@ -314,7 +311,7 @@ public class WebDriverResolver implements Resolver {
                                     .isAssignableFrom(boolean.class)) {
                                 return Boolean.parseBoolean(value);
                             } else {
-                                throw new PendingException(
+                                throw new NotImplementedException(
                                         "conversion not implemented for "
                                                 + propertiesMethod
                                                         .getReturnType());
@@ -351,7 +348,8 @@ public class WebDriverResolver implements Resolver {
                         || method.getName().equals("getProperties")
                         || method.getName().equals("getTitle")
                         || method.getName().equals("getLink")) {
-                    throw new PendingException(method.getName());
+                    throw new NotImplementedException(
+                            "method: " + method.getName());
                 } else {
                     final Map<String, Object> context = new HashMap<>();
 
@@ -419,7 +417,7 @@ public class WebDriverResolver implements Resolver {
     @Override
     public CompletableFuture<UpdatedEntity> update(final Link link,
             final Map<String, Object> filteredParameters) {
-        throw new PendingException();
+        throw new NotImplementedException("TODO");
     }
 
 }

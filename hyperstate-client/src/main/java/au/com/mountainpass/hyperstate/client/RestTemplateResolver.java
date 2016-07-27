@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.context.ApplicationContext;
@@ -20,6 +22,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.client.AsyncRestTemplate;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import au.com.mountainpass.hyperstate.client.deserialisation.ObjectMapperDeserialisationUpdater;
 import au.com.mountainpass.hyperstate.core.FutureConverter;
 import au.com.mountainpass.hyperstate.core.Link;
 import au.com.mountainpass.hyperstate.core.MediaTypes;
@@ -40,6 +45,18 @@ public class RestTemplateResolver implements Resolver {
 
     @Autowired
     private AsyncRestTemplate restTemplate;
+
+    @Autowired
+    private ObjectMapper om;
+
+    @Autowired
+    private ObjectMapperDeserialisationUpdater objectMapperDeserialisationUpdater;
+
+    @PostConstruct
+    public void postConstruct() {
+        objectMapperDeserialisationUpdater.addMixins(om);
+        objectMapperDeserialisationUpdater.addResolver(om, this);
+    }
 
     @Override
     public CompletableFuture<CreatedEntity> create(final Link link,

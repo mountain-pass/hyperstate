@@ -1,4 +1,4 @@
-package au.com.mountainpass.hyperstate.client.mixins;
+package au.com.mountainpass.hyperstate.client.deserialisation.mixins;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 

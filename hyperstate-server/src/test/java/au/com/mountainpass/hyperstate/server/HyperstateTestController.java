@@ -3,7 +3,6 @@ package au.com.mountainpass.hyperstate.server;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -17,24 +16,21 @@ import au.com.mountainpass.hyperstate.server.entities.HyperstateRootEntity;
 @RequestMapping(value = "/hyperstateTest")
 public class HyperstateTestController extends HyperstateController {
 
-  @Autowired
-  ApplicationContext context;
+    @Autowired
+    EntityRepository repository;
 
-  @Autowired
-  EntityRepository repository;
+    @PostConstruct
+    public void onConstructed() {
+        final EntityWrapper<?> root = new HyperstateRootEntity(this.getClass());
+        root.setRepository(repository);
+        repository.save(root);
 
-  @PostConstruct
-  public void onConstructed() {
-    final EntityWrapper<?> root = new HyperstateRootEntity(context, this.getClass());
-    root.setRepository(repository);
-    repository.save(root);
+        final VanillaEntity accounts = new VanillaEntity(
+                root.getId() + "/accounts", "Accounts", "Accounts");
+        repository.save(accounts);
+        accounts.setRepository(repository);
 
-    final VanillaEntity accounts = new VanillaEntity(root.getId() + "/accounts", "Accounts",
-        "Accounts");
-    repository.save(accounts);
-    accounts.setRepository(repository);
+        root.add(new NavigationalRelationship(accounts, "accounts"));
 
-    root.add(new NavigationalRelationship(accounts, "accounts"));
-
-  }
+    }
 }

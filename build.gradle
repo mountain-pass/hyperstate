@@ -529,8 +529,8 @@ project(":hyperstate-server"){
 
     compile("org.eclipse.jdt:org.eclipse.jdt.annotation:2.0.0")
 
-    compile("com.fasterxml.jackson.core:jackson-core:2.8.0")
-    compile('com.fasterxml.jackson.core:jackson-annotations:2.8.0')
+    compile("com.fasterxml.jackson.core:jackson-core:2.8.1")
+    compile('com.fasterxml.jackson.core:jackson-annotations:2.8.1')
 
     compile('org.apache.httpcomponents:httpasyncclient:4.1.2')
     compile('commons-codec:commons-codec:1.10')

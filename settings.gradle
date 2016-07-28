@@ -1,1 +1,1 @@
-include "hyperstate-core", "hyperstate-server", "hyperstate-server-cert", "hyperstate-client", "hyperstate-client-webdriver", "hyperstate-repository-memory"
+include "hyperstate-core", "hyperstate-server", "hyperstate-cert", "hyperstate-client", "hyperstate-client-webdriver", "hyperstate-repository-memory"

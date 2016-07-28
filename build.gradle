@@ -551,7 +551,7 @@ project(":hyperstate-server"){
     testCompile project(":hyperstate-client")
     testCompile project(":hyperstate-client-webdriver")
     testCompile project(":hyperstate-repository-memory")
-    testCompile project(":hyperstate-server-cert")
+    testCompile project(":hyperstate-cert")
     
   }
   
@@ -618,8 +618,8 @@ project(":hyperstate-repository-memory"){
   }
 }
 
-project(":hyperstate-server-cert"){
-  archivesBaseName = "hyperstate-server-cert"
+project(":hyperstate-cert"){
+  archivesBaseName = "hyperstate-cert"
   ext{
     // TODO: Increase these
     limits = [

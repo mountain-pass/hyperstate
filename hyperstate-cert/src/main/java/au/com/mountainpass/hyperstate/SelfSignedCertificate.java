@@ -1,13 +1,19 @@
-package au.com.mountainpass.hyperstate.server.config;
+package au.com.mountainpass.hyperstate;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
@@ -26,14 +32,13 @@ public class SelfSignedCertificate {
     private KeyPair keyPair;
     private X509Certificate cert;
 
-    public SelfSignedCertificate(String domainName, String keyAlias)
-            throws Exception {
+    public SelfSignedCertificate(String domainName) throws Exception {
         this.keyPair = createKeyPair();
-        this.cert = createSelfSignedCertificate(keyPair, domainName, keyAlias);
+        this.cert = createSelfSignedCertificate(keyPair, domainName);
     }
 
     private X509Certificate createSelfSignedCertificate(final KeyPair keyPair,
-            final String domainName, final String keyAlias) throws Exception {
+            final String domainName) throws Exception {
         // generate a key pair
 
         // see
@@ -77,5 +82,44 @@ public class SelfSignedCertificate {
 
     public PrivateKey getPrivateKey() {
         return this.keyPair.getPrivate();
+    }
+
+    static public void addCertToTrustStore(final String trustStoreFile,
+            final String trustStorePassword, final String trustStoreType,
+            final String keyAlias,
+            final SelfSignedCertificate selfSignedCertificate)
+                    throws KeyStoreException, IOException,
+                    NoSuchAlgorithmException, CertificateException {
+        if (trustStoreFile != null) {
+            final KeyStore ks = KeyStore.getInstance(trustStoreType);
+            final File trustFile = new File(trustStoreFile);
+            ks.load(null, null);
+            ks.setCertificateEntry(keyAlias,
+                    selfSignedCertificate.getCertificate());
+            final FileOutputStream fos = new FileOutputStream(trustFile);
+            ks.store(fos, trustStorePassword.toCharArray());
+            fos.close();
+        }
+    }
+
+    public static void addPrivateKeyToKeyStore(String keyStore,
+            String keyStorePassword, String keyPassword, String keyAlias,
+            SelfSignedCertificate selfSignedCertificate)
+                    throws KeyStoreException, NoSuchAlgorithmException,
+                    CertificateException, IOException {
+        final KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+
+        // load an empty key store
+        ks.load(null, keyStorePassword.toCharArray());
+
+        // add the key
+        ks.setKeyEntry(keyAlias, selfSignedCertificate.getPrivateKey(),
+                keyPassword.toCharArray(),
+                new java.security.cert.Certificate[] {
+                        selfSignedCertificate.getCertificate() });
+        // Write the key store to disk.
+        final FileOutputStream fos = new FileOutputStream(keyStore);
+        ks.store(fos, keyStorePassword.toCharArray());
+        fos.close();
     }
 }

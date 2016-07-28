@@ -74,6 +74,7 @@ import com.fasterxml.jackson.databind.cfg.HandlerInstantiator;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+import au.com.mountainpass.hyperstate.SelfSignedCertificate;
 import au.com.mountainpass.hyperstate.client.SpringBeanHandlerInstantiator;
 import au.com.mountainpass.hyperstate.client.deserialisation.AutowiringDeserializer;
 import au.com.mountainpass.hyperstate.client.deserialisation.EntityWrapperProxyDeserializer;
@@ -287,28 +288,6 @@ public class HyperstateTestConfiguration implements
                 .register("https", sslSocketFactory()).build();
     }
 
-    // @Bean
-    // RequestConfig httpClientRequestConfig() {
-    // RequestConfig config = RequestConfig.custom()
-    // .setConnectTimeout(proxyReadTimeoutMs).build();
-    // return config;
-    // }
-
-    @Bean
-    public HyperstateTestKeyStoreManager hyperstateTestKeyStoreManager()
-            throws Exception {
-        if (getTrustStoreLocation().equals(systemDefaultTrustStoreLocation())) {
-            LOGGER.warn(
-                    "Trust Store location {} appears to be set to system default. The Self signed cert for testing will not be added and the tests will likely fail.",
-                    getTrustStoreLocation());
-            return new HyperstateTestKeyStoreManager(keyStore, keyStorePassword,
-                    keyPassword, keyAlias, sslHostname, null, null, null);
-        }
-        return new HyperstateTestKeyStoreManager(keyStore, keyStorePassword,
-                keyPassword, keyAlias, sslHostname, getTrustStoreLocation(),
-                getTrustStorePassword(), getTrustStoreType());
-    }
-
     @Bean(name = "customObjectMapperBuilder")
     @Primary
     @Profile({ "integration", "ui-integration" })
@@ -446,9 +425,22 @@ public class HyperstateTestConfiguration implements
     }
 
     @Bean
+    SelfSignedCertificate selfSignedCertificate() throws Exception {
+        return new SelfSignedCertificate(sslHostname);
+    }
+
+    @Bean
     public TomcatEmbeddedServletContainerFactory tomcatFactory()
             throws Exception {
-        hyperstateTestKeyStoreManager();
+        SelfSignedCertificate.addPrivateKeyToKeyStore(keyStore,
+                keyStorePassword, keyPassword, keyAlias,
+                selfSignedCertificate());
+
+        // TODO: move this to the client
+        SelfSignedCertificate.addCertToTrustStore(trustStoreFile,
+                trustStorePassword, trustStoreType, keyAlias,
+                selfSignedCertificate());
+
         return new CustomTomcatEmbeddedServletContainerFactory();
     }
 

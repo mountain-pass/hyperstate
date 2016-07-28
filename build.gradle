@@ -519,7 +519,6 @@ project(":hyperstate-server"){
 
   
   dependencies {
-    compile 'org.bouncycastle:bcpkix-jdk15on:1.54'
 
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-actuator")
@@ -538,7 +537,8 @@ project(":hyperstate-server"){
     compile("org.webjars:jquery:3.0.0") // when updating, don't forget to update index.html
     compile 'org.webjars.bower:angularjs:1.5.7' // when updating, don't forget to update index.html
 
-
+    compile project(":hyperstate-core")
+    
     providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
@@ -548,11 +548,10 @@ project(":hyperstate-server"){
     testCompile("com.h2database:h2:1.4.192")
 
 
-    compile project(":hyperstate-core")
     testCompile project(":hyperstate-client")
     testCompile project(":hyperstate-client-webdriver")
     testCompile project(":hyperstate-repository-memory")
-    
+    testCompile project(":hyperstate-server-cert")
     
   }
   
@@ -619,6 +618,24 @@ project(":hyperstate-repository-memory"){
   }
 }
 
+project(":hyperstate-server-cert"){
+  archivesBaseName = "hyperstate-server-cert"
+  ext{
+    // TODO: Increase these
+    limits = [
+      'instruction': 0,
+      'branch'     : 0,
+      'line'       : 0,
+      'complexity' : 0,
+      'method'     : 0,
+      'class'      : 0
+    ]
+  }
+  dependencies {
+    compile 'org.bouncycastle:bcpkix-jdk15on:1.54' 
+    compile("org.springframework.boot:spring-boot-starter-logging")
+  }
+}
 
 
 gradle.taskGraph.afterTask { Task task, TaskState state ->

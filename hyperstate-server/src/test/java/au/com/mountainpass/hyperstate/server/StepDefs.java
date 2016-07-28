@@ -147,6 +147,7 @@ public class StepDefs {
     @When("^request is made to \"([^\"]*)\" for an \"([^\"]*)\"$")
     public void request_is_made_to_for_an(final String path,
             final String typeName) throws Throwable {
+        org.springframework.web.servlet.resource.ResourceHttpRequestHandler x;
         @SuppressWarnings("unchecked")
         final Class<? extends EntityWrapper<?>> type = (Class<? extends EntityWrapper<?>>) Class
                 .forName(typeName);

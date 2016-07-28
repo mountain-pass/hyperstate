@@ -74,9 +74,9 @@ import com.fasterxml.jackson.databind.cfg.HandlerInstantiator;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-import au.com.mountainpass.hyperstate.client.AutowiringDeserializer;
-import au.com.mountainpass.hyperstate.client.EntityWrapperProxyDeserializer;
 import au.com.mountainpass.hyperstate.client.SpringBeanHandlerInstantiator;
+import au.com.mountainpass.hyperstate.client.deserialisation.AutowiringDeserializer;
+import au.com.mountainpass.hyperstate.client.deserialisation.EntityWrapperProxyDeserializer;
 
 @SpringBootApplication
 @EnableAsync

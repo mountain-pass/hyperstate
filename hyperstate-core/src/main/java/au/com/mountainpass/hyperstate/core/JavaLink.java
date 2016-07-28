@@ -12,40 +12,45 @@ import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 
 public class JavaLink extends Link {
 
-  private EntityWrapper<?> entity;
+    final private EntityWrapper<?> entity;
 
-  protected JavaLink() {
-  }
+    public JavaLink(final EntityWrapper<?> entity) {
+        this.entity = entity;
+        assert(entity != null);
+    }
 
-  public JavaLink(final EntityWrapper<?> entity) {
-    this.entity = entity;
-  }
+    @Override
+    @JsonProperty("href")
+    public URI getAddress() {
+        BasicLinkBuilder linkToCurrentMapping = BasicLinkBuilder
+                .linkToCurrentMapping();
+        BasicLinkBuilder slash = linkToCurrentMapping.slash(entity);
+        URI uri = slash.toUri();
+        if ("/".equals(entity.getId())) {
+            return URI.create(uri.toString() + "/");
+        }
+        return uri;
+    }
 
-  @Override
-  @JsonProperty("href")
-  public URI getAddress() {
-    return BasicLinkBuilder.linkToCurrentMapping().slash(entity).toUri();
-  }
+    @Override
+    public String getPath() {
+        return entity.getId();
+    }
 
-  @Override
-  public String getPath() {
-    return entity.getId();
-  }
+    @Override
+    public MediaType getRepresentationFormat() {
+        return MediaTypes.SIREN_JSON;
+    }
 
-  @Override
-  public MediaType getRepresentationFormat() {
-    return MediaTypes.SIREN_JSON;
-  }
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T resolve(final Class<T> type) {
+        return (T) entity;
+    }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> T resolve(final Class<T> type) {
-    return (T) entity;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> T resolve(final ParameterizedTypeReference<T> type) {
-    return (T) entity;
-  }
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T resolve(final ParameterizedTypeReference<T> type) {
+        return (T) entity;
+    }
 }

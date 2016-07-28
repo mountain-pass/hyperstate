@@ -10,30 +10,30 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 abstract public class Link extends Labelled {
 
-  public Link() {
-  }
+    public Link() {
+    }
 
-  public Link(final String label) {
-    super(label);
-  }
+    public Link(final String label) {
+        super(label);
+    }
 
-  public Link(final String label, final Set<String> natures) {
-    super(label, natures);
-  }
+    public Link(final String label, final Set<String> natures) {
+        super(label, natures);
+    }
 
-  @JsonProperty("href")
-  public abstract URI getAddress();
+    @JsonProperty("href")
+    public abstract URI getAddress();
 
-  @JsonIgnore
-  public abstract String getPath();
+    @JsonIgnore
+    public abstract String getPath();
 
-  @JsonProperty("type")
-  public abstract MediaType getRepresentationFormat();
+    @JsonProperty("type")
+    public abstract MediaType getRepresentationFormat();
 
-  public abstract <T> T resolve(Class<T> type);
+    public abstract <T> T resolve(Class<T> type);
 
-  public abstract <T> T resolve(ParameterizedTypeReference<T> type);
+    public abstract <T> T resolve(ParameterizedTypeReference<T> type);
 }

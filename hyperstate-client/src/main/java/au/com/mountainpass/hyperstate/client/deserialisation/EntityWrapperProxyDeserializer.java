@@ -1,4 +1,4 @@
-package au.com.mountainpass.hyperstate.client;
+package au.com.mountainpass.hyperstate.client.deserialisation;
 
 import java.io.IOException;
 import java.lang.reflect.Method;

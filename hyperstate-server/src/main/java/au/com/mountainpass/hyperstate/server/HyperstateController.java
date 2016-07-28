@@ -1,5 +1,6 @@
 package au.com.mountainpass.hyperstate.server;
 
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -11,11 +12,11 @@ import java.util.concurrent.ExecutionException;
 import javax.script.ScriptException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.HandlerMapping;
 
@@ -101,21 +101,29 @@ public abstract class HyperstateController {
     public CompletableFuture<ResponseEntity<?>> get(
             @RequestParam final Map<String, Object> allRequestParams,
             final HttpServletRequest request) {
-        String url = (String) request.getAttribute(
-                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        if (!allRequestParams.isEmpty()) {
-            url += "?" + request.getQueryString();
-        }
-        final RequestAttributes currentRequestAttributes = RequestContextHolder
-                .getRequestAttributes();
-        return getEntity(url).thenApplyAsync(entity -> {
-            RequestContextHolder.setRequestAttributes(currentRequestAttributes);
+        CompletableFuture<EntityWrapper<?>> entityFuture = getEntity(
+                allRequestParams, request);
+        return entityFuture.thenApplyAsync(entity -> {
+            RequestContextHolder.setRequestAttributes(
+                    RequestContextHolder.getRequestAttributes());
             if (entity == null) {
                 return ResponseEntity.notFound().build();
             } else {
                 return ResponseEntity.ok(entity);
             }
         });
+    }
+
+    private CompletableFuture<EntityWrapper<?>> getEntity(
+            final Map<String, Object> allRequestParams,
+            final HttpServletRequest request) {
+        String url = (String) request.getAttribute(
+                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        if (!allRequestParams.isEmpty()) {
+            url += "?" + request.getQueryString();
+        }
+        CompletableFuture<EntityWrapper<?>> entityFuture = getEntity(url);
+        return entityFuture;
     }
 
     protected CompletableFuture<EntityWrapper<?>> getEntity(
@@ -137,17 +145,43 @@ public abstract class HyperstateController {
     }
 
     @RequestMapping(value = "**", method = RequestMethod.GET, produces = {
-            "text/html", "application/xhtml+xml" })
-    public String html(final HttpServletRequest request) {
+            MediaType.ALL_VALUE })
+    @ResponseBody
+    @Async
+    public CompletableFuture<ResponseEntity<?>> getResource(
+            @RequestParam final Map<String, Object> allRequestParams,
+            final HttpServletRequest request) {
         final String path = (String) request.getAttribute(
                 HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        if ("/index.html".equals(path)) {
-            throw new NotImplementedException(
-                    "eeeek! Looks like you've created a "
-                            + HyperstateController.class.getSimpleName()
-                            + " without a context path. We don't support that yet.");
-        }
-        return "/index.html";
+        CompletableFuture<EntityWrapper<?>> entityFuture = getEntity(
+                allRequestParams, request);
+        return entityFuture.thenApplyAsync(entity -> {
+            RequestContextHolder.setRequestAttributes(
+                    RequestContextHolder.getRequestAttributes());
+            if (entity == null) {
+                InputStream inputStream = this.getClass()
+                        .getResourceAsStream(path);
+                if (inputStream == null) {
+                    String webjarPath = "/META-INF/resources" + path;
+                    inputStream = this.getClass()
+                            .getResourceAsStream(webjarPath);
+                }
+                if (inputStream == null) {
+                    return ResponseEntity.notFound().build();
+                } else {
+                    InputStreamResource inputStreamResource = new InputStreamResource(
+                            inputStream);
+                    return ResponseEntity.ok(inputStreamResource);
+                }
+            } else {
+                InputStream inputStream = this.getClass()
+                        .getResourceAsStream("/static/index.html");
+
+                InputStreamResource inputStreamResource = new InputStreamResource(
+                        inputStream);
+                return ResponseEntity.ok(inputStreamResource);
+            }
+        });
     }
 
     @ExceptionHandler(value = Exception.class)

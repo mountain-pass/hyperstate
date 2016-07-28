@@ -633,6 +633,7 @@ project(":hyperstate-server-cert"){
   }
   dependencies {
     compile 'org.bouncycastle:bcpkix-jdk15on:1.54' 
+    compile("org.springframework.boot:spring-boot-starter")
     compile("org.springframework.boot:spring-boot-starter-logging")
   }
 }

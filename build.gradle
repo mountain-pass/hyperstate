@@ -525,7 +525,6 @@ project(":hyperstate-server"){
     compile("org.springframework.boot:spring-boot-starter-actuator")
     compile("org.springframework.boot:spring-boot-starter-aop")
     compile("org.springframework.boot:spring-boot-starter-hateoas")
-    compile("org.springframework.boot:spring-boot-starter-data-jpa")
 
     compile("org.eclipse.jdt:org.eclipse.jdt.annotation:2.0.0")
 
@@ -552,6 +551,7 @@ project(":hyperstate-server"){
     compile project(":hyperstate-core")
     testCompile project(":hyperstate-client")
     testCompile project(":hyperstate-client-webdriver")
+    testCompile project(":hyperstate-repository-memory")
     
     
   }
@@ -597,6 +597,29 @@ project(":hyperstate-client-webdriver"){
     
   }
 }
+
+project(":hyperstate-repository-memory"){
+  archivesBaseName = "hyperstate-repository-memory"
+  ext{
+    // TODO: Increase these
+    limits = [
+      'instruction': 0,
+      'branch'     : 0,
+      'line'       : 0,
+      'complexity' : 0,
+      'method'     : 0,
+      'class'      : 0
+    ]
+  }
+  dependencies {
+    compile("org.springframework.boot:spring-boot-starter")
+    compile project(":hyperstate-core")
+    
+    
+  }
+}
+
+
 
 gradle.taskGraph.afterTask { Task task, TaskState state ->
   if (state.failure) {

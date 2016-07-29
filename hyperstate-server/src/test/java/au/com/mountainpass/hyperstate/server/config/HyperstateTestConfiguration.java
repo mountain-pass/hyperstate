@@ -1,21 +1,14 @@
 package au.com.mountainpass.hyperstate.server.config;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.URI;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.util.List;
 import java.util.Locale;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
-import org.apache.catalina.startup.Tomcat;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -42,8 +35,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerInitializedEvent;
-import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainer;
-import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
@@ -52,7 +43,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.client.AsyncClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsAsyncClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -60,7 +50,6 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.util.StringUtils;
 import org.springframework.web.client.AsyncRestTemplate;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
@@ -74,7 +63,6 @@ import com.fasterxml.jackson.databind.cfg.HandlerInstantiator;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-import au.com.mountainpass.hyperstate.SelfSignedCertificate;
 import au.com.mountainpass.hyperstate.client.SpringBeanHandlerInstantiator;
 import au.com.mountainpass.hyperstate.client.deserialisation.AutowiringDeserializer;
 import au.com.mountainpass.hyperstate.client.deserialisation.EntityWrapperProxyDeserializer;
@@ -87,33 +75,11 @@ import au.com.mountainpass.hyperstate.client.deserialisation.EntityWrapperProxyD
 public class HyperstateTestConfiguration implements
         ApplicationListener<EmbeddedServletContainerInitializedEvent> {
 
-    private static class CustomTomcatEmbeddedServletContainerFactory
-            extends TomcatEmbeddedServletContainerFactory {
-
-        public CustomTomcatEmbeddedServletContainerFactory() {
-        }
-
-        @Override
-        protected TomcatEmbeddedServletContainer getTomcatEmbeddedServletContainer(
-                final Tomcat tomcat) {
-            return super.getTomcatEmbeddedServletContainer(tomcat);
-        }
-    }
-
     @Autowired
     private ApplicationContext context;
 
     @Value("${server.ssl.key-alias}")
     String keyAlias;
-
-    @Value("${server.ssl.key-password}")
-    String keyPassword;
-
-    @Value("${server.ssl.key-store}")
-    String keyStore;
-
-    @Value("${server.ssl.key-store-password}")
-    String keyStorePassword;
 
     public final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
@@ -142,18 +108,6 @@ public class HyperstateTestConfiguration implements
 
     @Value("${server.ssl.protocol:TLS}")
     String sslProtocol;
-
-    @Value("${javax.net.ssl.trustStore:}")
-    private String trustStore;
-
-    @Value("${javax.net.ssl.trustStore:build/truststore.jks}")
-    private String trustStoreFile;
-
-    @Value("${javax.net.ssl.trustStorePassword:changeit}")
-    private String trustStorePassword;
-
-    @Value("${javax.net.ssl.trustStoreType:JKS}")
-    private String trustStoreType;
 
     @Bean
     CloseableHttpAsyncClient asyncHttpClient() throws Exception {
@@ -200,27 +154,6 @@ public class HyperstateTestConfiguration implements
 
     public int getPort() {
         return port;
-    }
-
-    public String getTrustStoreLocation() {
-        if (StringUtils.hasLength(trustStore)) {
-            return trustStore;
-        }
-        final String locationProperty = System
-                .getProperty("javax.net.ssl.trustStore");
-        if (StringUtils.hasLength(locationProperty)) {
-            return locationProperty;
-        } else {
-            return systemDefaultTrustStoreLocation();
-        }
-    }
-
-    public String getTrustStorePassword() {
-        return trustStorePassword;
-    }
-
-    public String getTrustStoreType() {
-        return trustStoreType;
     }
 
     @Bean // (destroyMethod = "close")
@@ -396,12 +329,14 @@ public class HyperstateTestConfiguration implements
         this.port = port;
     }
 
+    @Autowired
+    KeyStore trustStore;
+
     @Bean
     public SSLContext sslContext() throws Exception {
         final SSLContext sslContext = SSLContext.getInstance(sslProtocol);
         final TrustManagerFactory tmf = trustManagerFactory();
-        final KeyStore ks = trustStore();
-        tmf.init(ks);
+        tmf.init(trustStore);
         sslContext.init(null, tmf.getTrustManagers(), null);
         return sslContext;
     }
@@ -413,37 +348,6 @@ public class HyperstateTestConfiguration implements
         return sf;
     }
 
-    public String systemDefaultTrustStoreLocation() {
-        final String javaHome = System.getProperty("java.home");
-        final FileSystemResource location = new FileSystemResource(
-                javaHome + "/lib/security/jssecacerts");
-        if (location.exists()) {
-            return location.getFilename();
-        } else {
-            return javaHome + "/lib/security/cacerts";
-        }
-    }
-
-    @Bean
-    SelfSignedCertificate selfSignedCertificate() throws Exception {
-        return new SelfSignedCertificate(sslHostname);
-    }
-
-    @Bean
-    public TomcatEmbeddedServletContainerFactory tomcatFactory()
-            throws Exception {
-        SelfSignedCertificate.addPrivateKeyToKeyStore(keyStore,
-                keyStorePassword, keyPassword, keyAlias,
-                selfSignedCertificate());
-
-        // TODO: move this to the client
-        SelfSignedCertificate.addCertToTrustStore(trustStoreFile,
-                trustStorePassword, trustStoreType, keyAlias,
-                selfSignedCertificate());
-
-        return new CustomTomcatEmbeddedServletContainerFactory();
-    }
-
     @Bean
     TrustManagerFactory trustManagerFactory() throws NoSuchAlgorithmException {
         final TrustManagerFactory tmf = TrustManagerFactory
@@ -451,15 +355,4 @@ public class HyperstateTestConfiguration implements
         return tmf;
     }
 
-    @Bean
-    KeyStore trustStore()
-            throws KeyStoreException, IOException, NoSuchAlgorithmException,
-            CertificateException, FileNotFoundException {
-        final KeyStore ks = KeyStore.getInstance(trustStoreType);
-
-        final File trustFile = new File(getTrustStoreLocation());
-        ks.load(new FileInputStream(trustFile),
-                trustStorePassword.toCharArray());
-        return ks;
-    }
 }

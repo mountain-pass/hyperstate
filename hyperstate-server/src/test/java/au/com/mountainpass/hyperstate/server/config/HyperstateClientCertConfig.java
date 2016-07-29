@@ -9,6 +9,10 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -76,6 +80,32 @@ public class HyperstateClientCertConfig {
         ks.load(new FileInputStream(trustFile),
                 trustStorePassword.toCharArray());
         return ks;
+    }
+
+    @Value("${server.ssl.protocol:TLS}")
+    private String sslProtocol;
+
+    @Bean
+    TrustManagerFactory trustManagerFactory() throws NoSuchAlgorithmException {
+        final TrustManagerFactory tmf = TrustManagerFactory
+                .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        return tmf;
+    }
+
+    @Bean
+    public SSLContext sslContext() throws Exception {
+        final SSLContext sslContext = SSLContext.getInstance(sslProtocol);
+        final TrustManagerFactory tmf = trustManagerFactory();
+        tmf.init(trustStore());
+        sslContext.init(null, tmf.getTrustManagers(), null);
+        return sslContext;
+    }
+
+    @Bean
+    public SSLConnectionSocketFactory sslSocketFactory() throws Exception {
+        final SSLConnectionSocketFactory sf = new SSLConnectionSocketFactory(
+                sslContext());
+        return sf;
     }
 
 }

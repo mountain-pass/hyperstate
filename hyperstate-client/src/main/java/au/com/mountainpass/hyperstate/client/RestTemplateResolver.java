@@ -21,6 +21,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.client.AsyncRestTemplate;
+import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -44,7 +45,10 @@ public class RestTemplateResolver implements Resolver {
     private URI baseUri;
 
     @Autowired
-    private AsyncRestTemplate restTemplate;
+    private AsyncRestTemplate asyncRestTemplate;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Autowired
     private ObjectMapper om;
@@ -70,7 +74,7 @@ public class RestTemplateResolver implements Resolver {
         final RequestEntity<?> request = RequestEntity.post(link.getAddress())
                 .accept(MediaTypes.SIREN_JSON)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(body);
-        final ListenableFuture<URI> locationFuture = restTemplate
+        final ListenableFuture<URI> locationFuture = asyncRestTemplate
                 .postForLocation(link.getAddress(), request);
         return FutureConverter.convert(locationFuture).thenApplyAsync(uri -> {
             final CreatedEntity linkedEntity = new CreatedEntity(
@@ -97,7 +101,7 @@ public class RestTemplateResolver implements Resolver {
                 .accept(MediaTypes.SIREN_JSON)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(body);
 
-        final ListenableFuture<ResponseEntity<Void>> responseFuture = restTemplate
+        final ListenableFuture<ResponseEntity<Void>> responseFuture = asyncRestTemplate
                 .exchange(link.getAddress(), HttpMethod.DELETE, request,
                         Void.class);
         return FutureConverter.convert(responseFuture)
@@ -120,7 +124,7 @@ public class RestTemplateResolver implements Resolver {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(body);
 
         @SuppressWarnings("rawtypes")
-        final ListenableFuture<ResponseEntity<EntityWrapper>> responseFuture = restTemplate
+        final ListenableFuture<ResponseEntity<EntityWrapper>> responseFuture = asyncRestTemplate
                 .exchange(link.getAddress(), HttpMethod.GET, request,
                         EntityWrapper.class);
         return FutureConverter.convert(responseFuture)
@@ -136,7 +140,7 @@ public class RestTemplateResolver implements Resolver {
         final URI rootUrl = getBaseUri().resolve(path);
 
         return FutureConverter.convert(
-                restTemplate.exchange(rootUrl, HttpMethod.GET, null, type))
+                asyncRestTemplate.exchange(rootUrl, HttpMethod.GET, null, type))
                 .thenApply(r -> {
                     return r.getBody();
                 });
@@ -169,7 +173,7 @@ public class RestTemplateResolver implements Resolver {
                 .accept(MediaTypes.SIREN_JSON)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(body);
 
-        final ListenableFuture<ResponseEntity<Void>> responseFuture = restTemplate
+        final ListenableFuture<ResponseEntity<Void>> responseFuture = asyncRestTemplate
                 .exchange(link.getAddress(), HttpMethod.PUT, request,
                         Void.class);
         return FutureConverter.convert(responseFuture)

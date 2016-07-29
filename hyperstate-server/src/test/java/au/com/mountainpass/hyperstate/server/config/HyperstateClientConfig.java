@@ -25,17 +25,31 @@ import org.apache.http.nio.conn.SchemeIOSessionStrategy;
 import org.apache.http.nio.conn.ssl.SSLIOSessionStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.client.AsyncClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsAsyncClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.AsyncRestTemplate;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.DeserializationConfig;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.cfg.HandlerInstantiator;
+import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+
+import au.com.mountainpass.hyperstate.client.SpringBeanHandlerInstantiator;
+import au.com.mountainpass.hyperstate.client.deserialisation.AutowiringDeserializer;
+import au.com.mountainpass.hyperstate.client.deserialisation.EntityWrapperProxyDeserializer;
 
 @Configuration
 public class HyperstateClientConfig {
@@ -48,6 +62,9 @@ public class HyperstateClientConfig {
 
     @Value("${au.com.mountainpass.hyperstate.test.proxy.read.timeout.ms:60000}")
     private int proxyReadTimeoutMs;
+
+    @Autowired
+    private ApplicationContext context;
 
     @Autowired
     private SSLConnectionSocketFactory sslSocketFactory;
@@ -205,6 +222,44 @@ public class HyperstateClientConfig {
         return HttpAsyncClientBuilder.create().setSSLContext(sslContext)
                 .setConnectionManager(nHttpClientConntectionManager())
                 .setDefaultRequestConfig(httpClientRequestConfig());
+    }
+
+    @Bean(name = "customObjectMapperBuilder")
+    @Primary
+    @Profile({ "integration", "ui-integration" })
+    Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder() {
+        final Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
+        builder.applicationContext(context);
+        final HandlerInstantiator handlerInstantiator = new SpringBeanHandlerInstantiator(
+                context);
+        // context.getAutowireCapableBeanFactory());
+        builder.handlerInstantiator(handlerInstantiator);
+
+        final SimpleModule module = new SimpleModule();
+        module.setDeserializerModifier(new BeanDeserializerModifier() {
+            @Override
+            public JsonDeserializer<?> modifyDeserializer(
+                    final DeserializationConfig config,
+                    final BeanDescription beanDesc,
+                    final JsonDeserializer<?> deserializer) {
+                return new AutowiringDeserializer(context, deserializer);
+            }
+        });
+
+        final SimpleModule module2 = new SimpleModule();
+        module2.setDeserializerModifier(new BeanDeserializerModifier() {
+            @Override
+            public JsonDeserializer<?> modifyDeserializer(
+                    final DeserializationConfig config,
+                    final BeanDescription beanDesc,
+                    final JsonDeserializer<?> deserializer) {
+                return new EntityWrapperProxyDeserializer(context,
+                        deserializer);
+            }
+        });
+        builder.modules(module, module2);
+
+        return builder;
     }
 
 }

@@ -22,15 +22,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -47,9 +41,6 @@ import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.LinkedEntity;
 import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 
-@Component
-@Profile("ui-integration")
-@Primary
 public class WebDriverResolver implements Resolver {
 
     public static ExpectedCondition<Boolean> angularHasFinishedProcessing() {
@@ -80,10 +71,12 @@ public class WebDriverResolver implements Resolver {
 
     private URI baseUri;
 
-    private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+    private final WebDriver webDriver;
 
-    @Autowired
-    private WebDriver webDriver;
+    public WebDriverResolver(final URI baseUri, final WebDriver webDriver) {
+        this.baseUri = baseUri;
+        this.webDriver = webDriver;
+    }
 
     @Override
     public CompletableFuture<CreatedEntity> create(final Link link,
@@ -403,15 +396,6 @@ public class WebDriverResolver implements Resolver {
 
         });
         return e;
-    }
-
-    /**
-     * @param baseUri
-     *            the baseUri to set
-     */
-    @Override
-    public void setBaseUri(URI baseUri) {
-        this.baseUri = baseUri;
     }
 
     @Override

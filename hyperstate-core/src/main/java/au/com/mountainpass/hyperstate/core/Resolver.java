@@ -1,6 +1,5 @@
 package au.com.mountainpass.hyperstate.core;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -22,8 +21,6 @@ public interface Resolver {
 
     public <E extends EntityWrapper<?>> CompletableFuture<E> get(String path,
             Class<E> type) throws URISyntaxException;
-
-    public void setBaseUri(URI baseUri);
 
     public CompletableFuture<UpdatedEntity> update(Link link,
             Map<String, Object> filteredParameters);

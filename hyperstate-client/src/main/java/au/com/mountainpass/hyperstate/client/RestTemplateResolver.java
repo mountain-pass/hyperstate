@@ -5,23 +5,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.client.AsyncRestTemplate;
-import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -34,30 +27,27 @@ import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 
-@Component()
-@Profile(value = "integration")
-@Primary
 public class RestTemplateResolver implements Resolver {
 
-    @Autowired
     private ApplicationContext applicationContext;
 
     private URI baseUri;
 
-    @Autowired
     private AsyncRestTemplate asyncRestTemplate;
 
-    @Autowired
-    private RestTemplate restTemplate;
-
-    @Autowired
     private ObjectMapper om;
 
-    @Autowired
     private ObjectMapperDeserialisationUpdater objectMapperDeserialisationUpdater;
 
-    @PostConstruct
-    public void postConstruct() {
+    public RestTemplateResolver(URI baseUri, ObjectMapper om,
+            AsyncRestTemplate asyncRestTemplate,
+            ApplicationContext applicationContext,
+            ObjectMapperDeserialisationUpdater objectMapperDeserialisationUpdater) {
+        this.baseUri = baseUri;
+        this.om = om;
+        this.asyncRestTemplate = asyncRestTemplate;
+        this.applicationContext = applicationContext;
+        this.objectMapperDeserialisationUpdater = objectMapperDeserialisationUpdater;
         objectMapperDeserialisationUpdater.addMixins(om);
         objectMapperDeserialisationUpdater.addResolver(om, this);
     }
@@ -149,15 +139,6 @@ public class RestTemplateResolver implements Resolver {
 
     private URI getBaseUri() {
         return baseUri;
-    }
-
-    /**
-     * @param baseUri
-     *            the baseUri to set
-     */
-    @Override
-    public void setBaseUri(URI baseUri) {
-        this.baseUri = baseUri;
     }
 
     @Override

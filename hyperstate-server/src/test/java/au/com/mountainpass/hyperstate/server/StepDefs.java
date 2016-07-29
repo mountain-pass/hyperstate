@@ -4,22 +4,30 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.env.Environment;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.client.AsyncRestTemplate;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import au.com.mountainpass.hyperstate.client.RepositoryResolver;
+import au.com.mountainpass.hyperstate.client.RestTemplateResolver;
+import au.com.mountainpass.hyperstate.client.deserialisation.ObjectMapperDeserialisationUpdater;
+import au.com.mountainpass.hyperstate.client.webdriver.WebDriverResolver;
 import au.com.mountainpass.hyperstate.core.EntityRelationship;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.Relationship;
@@ -55,15 +63,39 @@ public class StepDefs {
     private EntityWrapper<?> currentEntity;
 
     @Autowired
-    CloseableHttpAsyncClient httpAsyncClient;
+    private EntityRepository repository;
 
-    public final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
-
-    @Autowired
-    EntityRepository repository;
-
-    @Autowired
     private Resolver resolver;
+
+    @Autowired
+    private Environment environment;
+
+    @Autowired
+    private AsyncRestTemplate asyncRestTemplate;
+
+    @Autowired
+    private ObjectMapperDeserialisationUpdater objectMapperDeserialisationUpdater;
+
+    @Autowired
+    private ObjectMapper om;
+
+    @Autowired(required = false)
+    private WebDriver webDriver;
+
+    @Before
+    public void before() {
+        URI baseUri = config.getBaseUri();
+        List<String> activeProfiles = Arrays
+                .asList(this.environment.getActiveProfiles());
+        if (activeProfiles.contains("integration")) {
+            resolver = new RestTemplateResolver(baseUri, om, asyncRestTemplate,
+                    context, objectMapperDeserialisationUpdater);
+        } else if (activeProfiles.contains("ui-integration")) {
+            resolver = new WebDriverResolver(baseUri, webDriver);
+        } else {
+            resolver = new RepositoryResolver(repository);
+        }
+    }
 
     @Given("^a Hyperstate controller \"([^\"]*)\" at \"([^\"]*)\"$")
     public void a_Hyperstate_controller_at(final String beanName,
@@ -91,12 +123,6 @@ public class StepDefs {
         currentAccountBuilder = Account.builder()
                 .userName(properties.get("username"))
                 .creationDate(properties.get("creationDate"));
-    }
-
-    @Before
-    public void before() {
-        URI baseUri = config.getBaseUri();
-        resolver.setBaseUri(baseUri);
     }
 
     @Given("^it has no actions$")

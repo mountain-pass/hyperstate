@@ -1,12 +1,9 @@
 package au.com.mountainpass.hyperstate.client;
 
-import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.Link;
@@ -15,11 +12,13 @@ import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 
-@Component
 public class RepositoryResolver implements Resolver {
 
-    @Autowired
-    EntityRepository repository;
+    private EntityRepository repository;
+
+    public RepositoryResolver(EntityRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public CompletableFuture<CreatedEntity> create(final Link link,
@@ -45,11 +44,6 @@ public class RepositoryResolver implements Resolver {
             final String path, final Class<E> type) {
 
         return repository.findOne(path, type);
-    }
-
-    @Override
-    public void setBaseUri(URI baseUri) {
-        // noop
     }
 
     @Override

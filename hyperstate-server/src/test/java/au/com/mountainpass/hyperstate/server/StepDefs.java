@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.boot.test.WebIntegrationTest;
@@ -51,6 +52,9 @@ import cucumber.api.java.en.When;
 public class StepDefs {
 
     @Autowired
+    private AsyncRestTemplate asyncRestTemplate;
+
+    @Autowired
     HyperstateTestConfiguration config;
 
     @Autowired
@@ -63,15 +67,7 @@ public class StepDefs {
     private EntityWrapper<?> currentEntity;
 
     @Autowired
-    private EntityRepository repository;
-
-    private Resolver resolver;
-
-    @Autowired
     private Environment environment;
-
-    @Autowired
-    private AsyncRestTemplate asyncRestTemplate;
 
     @Autowired
     private ObjectMapperDeserialisationUpdater objectMapperDeserialisationUpdater;
@@ -79,23 +75,19 @@ public class StepDefs {
     @Autowired
     private ObjectMapper om;
 
+    @Value("${local.server.port}")
+    private int port;
+
+    @Autowired
+    private EntityRepository repository;
+
+    private Resolver resolver;
+
+    @Value("${au.com.mountainpass.hyperstate.test.ssl.hostname}")
+    private String sslHostname;
+
     @Autowired(required = false)
     private WebDriver webDriver;
-
-    @Before
-    public void before() {
-        URI baseUri = config.getBaseUri();
-        List<String> activeProfiles = Arrays
-                .asList(this.environment.getActiveProfiles());
-        if (activeProfiles.contains("integration")) {
-            resolver = new RestTemplateResolver(baseUri, om, asyncRestTemplate,
-                    context, objectMapperDeserialisationUpdater);
-        } else if (activeProfiles.contains("ui-integration")) {
-            resolver = new WebDriverResolver(baseUri, webDriver);
-        } else {
-            resolver = new RepositoryResolver(repository);
-        }
-    }
 
     @Given("^a Hyperstate controller \"([^\"]*)\" at \"([^\"]*)\"$")
     public void a_Hyperstate_controller_at(final String beanName,
@@ -123,6 +115,25 @@ public class StepDefs {
         currentAccountBuilder = Account.builder()
                 .userName(properties.get("username"))
                 .creationDate(properties.get("creationDate"));
+    }
+
+    @Before
+    public void before() {
+        final URI baseUri = getBaseUri();
+        final List<String> activeProfiles = Arrays
+                .asList(this.environment.getActiveProfiles());
+        if (activeProfiles.contains("integration")) {
+            resolver = new RestTemplateResolver(baseUri, om, asyncRestTemplate,
+                    context, objectMapperDeserialisationUpdater);
+        } else if (activeProfiles.contains("ui-integration")) {
+            resolver = new WebDriverResolver(baseUri, webDriver);
+        } else {
+            resolver = new RepositoryResolver(repository);
+        }
+    }
+
+    public URI getBaseUri() {
+        return URI.create("https://" + sslHostname + ":" + port);
     }
 
     @Given("^it has no actions$")
@@ -173,7 +184,7 @@ public class StepDefs {
     @When("^request is made to \"([^\"]*)\" for an \"([^\"]*)\"$")
     public void request_is_made_to_for_an(final String path,
             final String typeName) throws Throwable {
-        org.springframework.web.servlet.resource.ResourceHttpRequestHandler x;
+        final org.springframework.web.servlet.resource.ResourceHttpRequestHandler x;
         @SuppressWarnings("unchecked")
         final Class<? extends EntityWrapper<?>> type = (Class<? extends EntityWrapper<?>>) Class
                 .forName(typeName);

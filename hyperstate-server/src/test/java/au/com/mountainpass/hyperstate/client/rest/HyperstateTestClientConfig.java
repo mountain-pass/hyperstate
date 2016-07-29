@@ -1,4 +1,4 @@
-package au.com.mountainpass.hyperstate.server.config;
+package au.com.mountainpass.hyperstate.client.rest;
 
 import java.util.List;
 
@@ -52,7 +52,7 @@ import au.com.mountainpass.hyperstate.client.deserialisation.AutowiringDeseriali
 import au.com.mountainpass.hyperstate.client.deserialisation.EntityWrapperProxyDeserializer;
 
 @Configuration
-public class HyperstateClientConfig {
+public class HyperstateTestClientConfig {
 
     @Value("${au.com.mountainpass.hyperstate.test.proxy.max.connections.total:100}")
     private int proxyMaxConnectionsTotal;

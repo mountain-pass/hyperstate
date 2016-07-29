@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Profile;
 
 @Configuration
 @Profile("ui-integration")
-public class WebDriverTestConfiguration {
+public class HyperstateTestWebDriverConfiguration {
 
   @Autowired
   private WebDriverFactory webDriverFactory;

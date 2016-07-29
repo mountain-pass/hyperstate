@@ -1,4 +1,4 @@
-package au.com.mountainpass.hyperstate.server.config;
+package au.com.mountainpass.hyperstate.client.rest;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,7 +23,7 @@ import org.springframework.util.StringUtils;
 import au.com.mountainpass.hyperstate.SelfSignedCertificate;
 
 @Configuration
-public class HyperstateClientCertConfig {
+public class HyperstateTestClientCertConfig {
 
     @Value("${server.ssl.key-alias}")
     String keyAlias;

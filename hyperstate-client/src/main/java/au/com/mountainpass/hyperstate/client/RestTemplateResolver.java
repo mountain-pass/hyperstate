@@ -16,12 +16,19 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.client.AsyncRestTemplate;
 
+import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import au.com.mountainpass.hyperstate.client.deserialisation.ObjectMapperDeserialisationUpdater;
+import au.com.mountainpass.hyperstate.client.deserialisation.mixins.ActionMixin;
+import au.com.mountainpass.hyperstate.client.deserialisation.mixins.EntityRelationshipMixin;
+import au.com.mountainpass.hyperstate.client.deserialisation.mixins.LinkMixin;
+import au.com.mountainpass.hyperstate.client.deserialisation.mixins.NavigationalRelationshipMixin;
+import au.com.mountainpass.hyperstate.core.Action;
+import au.com.mountainpass.hyperstate.core.EntityRelationship;
 import au.com.mountainpass.hyperstate.core.FutureConverter;
 import au.com.mountainpass.hyperstate.core.Link;
 import au.com.mountainpass.hyperstate.core.MediaTypes;
+import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
 import au.com.mountainpass.hyperstate.core.Resolver;
 import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
@@ -37,19 +44,20 @@ public class RestTemplateResolver implements Resolver {
 
     private ObjectMapper om;
 
-    private ObjectMapperDeserialisationUpdater objectMapperDeserialisationUpdater;
-
     public RestTemplateResolver(URI baseUri, ObjectMapper om,
             AsyncRestTemplate asyncRestTemplate,
-            ApplicationContext applicationContext,
-            ObjectMapperDeserialisationUpdater objectMapperDeserialisationUpdater) {
+            ApplicationContext applicationContext) {
         this.baseUri = baseUri;
         this.om = om;
         this.asyncRestTemplate = asyncRestTemplate;
         this.applicationContext = applicationContext;
-        this.objectMapperDeserialisationUpdater = objectMapperDeserialisationUpdater;
-        objectMapperDeserialisationUpdater.addMixins(om);
-        objectMapperDeserialisationUpdater.addResolver(om, this);
+        om.addMixIn(Action.class, ActionMixin.class);
+        om.addMixIn(Link.class, LinkMixin.class);
+        om.addMixIn(EntityRelationship.class, EntityRelationshipMixin.class);
+        om.addMixIn(NavigationalRelationship.class,
+                NavigationalRelationshipMixin.class);
+        om.setInjectableValues(
+                new InjectableValues.Std().addValue(Resolver.class, this));
     }
 
     @Override

@@ -27,7 +27,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.client.RestTemplateResolver;
-import au.com.mountainpass.hyperstate.client.deserialisation.ObjectMapperDeserialisationUpdater;
 import au.com.mountainpass.hyperstate.client.webdriver.WebDriverResolver;
 import au.com.mountainpass.hyperstate.core.EntityRelationship;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
@@ -68,9 +67,6 @@ public class StepDefs {
 
     @Autowired
     private Environment environment;
-
-    @Autowired
-    private ObjectMapperDeserialisationUpdater objectMapperDeserialisationUpdater;
 
     @Autowired
     private ObjectMapper om;
@@ -124,7 +120,7 @@ public class StepDefs {
                 .asList(this.environment.getActiveProfiles());
         if (activeProfiles.contains("integration")) {
             resolver = new RestTemplateResolver(baseUri, om, asyncRestTemplate,
-                    context, objectMapperDeserialisationUpdater);
+                    context);
         } else if (activeProfiles.contains("ui-integration")) {
             resolver = new WebDriverResolver(baseUri, webDriver);
         } else {

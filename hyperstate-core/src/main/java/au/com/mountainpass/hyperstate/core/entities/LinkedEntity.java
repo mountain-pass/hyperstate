@@ -7,9 +7,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -30,14 +27,6 @@ public class LinkedEntity extends Entity {
         setNatures(natures);
         setTitle(label);
     }
-
-    // public LinkedEntity(@JsonProperty("href") URI address,
-    // @JsonProperty("title") String label,
-    // @JsonProperty("class") Set<String> natures) {
-    // this.link = new RestLink(address, natures, label);
-    // setNatures(natures);
-    // setTitle(label);
-    // }
 
     public LinkedEntity(final Link link, final String label,
             final String... natures) {
@@ -73,13 +62,6 @@ public class LinkedEntity extends Entity {
             final ParameterizedTypeReference<T> type)
                     throws InterruptedException, ExecutionException {
         return link.resolve(type);
-    }
-
-    @Autowired
-    public void setApplicationContext(final ApplicationContext context) {
-        final AutowiredAnnotationBeanPostProcessor bpp = new AutowiredAnnotationBeanPostProcessor();
-        bpp.setBeanFactory(context.getAutowireCapableBeanFactory());
-        bpp.processInjection(this.link);
     }
 
     @Override

@@ -48,7 +48,6 @@ import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import au.com.mountainpass.hyperstate.client.SpringBeanHandlerInstantiator;
-import au.com.mountainpass.hyperstate.client.deserialisation.AutowiringDeserializer;
 import au.com.mountainpass.hyperstate.client.deserialisation.EntityWrapperProxyDeserializer;
 
 @Configuration
@@ -232,7 +231,6 @@ public class HyperstateTestClientConfig {
         builder.applicationContext(context);
         final HandlerInstantiator handlerInstantiator = new SpringBeanHandlerInstantiator(
                 context);
-        // context.getAutowireCapableBeanFactory());
         builder.handlerInstantiator(handlerInstantiator);
 
         final SimpleModule module = new SimpleModule();
@@ -242,22 +240,11 @@ public class HyperstateTestClientConfig {
                     final DeserializationConfig config,
                     final BeanDescription beanDesc,
                     final JsonDeserializer<?> deserializer) {
-                return new AutowiringDeserializer(context, deserializer);
-            }
-        });
-
-        final SimpleModule module2 = new SimpleModule();
-        module2.setDeserializerModifier(new BeanDeserializerModifier() {
-            @Override
-            public JsonDeserializer<?> modifyDeserializer(
-                    final DeserializationConfig config,
-                    final BeanDescription beanDesc,
-                    final JsonDeserializer<?> deserializer) {
                 return new EntityWrapperProxyDeserializer(context,
                         deserializer);
             }
         });
-        builder.modules(module, module2);
+        builder.modules(module);
 
         return builder;
     }

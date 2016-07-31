@@ -54,10 +54,7 @@ public class StepDefs {
     private AsyncRestTemplate asyncRestTemplate;
 
     @Autowired
-    HyperstateTestConfiguration config;
-
-    @Autowired
-    ApplicationContext context;
+    private ApplicationContext context;
 
     private HyperstateController controller;
 
@@ -119,8 +116,7 @@ public class StepDefs {
         final List<String> activeProfiles = Arrays
                 .asList(this.environment.getActiveProfiles());
         if (activeProfiles.contains("integration")) {
-            resolver = new RestTemplateResolver(baseUri, om, asyncRestTemplate,
-                    context);
+            resolver = new RestTemplateResolver(baseUri, om, asyncRestTemplate);
         } else if (activeProfiles.contains("ui-integration")) {
             resolver = new WebDriverResolver(baseUri, webDriver);
         } else {

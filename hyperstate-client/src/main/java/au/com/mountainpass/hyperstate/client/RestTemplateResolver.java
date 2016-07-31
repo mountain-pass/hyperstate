@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 
-import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
-import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
@@ -37,21 +35,14 @@ import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 
 public class RestTemplateResolver implements Resolver {
 
-    private ApplicationContext applicationContext;
-
     private URI baseUri;
 
     private AsyncRestTemplate asyncRestTemplate;
 
-    private ObjectMapper om;
-
     public RestTemplateResolver(URI baseUri, ObjectMapper om,
-            AsyncRestTemplate asyncRestTemplate,
-            ApplicationContext applicationContext) {
+            AsyncRestTemplate asyncRestTemplate) {
         this.baseUri = baseUri;
-        this.om = om;
         this.asyncRestTemplate = asyncRestTemplate;
-        this.applicationContext = applicationContext;
         om.addMixIn(Action.class, ActionMixin.class);
         om.addMixIn(Link.class, LinkMixin.class);
         om.addMixIn(EntityRelationship.class, EntityRelationshipMixin.class);
@@ -79,10 +70,6 @@ public class RestTemplateResolver implements Resolver {
         return FutureConverter.convert(locationFuture).thenApplyAsync(uri -> {
             final CreatedEntity linkedEntity = new CreatedEntity(
                     new RestLink(this, asyncRestTemplate, uri, null, null));
-            final AutowiredAnnotationBeanPostProcessor bpp = new AutowiredAnnotationBeanPostProcessor();
-            bpp.setBeanFactory(
-                    applicationContext.getAutowireCapableBeanFactory());
-            bpp.processInjection(linkedEntity);
 
             return linkedEntity;
         });
@@ -173,18 +160,9 @@ public class RestTemplateResolver implements Resolver {
                 .exchange(link.getAddress(), HttpMethod.PUT, request,
                         Void.class);
         return FutureConverter.convert(responseFuture)
-                .thenApplyAsync(response -> {
-                    final UpdatedEntity linkedEntity = new UpdatedEntity(
-                            new RestLink(this, asyncRestTemplate,
-                                    response.getHeaders().getLocation(), null,
-                                    null));
-                    final AutowiredAnnotationBeanPostProcessor bpp = new AutowiredAnnotationBeanPostProcessor();
-                    bpp.setBeanFactory(
-                            applicationContext.getAutowireCapableBeanFactory());
-                    bpp.processInjection(linkedEntity);
-
-                    return linkedEntity;
-                });
+                .thenApplyAsync(response -> new UpdatedEntity(new RestLink(this,
+                        asyncRestTemplate, response.getHeaders().getLocation(),
+                        null, null)));
     }
 
 }

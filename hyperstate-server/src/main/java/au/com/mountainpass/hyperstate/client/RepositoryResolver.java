@@ -52,4 +52,9 @@ public class RepositoryResolver implements Resolver {
         throw new NotImplementedException("todo");
     }
 
+    @Override
+    public CompletableFuture<EntityWrapper<?>> get(Link link) {
+        throw new NotImplementedException("todo");
+    }
+
 }

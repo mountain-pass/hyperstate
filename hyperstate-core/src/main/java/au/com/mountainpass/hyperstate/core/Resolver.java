@@ -25,4 +25,6 @@ public interface Resolver {
     public CompletableFuture<UpdatedEntity> update(Link link,
             Map<String, Object> filteredParameters);
 
+    public CompletableFuture<EntityWrapper<?>> get(Link link);
+
 }

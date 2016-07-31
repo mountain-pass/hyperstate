@@ -5,6 +5,7 @@ import java.net.URI;
 import javax.annotation.PostConstruct;
 
 import org.springframework.http.HttpMethod;
+import org.springframework.web.client.AsyncRestTemplate;
 
 import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -21,59 +22,65 @@ import au.com.mountainpass.hyperstate.core.Resolver;
 
 public class RestActionBuilder {
 
-  private Parameter[] fields = {};
-  private URI href;
-  private String identifier;
-  private HttpMethod method;
+    private Parameter[] fields = {};
+    private URI href;
+    private String identifier;
+    private HttpMethod method;
 
-  private final Resolver resolver;
+    private final Resolver resolver;
 
-  @JsonCreator
-  public RestActionBuilder(@JacksonInject final Resolver resolver) {
-    this.resolver = resolver;
-  }
+    private AsyncRestTemplate asyncRestTemplate;
 
-  public Action<?> build() {
-    switch (method) {
-    case POST:
-      return new CreateAction(resolver, identifier, new RestLink(href), fields);
-    case DELETE:
-      return new DeleteAction(resolver, identifier, new RestLink(href), fields);
-    case GET:
-      return new GetAction(resolver, identifier, new RestLink(href), fields);
-    case PUT:
-      return new UpdateAction(resolver, identifier, new RestLink(href), fields);
-    default:
-      return null;
+    @JsonCreator
+    public RestActionBuilder(@JacksonInject final Resolver resolver,
+            @JacksonInject final AsyncRestTemplate asyncRestTemplate) {
+        this.resolver = resolver;
+        this.asyncRestTemplate = asyncRestTemplate;
     }
-  }
 
-  @PostConstruct
-  public void postConstruct() {
+    public Action<?> build() {
+        RestLink link = new RestLink(resolver, asyncRestTemplate, href,
+                identifier, null);
+        switch (method) {
+        case POST:
+            return new CreateAction(resolver, identifier, link, fields);
+        case DELETE:
+            return new DeleteAction(resolver, identifier, link, fields);
+        case GET:
+            return new GetAction(resolver, identifier, link, fields);
+        case PUT:
+            return new UpdateAction(resolver, identifier, link, fields);
+        default:
+            return null;
+        }
+    }
 
-  }
+    @PostConstruct
+    public void postConstruct() {
 
-  @JsonProperty("fields")
-  public RestActionBuilder setFields(final Parameter[] fields) {
-    this.fields = fields;
-    return this;
-  }
+    }
 
-  @JsonProperty("href")
-  public RestActionBuilder setHref(final URI href) {
-    this.href = href;
-    return this;
-  }
+    @JsonProperty("fields")
+    public RestActionBuilder setFields(final Parameter[] fields) {
+        this.fields = fields;
+        return this;
+    }
 
-  @JsonProperty("method")
-  public RestActionBuilder setMethod(final HttpMethod method) {
-    this.method = method;
-    return this;
-  }
+    @JsonProperty("href")
+    public RestActionBuilder setHref(final URI href) {
+        this.href = href;
+        return this;
+    }
 
-  @JsonProperty("name")
-  public RestActionBuilder setName(final String identifier) {
-    this.identifier = identifier;
-    return this;
-  }
+    @JsonProperty("method")
+    public RestActionBuilder setMethod(final HttpMethod method) {
+        this.method = method;
+        return this;
+    }
+
+    @JsonProperty("name")
+    public RestActionBuilder setName(final String identifier) {
+        this.identifier = identifier;
+        return this;
+    }
 }

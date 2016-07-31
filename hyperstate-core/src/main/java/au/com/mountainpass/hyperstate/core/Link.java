@@ -1,7 +1,7 @@
 package au.com.mountainpass.hyperstate.core;
 
 import java.net.URI;
-import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
@@ -20,7 +20,7 @@ abstract public class Link extends Labelled {
         super(label);
     }
 
-    public Link(final String label, final Set<String> natures) {
+    public Link(final String label, final String[] natures) {
         super(label, natures);
     }
 
@@ -33,7 +33,9 @@ abstract public class Link extends Labelled {
     @JsonProperty("type")
     public abstract MediaType getRepresentationFormat();
 
-    public abstract <T> T resolve(Class<T> type);
+    public abstract <T> T resolve(Class<T> type)
+            throws InterruptedException, ExecutionException;
 
-    public abstract <T> T resolve(ParameterizedTypeReference<T> type);
+    public abstract <T> T resolve(ParameterizedTypeReference<T> type)
+            throws InterruptedException, ExecutionException;
 }

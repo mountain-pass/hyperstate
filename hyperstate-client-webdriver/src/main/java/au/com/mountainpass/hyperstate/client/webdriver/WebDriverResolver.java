@@ -144,6 +144,12 @@ public class WebDriverResolver implements Resolver {
     }
 
     @Override
+    public CompletableFuture<EntityWrapper<?>> get(Link link) {
+        final Map<String, Object> filteredParameters = new HashMap<>();
+        return this.get(link, filteredParameters);
+    }
+
+    @Override
     public <E extends EntityWrapper<?>> CompletableFuture<E> get(
             final String path, final Class<E> type) {
         return get(getBaseUri().resolve(path), type);

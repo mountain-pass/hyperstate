@@ -1,6 +1,7 @@
 package au.com.mountainpass.hyperstate.client;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
@@ -57,7 +58,8 @@ public class RestTemplateResolver implements Resolver {
         om.addMixIn(NavigationalRelationship.class,
                 NavigationalRelationshipMixin.class);
         om.setInjectableValues(
-                new InjectableValues.Std().addValue(Resolver.class, this));
+                new InjectableValues.Std().addValue(Resolver.class, this)
+                        .addValue(AsyncRestTemplate.class, asyncRestTemplate));
     }
 
     @Override
@@ -76,7 +78,7 @@ public class RestTemplateResolver implements Resolver {
                 .postForLocation(link.getAddress(), request);
         return FutureConverter.convert(locationFuture).thenApplyAsync(uri -> {
             final CreatedEntity linkedEntity = new CreatedEntity(
-                    new RestLink(uri));
+                    new RestLink(this, asyncRestTemplate, uri, null, null));
             final AutowiredAnnotationBeanPostProcessor bpp = new AutowiredAnnotationBeanPostProcessor();
             bpp.setBeanFactory(
                     applicationContext.getAutowireCapableBeanFactory());
@@ -133,6 +135,12 @@ public class RestTemplateResolver implements Resolver {
     }
 
     @Override
+    public CompletableFuture<EntityWrapper<?>> get(Link link) {
+        Map<String, Object> filteredParameters = new HashMap<>();
+        return get(link, filteredParameters);
+    }
+
+    @Override
     public <E extends EntityWrapper<?>> CompletableFuture<E> get(
             final String path, final Class<E> type) {
         final URI rootUrl = getBaseUri().resolve(path);
@@ -142,7 +150,6 @@ public class RestTemplateResolver implements Resolver {
                 .thenApply(r -> {
                     return r.getBody();
                 });
-
     }
 
     private URI getBaseUri() {
@@ -168,7 +175,9 @@ public class RestTemplateResolver implements Resolver {
         return FutureConverter.convert(responseFuture)
                 .thenApplyAsync(response -> {
                     final UpdatedEntity linkedEntity = new UpdatedEntity(
-                            new RestLink(response.getHeaders().getLocation()));
+                            new RestLink(this, asyncRestTemplate,
+                                    response.getHeaders().getLocation(), null,
+                                    null));
                     final AutowiredAnnotationBeanPostProcessor bpp = new AutowiredAnnotationBeanPostProcessor();
                     bpp.setBeanFactory(
                             applicationContext.getAutowireCapableBeanFactory());

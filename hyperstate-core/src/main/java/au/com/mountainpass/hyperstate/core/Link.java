@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -13,7 +14,7 @@ import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 abstract public class Link extends Labelled {
 
     public Link(@JsonProperty("title") final String label,
@@ -32,6 +33,7 @@ abstract public class Link extends Labelled {
     public abstract <T> CompletableFuture<T> resolve(
             ParameterizedTypeReference<T> type);
 
+    @JsonIgnore
     public abstract String getPath();
 
     public abstract CompletableFuture<EntityWrapper<?>> get(

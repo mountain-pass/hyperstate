@@ -51,7 +51,6 @@ public abstract class HyperstateController {
     private RepositoryResolver resolver;
 
     public HyperstateController() {
-
     }
 
     @RequestMapping(value = "**", method = RequestMethod.DELETE, produces = {

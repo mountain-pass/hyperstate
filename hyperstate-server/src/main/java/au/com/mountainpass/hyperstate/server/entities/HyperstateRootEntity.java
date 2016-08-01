@@ -21,4 +21,5 @@ public class HyperstateRootEntity extends VanillaEntity {
                 controllerClass.getSimpleName(),
                 HyperstateRootEntity.class.getSimpleName());
     }
+
 }

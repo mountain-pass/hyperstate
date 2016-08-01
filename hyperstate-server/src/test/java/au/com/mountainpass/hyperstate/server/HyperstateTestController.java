@@ -11,11 +11,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
+import au.com.mountainpass.hyperstate.core.JavaLink;
+import au.com.mountainpass.hyperstate.core.Labelled;
+import au.com.mountainpass.hyperstate.core.Link;
 import au.com.mountainpass.hyperstate.core.MediaTypes;
 import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.VanillaEntity;
 import au.com.mountainpass.hyperstate.server.entities.HyperstateRootEntity;
+import au.com.mountainpass.hyperstate.server.serialization.mixins.LinkMixin;
 
 @Controller
 @RequestMapping(value = "/", produces = { MediaTypes.SIREN_JSON_VALUE,
@@ -33,6 +37,10 @@ public class HyperstateTestController extends HyperstateController {
 
     @PostConstruct
     public void onConstructed() {
+        objectMapper.addMixIn(JavaLink.class, LinkMixin.class);
+        objectMapper.addMixIn(Link.class, LinkMixin.class);
+        objectMapper.addMixIn(Labelled.class, Labelled.class);
+
         final EntityWrapper<?> root = new HyperstateRootEntity(resolver,
                 this.getClass());
         root.setRepository(repository);

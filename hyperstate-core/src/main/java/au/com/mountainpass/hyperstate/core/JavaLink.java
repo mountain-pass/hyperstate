@@ -22,6 +22,12 @@ public class JavaLink extends Link {
 
     private RepositoryResolver resolver;
 
+    // used ny jackson serialiser
+    public JavaLink() {
+        entity = null;
+        resolver = null;
+    }
+
     public JavaLink(RepositoryResolver resolver,
             final EntityWrapper<?> entity) {
         super();
@@ -42,6 +48,9 @@ public class JavaLink extends Link {
 
     @JsonProperty("href")
     public URI getAddress() {
+        if (entity == null) {
+            return null;
+        }
         BasicLinkBuilder linkToCurrentMapping = BasicLinkBuilder
                 .linkToCurrentMapping();
         BasicLinkBuilder slash = linkToCurrentMapping.slash(entity);
@@ -59,6 +68,9 @@ public class JavaLink extends Link {
 
     @Override
     public String getPath() {
+        if (entity == null) {
+            return null;
+        }
         return entity.getId();
     }
 

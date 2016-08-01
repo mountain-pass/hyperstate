@@ -54,7 +54,7 @@ public class RepositoryResolver implements Resolver {
 
     @Override
     public CompletableFuture<EntityWrapper<?>> get(Link link) {
-        throw new NotImplementedException("todo");
+        return repository.findOne(link.getPath());
     }
 
 }

@@ -20,86 +20,100 @@ import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 
 public class JavaAction<T> extends Action<T> {
 
-  public static HttpMethod determineMethodNature(final Method method) {
-    final Type type = method.getGenericReturnType();
-    if (ParameterizedType.class.isAssignableFrom(type.getClass())) {
-      final ParameterizedType parameterizedType = (ParameterizedType) type;
-      final Type rawType = parameterizedType.getRawType();
-      final Class<? extends Type> rawTypeClass = rawType.getClass();
-      if (Class.class.isAssignableFrom(rawTypeClass)
-          && CompletableFuture.class.isAssignableFrom((Class<?>) rawType)) {
-        final Type[] typeParams = parameterizedType.getActualTypeArguments();
-        if (typeParams.length == 1) {
-          final Type typeParam = typeParams[0];
-          if (Class.class.isAssignableFrom(typeParam.getClass())
-              && Void.class.isAssignableFrom((Class<?>) typeParam)) {
-            return HttpMethod.DELETE;
-          } else if (Class.class.isAssignableFrom(typeParam.getClass())
-              && CreatedEntity.class.isAssignableFrom((Class<?>) typeParam)) {
-            return HttpMethod.POST;
-          } else if (Class.class.isAssignableFrom(typeParam.getClass())
-              && UpdatedEntity.class.isAssignableFrom((Class<?>) typeParam)) {
-            return HttpMethod.PUT;
-          } else if (ParameterizedType.class.isAssignableFrom(typeParam.getClass())
-              && EntityWrapper.class
-                  .isAssignableFrom((Class<?>) ((ParameterizedType) typeParam).getRawType())) {
-            return HttpMethod.GET;
-          }
+    public static HttpMethod determineMethodNature(final Method method) {
+        final Type type = method.getGenericReturnType();
+        if (ParameterizedType.class.isAssignableFrom(type.getClass())) {
+            final ParameterizedType parameterizedType = (ParameterizedType) type;
+            final Type rawType = parameterizedType.getRawType();
+            final Class<? extends Type> rawTypeClass = rawType.getClass();
+            if (Class.class.isAssignableFrom(rawTypeClass)
+                    && CompletableFuture.class
+                            .isAssignableFrom((Class<?>) rawType)) {
+                final Type[] typeParams = parameterizedType
+                        .getActualTypeArguments();
+                if (typeParams.length == 1) {
+                    final Type typeParam = typeParams[0];
+                    if (Class.class.isAssignableFrom(typeParam.getClass())
+                            && Void.class
+                                    .isAssignableFrom((Class<?>) typeParam)) {
+                        return HttpMethod.DELETE;
+                    } else
+                        if (Class.class.isAssignableFrom(typeParam.getClass())
+                                && CreatedEntity.class.isAssignableFrom(
+                                        (Class<?>) typeParam)) {
+                        return HttpMethod.POST;
+                    } else if (Class.class
+                            .isAssignableFrom(typeParam.getClass())
+                            && UpdatedEntity.class
+                                    .isAssignableFrom((Class<?>) typeParam)) {
+                        return HttpMethod.PUT;
+                    } else if (ParameterizedType.class
+                            .isAssignableFrom(typeParam.getClass())
+                            && EntityWrapper.class.isAssignableFrom(
+                                    (Class<?>) ((ParameterizedType) typeParam)
+                                            .getRawType())) {
+                        return HttpMethod.GET;
+                    }
+                }
+            }
         }
-      }
-    }
-    return null;
-  }
-
-  private static au.com.mountainpass.hyperstate.core.Parameter[] extractParameters(
-      final Method method) {
-    final List<Parameter> params = Arrays.asList(method.getParameters());
-
-    final List<au.com.mountainpass.hyperstate.core.Parameter> rval = new ArrayList<>();
-    for (int i = 0; i < params.size(); ++i) {
-      rval.add(new au.com.mountainpass.hyperstate.core.Parameter(params.get(i).getName()));
-    }
-    rval.add(new au.com.mountainpass.hyperstate.core.Parameter("action", PresentationType.SUBMIT,
-        method.getName()));
-    return rval.toArray(new au.com.mountainpass.hyperstate.core.Parameter[0]);
-  }
-
-  private EntityWrapper<?> entity;
-
-  private Method method;
-
-  private HttpMethod nature;
-
-  protected JavaAction() {
-  }
-
-  public JavaAction(final EntityWrapper<?> entity, final Method method) {
-    super(null, method.getName(), new JavaLink(entity), extractParameters(method));
-    this.method = method;
-    this.entity = entity;
-    this.nature = determineMethodNature(method);
-  }
-
-  @Override
-  public CompletableFuture<T> doInvoke(final Resolver resolver,
-      final Map<String, Object> filteredParameters) {
-    final List<Object> args = new ArrayList<>(getParameters().size());
-    for (final au.com.mountainpass.hyperstate.core.Parameter param : getParameters()) {
-      if (!PresentationType.SUBMIT.equals(param.getType())) {
-        args.add(filteredParameters.get(param.getIdentifier()));
-      }
-    }
-    try {
-      return (CompletableFuture<T>) method.invoke(entity, args.toArray());
-    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new RuntimeException(e);
+        return null;
     }
 
-  }
+    private static au.com.mountainpass.hyperstate.core.Parameter[] extractParameters(
+            final Method method) {
+        final List<Parameter> params = Arrays.asList(method.getParameters());
 
-  @Override
-  public HttpMethod getNature() {
-    return nature;
-  }
+        final List<au.com.mountainpass.hyperstate.core.Parameter> rval = new ArrayList<>();
+        for (int i = 0; i < params.size(); ++i) {
+            rval.add(new au.com.mountainpass.hyperstate.core.Parameter(
+                    params.get(i).getName()));
+        }
+        rval.add(new au.com.mountainpass.hyperstate.core.Parameter("action",
+                PresentationType.SUBMIT, method.getName()));
+        return rval
+                .toArray(new au.com.mountainpass.hyperstate.core.Parameter[0]);
+    }
+
+    private EntityWrapper<?> entity;
+
+    private Method method;
+
+    private HttpMethod nature;
+
+    protected JavaAction() {
+    }
+
+    public JavaAction(Resolver resolver, final EntityWrapper<?> entity,
+            final Method method) {
+        super(resolver, method.getName(), new JavaLink(resolver, entity),
+                extractParameters(method));
+        this.method = method;
+        this.entity = entity;
+        this.nature = determineMethodNature(method);
+    }
+
+    @Override
+    public CompletableFuture<T> doInvoke(final Resolver resolver,
+            final Map<String, Object> filteredParameters) {
+        final List<Object> args = new ArrayList<>(getParameters().size());
+        for (final au.com.mountainpass.hyperstate.core.Parameter param : getParameters()) {
+            if (!PresentationType.SUBMIT.equals(param.getType())) {
+                args.add(filteredParameters.get(param.getIdentifier()));
+            }
+        }
+        try {
+            return (CompletableFuture<T>) method.invoke(entity, args.toArray());
+        } catch (IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @Override
+    public HttpMethod getNature() {
+        return nature;
+    }
 
 }

@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.MediaTypes;
 import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
@@ -22,13 +23,17 @@ public class HyperstateTestController extends HyperstateController {
     @Autowired
     EntityRepository repository;
 
+    @Autowired
+    RepositoryResolver resolver;
+
     @PostConstruct
     public void onConstructed() {
-        final EntityWrapper<?> root = new HyperstateRootEntity(this.getClass());
+        final EntityWrapper<?> root = new HyperstateRootEntity(resolver,
+                this.getClass());
         root.setRepository(repository);
         repository.save(root);
 
-        final VanillaEntity accounts = new VanillaEntity(
+        final VanillaEntity accounts = new VanillaEntity(resolver,
                 root.getId() + "accounts", "Accounts", "Accounts");
         repository.save(accounts);
         accounts.setRepository(repository);
@@ -36,4 +41,5 @@ public class HyperstateTestController extends HyperstateController {
         root.add(new NavigationalRelationship(accounts, "accounts"));
 
     }
+
 }

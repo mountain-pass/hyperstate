@@ -25,7 +25,6 @@ import org.springframework.web.client.AsyncRestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.client.RestTemplateResolver;
 import au.com.mountainpass.hyperstate.client.webdriver.WebDriverResolver;
 import au.com.mountainpass.hyperstate.core.EntityRelationship;
@@ -82,6 +81,9 @@ public class StepDefs {
     @Autowired(required = false)
     private WebDriver webDriver;
 
+    @Autowired
+    private Resolver repositoryResovler;
+
     @Given("^a Hyperstate controller \"([^\"]*)\" at \"([^\"]*)\"$")
     public void a_Hyperstate_controller_at(final String beanName,
             final String path) throws Throwable {
@@ -120,7 +122,7 @@ public class StepDefs {
         } else if (activeProfiles.contains("ui-integration")) {
             resolver = new WebDriverResolver(baseUri, webDriver);
         } else {
-            resolver = new RepositoryResolver(repository);
+            resolver = repositoryResovler;
         }
     }
 
@@ -140,7 +142,7 @@ public class StepDefs {
 
     @Given("^it is exposed at \"([^\"]*)\"$")
     public void it_is_exposed_at(final String path) throws Throwable {
-        currentAccountBuilder.build(path, repository).get();
+        currentAccountBuilder.build(repositoryResovler, repository, path).get();
     }
 
     @Then("^it will have a self link referencing \"([^\"]*)\"$")

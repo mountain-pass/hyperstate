@@ -16,12 +16,9 @@ public class WebDriverLink extends Link {
 
     public WebDriverLink(final WebDriverResolver resolver,
             final WebElement webElement) {
+        super(resolver, webElement.getAttribute("href"));
         this.webElement = webElement;
         this.resolver = resolver;
-    }
-
-    public WebDriverLink(final WebElement webElement) {
-        this.webElement = webElement;
     }
 
     @Override

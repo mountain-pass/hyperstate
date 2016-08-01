@@ -1,17 +1,9 @@
 package au.com.mountainpass.hyperstate.client;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.client.AsyncRestTemplate;
 
 import com.fasterxml.jackson.annotation.JacksonInject;
@@ -19,7 +11,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import au.com.mountainpass.hyperstate.core.FutureConverter;
 import au.com.mountainpass.hyperstate.core.Link;
 import au.com.mountainpass.hyperstate.core.MediaTypes;
 import au.com.mountainpass.hyperstate.core.Resolver;
@@ -41,7 +32,7 @@ public class RestLink extends Link {
             @JsonProperty("href") final URI address,
             @JsonProperty("title") final String label,
             @JsonProperty("class") final String[] natures) {
-        super(label, natures);
+        super(resolver, address.toString(), label, natures);
         this.resolver = resolver;
         this.asyncRestTemplate = asyncRestTemplate;
         this.address = address;
@@ -65,40 +56,40 @@ public class RestLink extends Link {
                 : representationFormat;
     }
 
-    @Override
-    public <T> T resolve(final Class<T> type)
-            throws InterruptedException, ExecutionException {
-        Map<String, Object> filteredParameters = new HashMap<>();
-        if (this.representationFormat == MediaTypes.SIREN_JSON) {
-            return (T) resolver.get(this, filteredParameters).get();
-        } else {
-            final RequestEntity<Void> request = RequestEntity.get(address)
-                    .accept(getRepresentationFormat()).build();
-            ListenableFuture<ResponseEntity<T>> responseFuture = asyncRestTemplate
-                    .exchange(address, HttpMethod.GET, request, type);
-            return FutureConverter.convert(responseFuture)
-                    .thenApply(response -> {
-                        return response.getBody();
-                    }).get();
-        }
-    }
-
-    @Override
-    public <T> T resolve(final ParameterizedTypeReference<T> type)
-            throws InterruptedException, ExecutionException {
-        if (this.representationFormat == MediaTypes.SIREN_JSON) {
-            return (T) resolver.get(this).get();
-        } else {
-            final RequestEntity<Void> request = RequestEntity.get(address)
-                    .accept(getRepresentationFormat()).build();
-            ListenableFuture<ResponseEntity<T>> responseFuture = asyncRestTemplate
-                    .exchange(address, HttpMethod.GET, request, type);
-            return FutureConverter.convert(responseFuture)
-                    .thenApply(response -> {
-                        return response.getBody();
-                    }).get();
-        }
-    }
+    // @Override
+    // public <T> T resolve(final Class<T> type)
+    // throws InterruptedException, ExecutionException {
+    // Map<String, Object> filteredParameters = new HashMap<>();
+    // if (this.representationFormat == MediaTypes.SIREN_JSON) {
+    // return (T) resolver.get(this, filteredParameters).get();
+    // } else {
+    // final RequestEntity<Void> request = RequestEntity.get(address)
+    // .accept(getRepresentationFormat()).build();
+    // ListenableFuture<ResponseEntity<T>> responseFuture = asyncRestTemplate
+    // .exchange(address, HttpMethod.GET, request, type);
+    // return FutureConverter.convert(responseFuture)
+    // .thenApply(response -> {
+    // return response.getBody();
+    // }).get();
+    // }
+    // }
+    //
+    // @Override
+    // public <T> T resolve(final ParameterizedTypeReference<T> type)
+    // throws InterruptedException, ExecutionException {
+    // if (this.representationFormat == MediaTypes.SIREN_JSON) {
+    // return (T) resolver.get(this).get();
+    // } else {
+    // final RequestEntity<Void> request = RequestEntity.get(address)
+    // .accept(getRepresentationFormat()).build();
+    // ListenableFuture<ResponseEntity<T>> responseFuture = asyncRestTemplate
+    // .exchange(address, HttpMethod.GET, request, type);
+    // return FutureConverter.convert(responseFuture)
+    // .thenApply(response -> {
+    // return response.getBody();
+    // }).get();
+    // }
+    // }
 
     public void setAddress(final URI address) {
         this.address = address;

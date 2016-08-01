@@ -35,6 +35,7 @@ import au.com.mountainpass.hyperstate.core.JavaLink;
 import au.com.mountainpass.hyperstate.core.Link;
 import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
 import au.com.mountainpass.hyperstate.core.Relationship;
+import au.com.mountainpass.hyperstate.core.Resolver;
 
 @JsonPropertyOrder({ "class", "properties", "entities", "actions", "links",
         "title" })
@@ -66,12 +67,12 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
         this.navigationalRelationships = src.navigationalRelationships;
     }
 
-    protected EntityWrapper(final String path, final T properties,
-            final String label, final String... natures) {
+    protected EntityWrapper(final Resolver resolver, final String path,
+            final T properties, final String label, final String... natures) {
         super(label, natures);
         this.properties = properties;
         this.path = path;
-        add(new NavigationalRelationship(new JavaLink(this),
+        add(new NavigationalRelationship(new JavaLink(resolver, this),
                 Relationship.SELF));
         final Method[] methods = this.getClass().getMethods();
         for (final Method method : methods) {
@@ -81,19 +82,20 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
                 switch (httpMethod) {
                 case DELETE:
                     actions.put(method.getName(),
-                            new JavaAction<Void>(this, method));
+                            new JavaAction<Void>(resolver, this, method));
                     break;
                 case POST:
-                    actions.put(method.getName(),
-                            new JavaAction<CreatedEntity>(this, method));
+                    actions.put(method.getName(), new JavaAction<CreatedEntity>(
+                            resolver, this, method));
                     break;
                 case PUT:
-                    actions.put(method.getName(),
-                            new JavaAction<UpdatedEntity>(this, method));
+                    actions.put(method.getName(), new JavaAction<UpdatedEntity>(
+                            resolver, this, method));
                     break;
                 case GET:
                     actions.put(method.getName(),
-                            new JavaAction<EntityWrapper<?>>(this, method));
+                            new JavaAction<EntityWrapper<?>>(resolver, this,
+                                    method));
                     break;
                 default:
                 }

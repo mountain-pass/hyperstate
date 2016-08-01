@@ -4,6 +4,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import au.com.mountainpass.hyperstate.core.EntityRepository;
+import au.com.mountainpass.hyperstate.core.Resolver;
 
 public class AccountBuilder {
 
@@ -17,12 +18,13 @@ public class AccountBuilder {
         // TODO Auto-generated constructor stub
     }
 
-    public CompletableFuture<Account> build(final String path,
-            final EntityRepository repository)
+    public CompletableFuture<Account> build(final Resolver resolver,
+            final EntityRepository repository, final String path)
                     throws InterruptedException, ExecutionException {
         AccountProperties properties = new AccountProperties(username,
                 creationDate);
-        final Account entity = new Account(properties, path, "The Account");
+        final Account entity = new Account(resolver, properties, path,
+                "The Account");
         return repository.save(entity);
     }
 

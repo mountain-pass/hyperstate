@@ -1,6 +1,7 @@
 package au.com.mountainpass.hyperstate.core;
 
 import java.net.URI;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.core.ParameterizedTypeReference;
@@ -40,13 +41,13 @@ abstract public class Link extends Labelled {
     @JsonProperty("type")
     public abstract MediaType getRepresentationFormat();
 
-    public <T> T resolve(Class<T> type)
+    public <T> CompletableFuture<T> resolve(Class<T> type)
             throws InterruptedException, ExecutionException {
-        return (T) resolver.get(this).get();
+        return resolver.get(this, type);
     }
 
-    public <T> T resolve(ParameterizedTypeReference<T> type)
+    public <T> CompletableFuture<T> resolve(ParameterizedTypeReference<T> type)
             throws InterruptedException, ExecutionException {
-        return (T) resolver.get(this).get();
+        return resolver.get(this, type);
     }
 }

@@ -22,92 +22,94 @@ import com.google.common.collect.Maps;
  * Actions represent available behaviours an entity exposes.
  *
  * @param <T>
- *          the type returned by invoking the action
+ *            the type returned by invoking the action
  */
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public abstract class Action<T> extends Labelled {
 
-  private String identifier;
+    private String identifier;
 
-  private Link link;
+    private Link link;
 
-  private final List<Parameter> parameters = new ArrayList<>();
+    private final List<Parameter> parameters = new ArrayList<>();
 
-  private Resolver resolver;
+    private Resolver resolver;
 
-  protected Action() {
-  }
-
-  public Action(final Resolver resolver, final String identifier, final Link link,
-      final Parameter... parameters) {
-    this.identifier = identifier;
-    this.parameters.addAll(Arrays.asList(parameters));
-    this.link = link;
-    this.resolver = resolver;
-  }
-
-  abstract protected CompletableFuture<T> doInvoke(Resolver resolver,
-      Map<String, Object> filteredParameters);
-
-  @JsonProperty("href")
-  public URI getAddress() {
-    if (getLink() != null) {
-      return getLink().getAddress();
-    } else {
-      return null;
+    protected Action() {
     }
-  }
 
-  /**
-   * @return the identifier
-   */
-  @JsonProperty("name")
-  public String getIdentifier() {
-    return identifier;
-  }
-
-  @JsonIgnore
-  public Link getLink() {
-    return this.link;
-  }
-
-  /**
-   * @return the nature
-   */
-  @JsonProperty("method")
-  public abstract HttpMethod getNature();
-
-  public Set<String> getParameterKeys() {
-    final Set<String> rval = new HashSet<>();
-    for (final Parameter param : getParameters()) {
-      rval.add(param.getIdentifier());
+    public Action(final Resolver resolver, final String identifier,
+            final Link link, final Parameter... parameters) {
+        this.identifier = identifier;
+        this.parameters.addAll(Arrays.asList(parameters));
+        this.link = link;
+        this.resolver = resolver;
     }
-    return rval;
-  }
 
-  /**
-   * @return the parameters
-   */
-  @JsonProperty("fields")
-  public List<Parameter> getParameters() {
-    return parameters;
-  }
+    abstract protected CompletableFuture<T> doInvoke(Resolver resolver,
+            Map<String, Object> filteredParameters);
 
-  /**
-   *
-   * @param context
-   *          name value pairs representing the parameters the action is being invoked with
-   * @return a future representing the result from a successful invocation of the action. The
-   *         invocation may be a network operation, so the caller should not make assumptions about
-   *         the timeliness of the response.
-   */
-  public CompletableFuture<T> invoke(final Map<String, Object> context) {
-    final Set<String> parameterKeys = getParameterKeys();
-    final Map<String, Object> filteredParameters = new HashMap<>(
-        Maps.filterKeys(context, Predicates.in(parameterKeys)));
-    final String id = getIdentifier();
-    filteredParameters.put("action", id);
-    return doInvoke(resolver, filteredParameters);
-  }
+    @JsonProperty("href")
+    public URI getAddress() {
+        if (getLink() != null) {
+            return getLink().getAddress();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @return the identifier
+     */
+    @JsonProperty("name")
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    @JsonIgnore
+    public Link getLink() {
+        return this.link;
+    }
+
+    /**
+     * @return the nature
+     */
+    @JsonProperty("method")
+    public abstract HttpMethod getNature();
+
+    public Set<String> getParameterKeys() {
+        final Set<String> rval = new HashSet<>();
+        for (final Parameter param : getParameters()) {
+            rval.add(param.getIdentifier());
+        }
+        return rval;
+    }
+
+    /**
+     * @return the parameters
+     */
+    @JsonProperty("fields")
+    public List<Parameter> getParameters() {
+        return parameters;
+    }
+
+    /**
+     *
+     * @param context
+     *            name value pairs representing the parameters the action is
+     *            being invoked with
+     * @return a future representing the result from a successful invocation of
+     *         the action. The invocation may be a network operation, so the
+     *         caller should not make assumptions about the timeliness of the
+     *         response.
+     */
+    public CompletableFuture<T> invoke(final Map<String, Object> context) {
+        final Set<String> parameterKeys = getParameterKeys();
+        final Map<String, Object> filteredParameters = new HashMap<>(
+                Maps.filterKeys(context, Predicates.in(parameterKeys)));
+        final String id = getIdentifier();
+        filteredParameters.put("action", id);
+        return doInvoke(resolver, filteredParameters);
+    }
 
 }

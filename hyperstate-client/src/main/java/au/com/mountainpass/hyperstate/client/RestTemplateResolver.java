@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
@@ -98,8 +100,8 @@ public class RestTemplateResolver implements Resolver {
     }
 
     @Override
-    public CompletableFuture<EntityWrapper<?>> get(final Link link,
-            final Map<String, Object> filteredParameters) {
+    public <T> CompletableFuture<T> get(final Link link,
+            final Map<String, Object> filteredParameters, Class<T> type) {
         final MultiValueMap<String, Object> body = new LinkedMultiValueMap<>(
                 filteredParameters.size());
         for (final Entry<String, Object> entry : filteredParameters
@@ -114,7 +116,7 @@ public class RestTemplateResolver implements Resolver {
         final ListenableFuture<ResponseEntity<EntityWrapper>> responseFuture = asyncRestTemplate
                 .exchange(link.getAddress(), HttpMethod.GET, request,
                         EntityWrapper.class);
-        return FutureConverter.convert(responseFuture)
+        return (CompletableFuture<T>) FutureConverter.convert(responseFuture)
                 .thenApplyAsync(response -> {
                     return response.getBody();
                 });
@@ -122,9 +124,9 @@ public class RestTemplateResolver implements Resolver {
     }
 
     @Override
-    public CompletableFuture<EntityWrapper<?>> get(Link link) {
+    public <T> CompletableFuture<T> get(Link link, Class<T> type) {
         Map<String, Object> filteredParameters = new HashMap<>();
-        return get(link, filteredParameters);
+        return get(link, filteredParameters, type);
     }
 
     @Override
@@ -163,6 +165,12 @@ public class RestTemplateResolver implements Resolver {
                 .thenApplyAsync(response -> new UpdatedEntity(new RestLink(this,
                         asyncRestTemplate, response.getHeaders().getLocation(),
                         null, null)));
+    }
+
+    @Override
+    public <T> CompletableFuture<T> get(Link link,
+            ParameterizedTypeReference<T> type) {
+        throw new NotImplementedException("TODO");
     }
 
 }

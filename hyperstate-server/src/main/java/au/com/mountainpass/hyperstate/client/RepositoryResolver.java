@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.core.ParameterizedTypeReference;
 
 import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.Link;
@@ -34,8 +35,8 @@ public class RepositoryResolver implements Resolver {
     }
 
     @Override
-    public CompletableFuture<EntityWrapper<?>> get(final Link link,
-            final Map<String, Object> filteredParameters) {
+    public <T> CompletableFuture<T> get(final Link link,
+            final Map<String, Object> filteredParameters, Class<T> type) {
         throw new NotImplementedException("todo");
     }
 
@@ -53,8 +54,18 @@ public class RepositoryResolver implements Resolver {
     }
 
     @Override
-    public CompletableFuture<EntityWrapper<?>> get(Link link) {
-        return repository.findOne(link.getPath());
+    public <T> CompletableFuture<T> get(Link link, Class<T> type) {
+        return repository.findOne(link.getPath()).thenApply(entity -> {
+            return (T) entity;
+        });
+    }
+
+    @Override
+    public <T> CompletableFuture<T> get(Link link,
+            ParameterizedTypeReference<T> type) {
+        return repository.findOne(link.getPath()).thenApply(entity -> {
+            return (T) entity;
+        });
     }
 
 }

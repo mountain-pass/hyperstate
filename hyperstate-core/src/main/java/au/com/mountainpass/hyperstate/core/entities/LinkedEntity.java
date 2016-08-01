@@ -54,14 +54,14 @@ public class LinkedEntity extends Entity {
     @Override
     public <K, T extends EntityWrapper<K>> T resolve(final Class<T> type)
             throws InterruptedException, ExecutionException {
-        return link.resolve(type);
+        return link.resolve(type).get();
     }
 
     @Override
     public <K, T extends EntityWrapper<K>> T resolve(
             final ParameterizedTypeReference<T> type)
                     throws InterruptedException, ExecutionException {
-        return link.resolve(type);
+        return link.resolve(type).get();
     }
 
     @Override

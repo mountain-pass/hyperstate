@@ -29,6 +29,7 @@ import au.com.mountainpass.hyperstate.client.RestTemplateResolver;
 import au.com.mountainpass.hyperstate.client.webdriver.WebDriverResolver;
 import au.com.mountainpass.hyperstate.core.EntityRelationship;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
+import au.com.mountainpass.hyperstate.core.Link;
 import au.com.mountainpass.hyperstate.core.Relationship;
 import au.com.mountainpass.hyperstate.core.Resolver;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
@@ -167,7 +168,8 @@ public class StepDefs {
 
     @When("^its \"([^\"]*)\" link is followed$")
     public void its_link_is_followed(final String rel) throws Throwable {
-        currentEntity = currentEntity.getLink(rel).resolve(VanillaEntity.class);
+        Link link = currentEntity.getLink(rel);
+        currentEntity = link.resolve(VanillaEntity.class).get();
     }
 
     @When("^request is made to \"([^\"]*)\"$")

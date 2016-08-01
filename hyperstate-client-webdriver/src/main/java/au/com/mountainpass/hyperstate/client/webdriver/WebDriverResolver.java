@@ -25,6 +25,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;
+import org.springframework.core.ParameterizedTypeReference;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -119,34 +120,31 @@ public class WebDriverResolver implements Resolver {
     }
 
     @Override
-    public CompletableFuture<EntityWrapper<?>> get(final Link link,
-            final Map<String, Object> filteredParameters) {
+    public <T> CompletableFuture<T> get(final Link link,
+            final Map<String, Object> filteredParameters, Class<T> type) {
         if (link instanceof WebDriverLink) {
             final WebDriverLink wdl = (WebDriverLink) link;
             final WebElement form = wdl.getWebElement();
-            for (final WebElement input : form.findElements(By.name("input"))) {
-                final Object value = filteredParameters
-                        .get(input.getAttribute("name"));
-                if (value != null) {
-                    input.sendKeys(value.toString());
+            if ("form".equals(form.getTagName())) {
+                for (final WebElement input : form
+                        .findElements(By.name("input"))) {
+                    final Object value = filteredParameters
+                            .get(input.getAttribute("name"));
+                    if (value != null) {
+                        input.sendKeys(value.toString());
+                    }
                 }
+                form.findElement(By.cssSelector("button[type='submit']"))
+                        .click();
+            } else {
+                form.click();
             }
-            form.findElement(By.cssSelector("button[type='submit']")).click();
             return CompletableFuture.supplyAsync(() -> {
-                final EntityWrapper<?> wrapper = createProxy(
-                        EntityWrapper.class);
-                return wrapper;
+                return createProxy(type);
             });
-
         } else {
             throw new NotImplementedException("TODO");
         }
-    }
-
-    @Override
-    public CompletableFuture<EntityWrapper<?>> get(Link link) {
-        final Map<String, Object> filteredParameters = new HashMap<>();
-        return this.get(link, filteredParameters);
     }
 
     @Override
@@ -407,6 +405,18 @@ public class WebDriverResolver implements Resolver {
     @Override
     public CompletableFuture<UpdatedEntity> update(final Link link,
             final Map<String, Object> filteredParameters) {
+        throw new NotImplementedException("TODO");
+    }
+
+    @Override
+    public <T> CompletableFuture<T> get(Link link, Class<T> type) {
+        Map<String, Object> parameters = new HashMap<>();
+        return get(link, parameters, type);
+    }
+
+    @Override
+    public <T> CompletableFuture<T> get(Link link,
+            ParameterizedTypeReference<T> type) {
         throw new NotImplementedException("TODO");
     }
 

@@ -3,8 +3,8 @@ package au.com.mountainpass.hyperstate.server.entities;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
-import au.com.mountainpass.hyperstate.core.Resolver;
 
 public class AccountBuilder {
 
@@ -18,7 +18,7 @@ public class AccountBuilder {
         // TODO Auto-generated constructor stub
     }
 
-    public CompletableFuture<Account> build(final Resolver resolver,
+    public CompletableFuture<Account> build(final RepositoryResolver resolver,
             final EntityRepository repository, final String path)
                     throws InterruptedException, ExecutionException {
         AccountProperties properties = new AccountProperties(username,

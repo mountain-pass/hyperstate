@@ -79,8 +79,7 @@ public class WebDriverResolver implements Resolver {
         this.webDriver = webDriver;
     }
 
-    @Override
-    public CompletableFuture<CreatedEntity> create(final Link link,
+    public CompletableFuture<CreatedEntity> create(final WebDriverLink link,
             final Map<String, Object> filteredParameters) {
         return CompletableFuture.supplyAsync(() -> {
             final WebElement form = (new WebDriverWait(webDriver, 5))
@@ -113,17 +112,15 @@ public class WebDriverResolver implements Resolver {
         return proxy;
     }
 
-    @Override
     public CompletableFuture<Void> delete(final Link link,
             final Map<String, Object> filteredParameters) {
         throw new NotImplementedException("TODO");
     }
 
-    @Override
-    public <T> CompletableFuture<T> get(final Link link,
+    public <T> CompletableFuture<T> get(final WebDriverLink link,
             final Map<String, Object> filteredParameters, Class<T> type) {
         if (link instanceof WebDriverLink) {
-            final WebDriverLink wdl = (WebDriverLink) link;
+            final WebDriverLink wdl = link;
             final WebElement form = wdl.getWebElement();
             if ("form".equals(form.getTagName())) {
                 for (final WebElement input : form
@@ -147,7 +144,6 @@ public class WebDriverResolver implements Resolver {
         }
     }
 
-    @Override
     public <E extends EntityWrapper<?>> CompletableFuture<E> get(
             final String path, final Class<E> type) {
         return get(getBaseUri().resolve(path), type);
@@ -402,20 +398,17 @@ public class WebDriverResolver implements Resolver {
         return e;
     }
 
-    @Override
-    public CompletableFuture<UpdatedEntity> update(final Link link,
+    public CompletableFuture<UpdatedEntity> update(final WebDriverLink link,
             final Map<String, Object> filteredParameters) {
         throw new NotImplementedException("TODO");
     }
 
-    @Override
-    public <T> CompletableFuture<T> get(Link link, Class<T> type) {
+    public <T> CompletableFuture<T> get(WebDriverLink link, Class<T> type) {
         Map<String, Object> parameters = new HashMap<>();
         return get(link, parameters, type);
     }
 
-    @Override
-    public <T> CompletableFuture<T> get(Link link,
+    public <T> CompletableFuture<T> get(WebDriverLink link,
             ParameterizedTypeReference<T> type) {
         throw new NotImplementedException("TODO");
     }

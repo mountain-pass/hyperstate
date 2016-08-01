@@ -1,25 +1,27 @@
 package au.com.mountainpass.hyperstate.client;
 
 import java.net.URI;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.eclipse.jdt.annotation.Nullable;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
-import org.springframework.web.client.AsyncRestTemplate;
 
 import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import au.com.mountainpass.hyperstate.core.Link;
 import au.com.mountainpass.hyperstate.core.MediaTypes;
-import au.com.mountainpass.hyperstate.core.Resolver;
+import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
+import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
+import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 
 public class RestLink extends Link {
 
-    private Resolver resolver;
-
-    private AsyncRestTemplate asyncRestTemplate;
+    private RestTemplateResolver resolver;
 
     URI address;
 
@@ -27,27 +29,18 @@ public class RestLink extends Link {
     MediaType representationFormat = MediaTypes.SIREN_JSON;
 
     @JsonCreator
-    public RestLink(@JacksonInject Resolver resolver,
-            @JacksonInject AsyncRestTemplate asyncRestTemplate,
+    public RestLink(@JacksonInject RestTemplateResolver resolver,
             @JsonProperty("href") final URI address,
             @JsonProperty("title") final String label,
             @JsonProperty("class") final String[] natures) {
-        super(resolver, address.toString(), label, natures);
+        super(label, natures);
         this.resolver = resolver;
-        this.asyncRestTemplate = asyncRestTemplate;
         this.address = address;
     }
 
-    @Override
     @JsonProperty("href")
     public URI getAddress() {
         return address;
-    }
-
-    @Override
-    @JsonIgnore
-    public String getPath() {
-        return address.toString();
     }
 
     @Override
@@ -56,48 +49,53 @@ public class RestLink extends Link {
                 : representationFormat;
     }
 
-    // @Override
-    // public <T> T resolve(final Class<T> type)
-    // throws InterruptedException, ExecutionException {
-    // Map<String, Object> filteredParameters = new HashMap<>();
-    // if (this.representationFormat == MediaTypes.SIREN_JSON) {
-    // return (T) resolver.get(this, filteredParameters).get();
-    // } else {
-    // final RequestEntity<Void> request = RequestEntity.get(address)
-    // .accept(getRepresentationFormat()).build();
-    // ListenableFuture<ResponseEntity<T>> responseFuture = asyncRestTemplate
-    // .exchange(address, HttpMethod.GET, request, type);
-    // return FutureConverter.convert(responseFuture)
-    // .thenApply(response -> {
-    // return response.getBody();
-    // }).get();
-    // }
-    // }
-    //
-    // @Override
-    // public <T> T resolve(final ParameterizedTypeReference<T> type)
-    // throws InterruptedException, ExecutionException {
-    // if (this.representationFormat == MediaTypes.SIREN_JSON) {
-    // return (T) resolver.get(this).get();
-    // } else {
-    // final RequestEntity<Void> request = RequestEntity.get(address)
-    // .accept(getRepresentationFormat()).build();
-    // ListenableFuture<ResponseEntity<T>> responseFuture = asyncRestTemplate
-    // .exchange(address, HttpMethod.GET, request, type);
-    // return FutureConverter.convert(responseFuture)
-    // .thenApply(response -> {
-    // return response.getBody();
-    // }).get();
-    // }
-    // }
-
     public void setAddress(final URI address) {
         this.address = address;
     }
 
-    // @Autowired
-    // public void setRestTemplate(final RestTemplate restTemplate) {
-    // this.restTemplate = restTemplate;
-    // }
+    @Override
+    public <T> CompletableFuture<T> resolve(Class<T> type) {
+        return resolver.get(this, type);
+    }
+
+    @Override
+    public <T> CompletableFuture<T> resolve(
+            ParameterizedTypeReference<T> type) {
+        return resolver.get(this, type);
+    }
+
+    @Override
+    public String getPath() {
+        return address.toString();
+    }
+
+    @Override
+    public CompletableFuture<EntityWrapper<?>> get(
+            Map<String, Object> filteredParameters) {
+        throw new NotImplementedException("TODO");
+    }
+
+    @Override
+    public CompletableFuture<Void> delete(
+            Map<String, Object> filteredParameters) {
+        throw new NotImplementedException("TODO");
+    }
+
+    @Override
+    public CompletableFuture<CreatedEntity> create(
+            Map<String, Object> filteredParameters) {
+        throw new NotImplementedException("TODO");
+    }
+
+    @Override
+    public CompletableFuture<UpdatedEntity> update(
+            Map<String, Object> filteredParameters) {
+        throw new NotImplementedException("TODO");
+    }
+
+    @Override
+    public CompletableFuture<EntityWrapper<?>> get() {
+        throw new NotImplementedException("TODO");
+    }
 
 }

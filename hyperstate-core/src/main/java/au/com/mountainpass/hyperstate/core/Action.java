@@ -1,6 +1,5 @@
 package au.com.mountainpass.hyperstate.core;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,9 +11,9 @@ import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.HttpMethod;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Maps;
 
@@ -49,15 +48,6 @@ public abstract class Action<T> extends Labelled {
     abstract protected CompletableFuture<T> doInvoke(Resolver resolver,
             Map<String, Object> filteredParameters);
 
-    @JsonProperty("href")
-    public URI getAddress() {
-        if (getLink() != null) {
-            return getLink().getAddress();
-        } else {
-            return null;
-        }
-    }
-
     /**
      * @return the identifier
      */
@@ -66,7 +56,7 @@ public abstract class Action<T> extends Labelled {
         return identifier;
     }
 
-    @JsonIgnore
+    @JsonUnwrapped
     public Link getLink() {
         return this.link;
     }

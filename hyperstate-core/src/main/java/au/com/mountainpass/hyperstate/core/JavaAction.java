@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import org.springframework.http.HttpMethod;
 
 import au.com.mountainpass.hyperstate.annotations.PresentationType;
+import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
@@ -84,8 +85,8 @@ public class JavaAction<T> extends Action<T> {
     protected JavaAction() {
     }
 
-    public JavaAction(Resolver resolver, final EntityWrapper<?> entity,
-            final Method method) {
+    public JavaAction(RepositoryResolver resolver,
+            final EntityWrapper<?> entity, final Method method) {
         super(resolver, method.getName(), new JavaLink(resolver, entity),
                 extractParameters(method));
         this.method = method;

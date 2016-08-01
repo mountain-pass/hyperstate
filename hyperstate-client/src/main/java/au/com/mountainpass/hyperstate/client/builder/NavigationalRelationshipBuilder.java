@@ -2,14 +2,12 @@ package au.com.mountainpass.hyperstate.client.builder;
 
 import java.net.URI;
 
-import org.springframework.web.client.AsyncRestTemplate;
-
 import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import au.com.mountainpass.hyperstate.client.RestLink;
+import au.com.mountainpass.hyperstate.client.RestTemplateResolver;
 import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
-import au.com.mountainpass.hyperstate.core.Resolver;
 
 public class NavigationalRelationshipBuilder {
 
@@ -18,15 +16,12 @@ public class NavigationalRelationshipBuilder {
     private String[] natures;
 
     public NavigationalRelationship build() {
-        return new NavigationalRelationship(new RestLink(resolver,
-                asyncRestTemplte, address, label, natures), natures);
+        return new NavigationalRelationship(
+                new RestLink(resolver, address, label, natures), natures);
     }
 
     @JacksonInject
-    private Resolver resolver;
-
-    @JacksonInject
-    private AsyncRestTemplate asyncRestTemplte;
+    private RestTemplateResolver resolver;
 
     @JsonProperty("href")
     public NavigationalRelationshipBuilder setAddress(final URI address) {

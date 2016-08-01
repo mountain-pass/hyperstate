@@ -50,13 +50,11 @@ public class RestTemplateResolver implements Resolver {
         om.addMixIn(EntityRelationship.class, EntityRelationshipMixin.class);
         om.addMixIn(NavigationalRelationship.class,
                 NavigationalRelationshipMixin.class);
-        om.setInjectableValues(
-                new InjectableValues.Std().addValue(Resolver.class, this)
-                        .addValue(AsyncRestTemplate.class, asyncRestTemplate));
+        om.setInjectableValues(new InjectableValues.Std()
+                .addValue(RestTemplateResolver.class, this));
     }
 
-    @Override
-    public CompletableFuture<CreatedEntity> create(final Link link,
+    public CompletableFuture<CreatedEntity> create(final RestLink link,
             final Map<String, Object> filteredParameters) {
         final MultiValueMap<String, Object> body = new LinkedMultiValueMap<>(
                 filteredParameters.size());
@@ -71,14 +69,13 @@ public class RestTemplateResolver implements Resolver {
                 .postForLocation(link.getAddress(), request);
         return FutureConverter.convert(locationFuture).thenApplyAsync(uri -> {
             final CreatedEntity linkedEntity = new CreatedEntity(
-                    new RestLink(this, asyncRestTemplate, uri, null, null));
+                    new RestLink(this, uri, null, null));
 
             return linkedEntity;
         });
     }
 
-    @Override
-    public CompletableFuture<Void> delete(final Link link,
+    public CompletableFuture<Void> delete(final RestLink link,
             final Map<String, Object> filteredParameters) {
         final MultiValueMap<String, Object> body = new LinkedMultiValueMap<>(
                 filteredParameters.size());
@@ -99,8 +96,7 @@ public class RestTemplateResolver implements Resolver {
                 });
     }
 
-    @Override
-    public <T> CompletableFuture<T> get(final Link link,
+    public <T> CompletableFuture<T> get(final RestLink link,
             final Map<String, Object> filteredParameters, Class<T> type) {
         final MultiValueMap<String, Object> body = new LinkedMultiValueMap<>(
                 filteredParameters.size());
@@ -123,8 +119,7 @@ public class RestTemplateResolver implements Resolver {
 
     }
 
-    @Override
-    public <T> CompletableFuture<T> get(Link link, Class<T> type) {
+    public <T> CompletableFuture<T> get(RestLink link, Class<T> type) {
         Map<String, Object> filteredParameters = new HashMap<>();
         return get(link, filteredParameters, type);
     }
@@ -145,8 +140,7 @@ public class RestTemplateResolver implements Resolver {
         return baseUri;
     }
 
-    @Override
-    public CompletableFuture<UpdatedEntity> update(final Link link,
+    public CompletableFuture<UpdatedEntity> update(final RestLink link,
             final Map<String, Object> filteredParameters) {
         final MultiValueMap<String, Object> body = new LinkedMultiValueMap<>(
                 filteredParameters.size());
@@ -163,12 +157,10 @@ public class RestTemplateResolver implements Resolver {
                         Void.class);
         return FutureConverter.convert(responseFuture)
                 .thenApplyAsync(response -> new UpdatedEntity(new RestLink(this,
-                        asyncRestTemplate, response.getHeaders().getLocation(),
-                        null, null)));
+                        response.getHeaders().getLocation(), null, null)));
     }
 
-    @Override
-    public <T> CompletableFuture<T> get(Link link,
+    public <T> CompletableFuture<T> get(RestLink link,
             ParameterizedTypeReference<T> type) {
         throw new NotImplementedException("TODO");
     }

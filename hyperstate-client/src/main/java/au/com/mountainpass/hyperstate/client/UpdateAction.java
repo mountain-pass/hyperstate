@@ -21,7 +21,7 @@ public class UpdateAction extends Action<UpdatedEntity> {
     @Override
     public CompletableFuture<UpdatedEntity> doInvoke(final Resolver resolver,
             final Map<String, Object> filteredParameters) {
-        return resolver.update(getLink(), filteredParameters);
+        return getLink().update(filteredParameters);
     }
 
     /**

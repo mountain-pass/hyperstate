@@ -13,23 +13,23 @@ import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
 
 public class CreateAction extends Action<CreatedEntity> {
 
-  public CreateAction(final Resolver resolver, final String identifier, final Link link,
-      final Parameter[] fields) {
-    super(resolver, identifier, link, fields);
-  }
+    public CreateAction(final Resolver resolver, final String identifier,
+            final Link link, final Parameter[] fields) {
+        super(resolver, identifier, link, fields);
+    }
 
-  @Override
-  public CompletableFuture<CreatedEntity> doInvoke(final Resolver resolver,
-      final Map<String, Object> filteredParameters) {
-    return resolver.create(getLink(), filteredParameters);
-  }
+    @Override
+    public CompletableFuture<CreatedEntity> doInvoke(final Resolver resolver,
+            final Map<String, Object> filteredParameters) {
+        return getLink().create(filteredParameters);
+    }
 
-  /**
-   * @return the nature
-   */
-  @Override
-  public HttpMethod getNature() {
-    return HttpMethod.POST;
-  }
+    /**
+     * @return the nature
+     */
+    @Override
+    public HttpMethod getNature() {
+        return HttpMethod.POST;
+    }
 
 }

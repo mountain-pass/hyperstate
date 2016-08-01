@@ -26,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.google.common.collect.ImmutableSet;
 
+import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.Action;
 import au.com.mountainpass.hyperstate.core.EntityRelationship;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
@@ -34,7 +35,6 @@ import au.com.mountainpass.hyperstate.core.JavaLink;
 import au.com.mountainpass.hyperstate.core.Link;
 import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
 import au.com.mountainpass.hyperstate.core.Relationship;
-import au.com.mountainpass.hyperstate.core.Resolver;
 
 @JsonPropertyOrder({ "class", "properties", "entities", "actions", "links",
         "title" })
@@ -66,8 +66,9 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
         this.navigationalRelationships = src.navigationalRelationships;
     }
 
-    protected EntityWrapper(final Resolver resolver, final String path,
-            final T properties, final String label, final String... natures) {
+    protected EntityWrapper(final RepositoryResolver resolver,
+            final String path, final T properties, final String label,
+            final String... natures) {
         super(label, natures);
         this.properties = properties;
         this.path = path;
@@ -100,13 +101,6 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
                 }
             }
         }
-        // getNatures().add(this.getClass().getSimpleName());
-
-        // Label titleAnnotation = properties.getClass()
-        // .getAnnotation(Label.class);
-        // if (titleAnnotation != null) {
-        // setTitle(titleAnnotation.value(), args);
-        // }
     }
 
     protected EntityWrapper(@JsonProperty("properties") final T properties) {

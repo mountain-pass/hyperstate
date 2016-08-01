@@ -1,8 +1,7 @@
 package au.com.mountainpass.hyperstate.client.webdriver;
 
-import java.net.URI;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.openqa.selenium.WebElement;
@@ -10,19 +9,19 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 
 import au.com.mountainpass.hyperstate.core.Link;
-import au.com.mountainpass.hyperstate.core.Resolver;
+import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
+import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
+import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 
 public class WebDriverLink extends Link {
 
-    private Resolver resolver;
+    private WebDriverResolver resolver;
     private final WebElement webElement;
-    private URI address;
 
-    public WebDriverLink(final Resolver resolver, final WebElement webElement) {
-        super(resolver, webElement.getAttribute("href"));
+    public WebDriverLink(final WebDriverResolver resolver,
+            final WebElement webElement) {
         this.webElement = webElement;
         this.resolver = resolver;
-        this.address = URI.create(webElement.getAttribute("href"));
     }
 
     @Override
@@ -35,26 +34,48 @@ public class WebDriverLink extends Link {
     }
 
     @Override
-    public <T> CompletableFuture<T> resolve(final Class<T> type)
-            throws InterruptedException, ExecutionException {
+    public <T> CompletableFuture<T> resolve(final Class<T> type) {
         return resolver.get(this, type);
     }
 
     @Override
     public <T> CompletableFuture<T> resolve(
-            final ParameterizedTypeReference<T> type)
-                    throws InterruptedException, ExecutionException {
+            final ParameterizedTypeReference<T> type) {
         return resolver.get(this, type);
     }
 
     @Override
-    public URI getAddress() {
-        return address;
+    public String getPath() {
+        return webElement.getAttribute("href");
     }
 
     @Override
-    public String getPath() {
-        return address.toString();
+    public CompletableFuture<EntityWrapper<?>> get(
+            Map<String, Object> filteredParameters) {
+        throw new NotImplementedException("TODO");
+    }
+
+    @Override
+    public CompletableFuture<Void> delete(
+            Map<String, Object> filteredParameters) {
+        throw new NotImplementedException("TODO");
+    }
+
+    @Override
+    public CompletableFuture<CreatedEntity> create(
+            Map<String, Object> filteredParameters) {
+        throw new NotImplementedException("TODO");
+    }
+
+    @Override
+    public CompletableFuture<UpdatedEntity> update(
+            Map<String, Object> filteredParameters) {
+        throw new NotImplementedException("TODO");
+    }
+
+    @Override
+    public CompletableFuture<EntityWrapper<?>> get() {
+        throw new NotImplementedException("TODO");
     }
 
 }

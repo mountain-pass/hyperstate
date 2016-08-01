@@ -25,6 +25,7 @@ import org.springframework.web.client.AsyncRestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.client.RestTemplateResolver;
 import au.com.mountainpass.hyperstate.client.webdriver.WebDriverResolver;
 import au.com.mountainpass.hyperstate.core.EntityRelationship;
@@ -83,7 +84,7 @@ public class StepDefs {
     private WebDriver webDriver;
 
     @Autowired
-    private Resolver repositoryResovler;
+    private RepositoryResolver repositoryResovler;
 
     @Given("^a Hyperstate controller \"([^\"]*)\" at \"([^\"]*)\"$")
     public void a_Hyperstate_controller_at(final String beanName,

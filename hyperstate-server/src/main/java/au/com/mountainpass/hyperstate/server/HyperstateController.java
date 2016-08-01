@@ -32,10 +32,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.HandlerMapping;
 
+import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.Action;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
+import au.com.mountainpass.hyperstate.core.JavaLink;
 import au.com.mountainpass.hyperstate.core.MediaTypes;
-import au.com.mountainpass.hyperstate.core.Relationship;
 import au.com.mountainpass.hyperstate.core.entities.Entity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 
@@ -45,6 +46,9 @@ public abstract class HyperstateController {
 
     @Autowired
     private EntityRepository repository;
+
+    @Autowired
+    private RepositoryResolver resolver;
 
     public HyperstateController() {
 
@@ -224,8 +228,7 @@ public abstract class HyperstateController {
         final Entity result = (Entity) action
                 .invoke(allRequestParams.toSingleValueMap()).get();
         return ResponseEntity
-                .created(entity.getLink(Relationship.SELF).getAddress())
-                .build();
+                .created(new JavaLink(resolver, entity).getAddress()).build();
     }
 
     @RequestMapping(value = "**", method = RequestMethod.PUT, produces = {
@@ -261,8 +264,7 @@ public abstract class HyperstateController {
         action.invoke(params.toSingleValueMap());
         // todo: automatically treat actions that return void as PUT actions
         return ResponseEntity.noContent()
-                .location(entity.getLink(Relationship.SELF).getAddress())
-                .build();
+                .location(new JavaLink(resolver, entity).getAddress()).build();
     }
 
 }

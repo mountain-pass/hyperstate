@@ -16,7 +16,8 @@ public class RestEntity<T> extends EntityWrapper<T> {
 
     public RestEntity(final Resolver resolver, final String path,
             final T properties, final String title) {
-        super(resolver, path, properties, title);
+        super(null, path, properties, title);
+        throw new NotImplementedException("dead?");
     }
 
     public RestEntity(final T properties) {

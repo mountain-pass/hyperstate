@@ -21,8 +21,7 @@ public class GetAction extends Action<EntityWrapper<?>> {
     @Override
     public CompletableFuture<EntityWrapper<?>> doInvoke(final Resolver resolver,
             final Map<String, Object> filteredParameters) {
-        return (CompletableFuture) resolver.get(getLink(), filteredParameters,
-                EntityWrapper.class);
+        return getLink().get(filteredParameters);
     }
 
     @Override

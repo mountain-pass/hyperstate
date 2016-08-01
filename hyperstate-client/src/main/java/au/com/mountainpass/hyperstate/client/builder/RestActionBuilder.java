@@ -15,10 +15,10 @@ import au.com.mountainpass.hyperstate.client.CreateAction;
 import au.com.mountainpass.hyperstate.client.DeleteAction;
 import au.com.mountainpass.hyperstate.client.GetAction;
 import au.com.mountainpass.hyperstate.client.RestLink;
+import au.com.mountainpass.hyperstate.client.RestTemplateResolver;
 import au.com.mountainpass.hyperstate.client.UpdateAction;
 import au.com.mountainpass.hyperstate.core.Action;
 import au.com.mountainpass.hyperstate.core.Parameter;
-import au.com.mountainpass.hyperstate.core.Resolver;
 
 public class RestActionBuilder {
 
@@ -27,20 +27,16 @@ public class RestActionBuilder {
     private String identifier;
     private HttpMethod method;
 
-    private final Resolver resolver;
-
-    private AsyncRestTemplate asyncRestTemplate;
+    private final RestTemplateResolver resolver;
 
     @JsonCreator
-    public RestActionBuilder(@JacksonInject final Resolver resolver,
+    public RestActionBuilder(@JacksonInject final RestTemplateResolver resolver,
             @JacksonInject final AsyncRestTemplate asyncRestTemplate) {
         this.resolver = resolver;
-        this.asyncRestTemplate = asyncRestTemplate;
     }
 
     public Action<?> build() {
-        RestLink link = new RestLink(resolver, asyncRestTemplate, href,
-                identifier, null);
+        RestLink link = new RestLink(resolver, href, identifier, null);
         switch (method) {
         case POST:
             return new CreateAction(resolver, identifier, link, fields);

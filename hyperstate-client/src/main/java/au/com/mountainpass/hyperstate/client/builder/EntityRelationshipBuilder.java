@@ -2,14 +2,12 @@ package au.com.mountainpass.hyperstate.client.builder;
 
 import java.net.URI;
 
-import org.springframework.web.client.AsyncRestTemplate;
-
 import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import au.com.mountainpass.hyperstate.client.RestLink;
+import au.com.mountainpass.hyperstate.client.RestTemplateResolver;
 import au.com.mountainpass.hyperstate.core.EntityRelationship;
-import au.com.mountainpass.hyperstate.core.Resolver;
 import au.com.mountainpass.hyperstate.core.entities.LinkedEntity;
 
 public class EntityRelationshipBuilder {
@@ -18,18 +16,15 @@ public class EntityRelationshipBuilder {
     private String[] entityNatures;
     private String label;
     private String[] relationshipNatures;
+
+    @JacksonInject
+    private RestTemplateResolver resolver;
     private String type;
-
-    @JacksonInject
-    private Resolver resolver;
-
-    @JacksonInject
-    private AsyncRestTemplate asyncRestTemplate;
 
     public EntityRelationship build() {
         final LinkedEntity entity = new LinkedEntity(
-                new RestLink(resolver, asyncRestTemplate, address, label, null),
-                label, entityNatures);
+                new RestLink(resolver, address, label, null), label,
+                entityNatures);
         return new EntityRelationship(entity, relationshipNatures);
     }
 

@@ -35,6 +35,7 @@ import org.springframework.web.servlet.HandlerMapping;
 import au.com.mountainpass.hyperstate.core.Action;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.MediaTypes;
+import au.com.mountainpass.hyperstate.core.Relationship;
 import au.com.mountainpass.hyperstate.core.entities.Entity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 
@@ -222,7 +223,9 @@ public abstract class HyperstateController {
         // todo: automatically treat actions that return links as POST actions
         final Entity result = (Entity) action
                 .invoke(allRequestParams.toSingleValueMap()).get();
-        return ResponseEntity.created(result.getAddress()).build();
+        return ResponseEntity
+                .created(entity.getLink(Relationship.SELF).getAddress())
+                .build();
     }
 
     @RequestMapping(value = "**", method = RequestMethod.PUT, produces = {
@@ -257,7 +260,9 @@ public abstract class HyperstateController {
 
         action.invoke(params.toSingleValueMap());
         // todo: automatically treat actions that return void as PUT actions
-        return ResponseEntity.noContent().location(entity.getAddress()).build();
+        return ResponseEntity.noContent()
+                .location(entity.getLink(Relationship.SELF).getAddress())
+                .build();
     }
 
 }

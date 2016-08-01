@@ -52,16 +52,4 @@ public class JavaLink extends Link {
     public MediaType getRepresentationFormat() {
         return MediaTypes.SIREN_JSON;
     }
-
-    // @SuppressWarnings("unchecked")
-    // @Override
-    // public <T> T resolve(final Class<T> type) {
-    // return (T) entity;
-    // }
-    //
-    // @SuppressWarnings("unchecked")
-    // @Override
-    // public <T> T resolve(final ParameterizedTypeReference<T> type) {
-    // return (T) entity;
-    // }
 }

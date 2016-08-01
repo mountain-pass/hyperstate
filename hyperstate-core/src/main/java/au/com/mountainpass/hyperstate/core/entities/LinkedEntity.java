@@ -1,6 +1,5 @@
 package au.com.mountainpass.hyperstate.core.entities;
 
-import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -9,8 +8,7 @@ import java.util.concurrent.ExecutionException;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.core.ParameterizedTypeReference;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 import au.com.mountainpass.hyperstate.core.Link;
 
@@ -35,13 +33,7 @@ public class LinkedEntity extends Entity {
         setTitle(label);
     }
 
-    @Override
-    @JsonProperty("href")
-    public URI getAddress() {
-        return link.getAddress();
-    }
-
-    @JsonIgnore
+    @JsonUnwrapped
     public Link getLink() {
         return link;
     }

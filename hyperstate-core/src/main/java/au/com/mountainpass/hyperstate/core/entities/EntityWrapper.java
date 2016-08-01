@@ -2,7 +2,6 @@ package au.com.mountainpass.hyperstate.core.entities;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -125,12 +124,6 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
     @JsonProperty("actions")
     public ImmutableSet<Action<?>> getActions() {
         return ImmutableSet.copyOf(actions.values());
-    }
-
-    @Override
-    @JsonIgnore
-    public URI getAddress() {
-        return getLink(Relationship.SELF).getAddress();
     }
 
     public CompletableFuture<Collection<EntityRelationship>> getEntities() {

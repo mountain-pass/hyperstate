@@ -1,7 +1,5 @@
 package au.com.mountainpass.hyperstate.core.entities;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.core.ParameterizedTypeReference;
@@ -22,8 +20,6 @@ public abstract class Entity extends Labelled {
     public Entity(final String label, final String... natures) {
         super(label, natures);
     }
-
-    public abstract URI getAddress() throws URISyntaxException;
 
     public abstract <K, T extends EntityWrapper<K>> T reload(Class<T> type);
 

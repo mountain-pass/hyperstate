@@ -7,6 +7,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.MediaTypes;
@@ -25,6 +27,9 @@ public class HyperstateTestController extends HyperstateController {
 
     @Autowired
     RepositoryResolver resolver;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @PostConstruct
     public void onConstructed() {

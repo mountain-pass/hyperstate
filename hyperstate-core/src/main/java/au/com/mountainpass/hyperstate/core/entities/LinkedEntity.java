@@ -20,16 +20,16 @@ public class LinkedEntity extends Entity {
     }
 
     public LinkedEntity(final Link link, final String title,
-            final Set<String> natures) {
+            final Set<String> classes) {
         this.link = link;
-        setNatures(natures);
+        setClasses(classes);
         setTitle(title);
     }
 
     public LinkedEntity(final Link link, final String title,
-            final String... natures) {
+            final String... classes) {
         this.link = link;
-        setNatures(new HashSet<String>(Arrays.asList(natures)));
+        setClasses(new HashSet<String>(Arrays.asList(classes)));
         setTitle(title);
     }
 

@@ -81,7 +81,7 @@ abstract public class Titled {
      *            the natures to set
      */
     @JsonProperty("class")
-    public void setNatures(final Set<String> natures) {
+    public void setClasses(final Set<String> natures) {
         this.natures = natures;
     }
 

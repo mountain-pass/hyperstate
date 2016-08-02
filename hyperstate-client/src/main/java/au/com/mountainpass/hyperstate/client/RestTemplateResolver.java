@@ -27,7 +27,7 @@ import au.com.mountainpass.hyperstate.client.deserialisation.mixins.Navigational
 import au.com.mountainpass.hyperstate.core.Action;
 import au.com.mountainpass.hyperstate.core.EntityRelationship;
 import au.com.mountainpass.hyperstate.core.FutureConverter;
-import au.com.mountainpass.hyperstate.core.Link;
+import au.com.mountainpass.hyperstate.core.Address;
 import au.com.mountainpass.hyperstate.core.MediaTypes;
 import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
 import au.com.mountainpass.hyperstate.core.Resolver;
@@ -46,7 +46,7 @@ public class RestTemplateResolver implements Resolver {
         this.baseUri = baseUri;
         this.asyncRestTemplate = asyncRestTemplate;
         om.addMixIn(Action.class, ActionMixin.class);
-        om.addMixIn(Link.class, LinkMixin.class);
+        om.addMixIn(Address.class, LinkMixin.class);
         om.addMixIn(EntityRelationship.class, EntityRelationshipMixin.class);
         om.addMixIn(NavigationalRelationship.class,
                 NavigationalRelationshipMixin.class);

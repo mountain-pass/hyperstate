@@ -13,7 +13,7 @@ import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.JavaLink;
 import au.com.mountainpass.hyperstate.core.Titled;
-import au.com.mountainpass.hyperstate.core.Link;
+import au.com.mountainpass.hyperstate.core.Address;
 import au.com.mountainpass.hyperstate.core.MediaTypes;
 import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
@@ -38,7 +38,7 @@ public class HyperstateTestController extends HyperstateController {
     @PostConstruct
     public void onConstructed() {
         objectMapper.addMixIn(JavaLink.class, LinkMixin.class);
-        objectMapper.addMixIn(Link.class, LinkMixin.class);
+        objectMapper.addMixIn(Address.class, LinkMixin.class);
         objectMapper.addMixIn(Titled.class, Titled.class);
 
         final EntityWrapper<?> root = new HyperstateRootEntity(resolver,

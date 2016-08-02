@@ -12,13 +12,13 @@ public class NavigationalRelationship extends Relationship {
     }
 
     public NavigationalRelationship(final EntityWrapper<?> entity,
-            final String... natures) {
-        super(natures);
+            final String... rels) {
+        super(rels);
         this.link = entity.toLinkedEntity().getLink();
     }
 
-    public NavigationalRelationship(final Link link, final String... natures) {
-        super(natures);
+    public NavigationalRelationship(final Link link, final String... rels) {
+        super(rels);
         this.link = link;
     }
 

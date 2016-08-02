@@ -6,21 +6,20 @@ import java.util.concurrent.CompletableFuture;
 import org.springframework.http.HttpMethod;
 
 import au.com.mountainpass.hyperstate.core.Action;
-import au.com.mountainpass.hyperstate.core.Link;
+import au.com.mountainpass.hyperstate.core.Address;
 import au.com.mountainpass.hyperstate.core.Parameter;
-import au.com.mountainpass.hyperstate.core.Resolver;
 
 public class DeleteAction extends Action<Void> {
 
-    public DeleteAction(final Resolver resolver, final String identifier,
-            final Link link, final Parameter[] fields) {
-        super(resolver, identifier, link, fields);
+    public DeleteAction(final String name, final Address address,
+            final Parameter[] fields) {
+        super(name, address, fields);
     }
 
     @Override
-    public CompletableFuture<Void> doInvoke(final Resolver resolver,
+    public CompletableFuture<Void> doInvoke(
             final Map<String, Object> filteredParameters) {
-        return getLink().delete(filteredParameters);
+        return getAddress().delete(filteredParameters);
     }
 
     /**

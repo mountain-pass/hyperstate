@@ -6,22 +6,21 @@ import java.util.concurrent.CompletableFuture;
 import org.springframework.http.HttpMethod;
 
 import au.com.mountainpass.hyperstate.core.Action;
-import au.com.mountainpass.hyperstate.core.Link;
+import au.com.mountainpass.hyperstate.core.Address;
 import au.com.mountainpass.hyperstate.core.Parameter;
-import au.com.mountainpass.hyperstate.core.Resolver;
 import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
 
 public class CreateAction extends Action<CreatedEntity> {
 
-    public CreateAction(final Resolver resolver, final String identifier,
-            final Link link, final Parameter[] fields) {
-        super(resolver, identifier, link, fields);
+    public CreateAction(final String name, final Address link,
+            final Parameter[] fields) {
+        super(name, link, fields);
     }
 
     @Override
-    public CompletableFuture<CreatedEntity> doInvoke(final Resolver resolver,
+    public CompletableFuture<CreatedEntity> doInvoke(
             final Map<String, Object> filteredParameters) {
-        return getLink().create(filteredParameters);
+        return getAddress().create(filteredParameters);
     }
 
     /**

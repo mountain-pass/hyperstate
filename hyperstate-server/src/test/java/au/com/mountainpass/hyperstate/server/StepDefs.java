@@ -163,7 +163,7 @@ public class StepDefs {
     public void it_will_have_no_links_apart_from(final String rel)
             throws Throwable {
         assertThat(currentEntity.getLinks().size(), equalTo(1));
-        assertThat(currentEntity.getLinks().asList().get(0).getNature(),
+        assertThat(currentEntity.getLinks().asList().get(0).getRelationships(),
                 hasItemInArray(rel));
     }
 
@@ -195,7 +195,7 @@ public class StepDefs {
             root.getEntities().thenAcceptAsync(entities -> {
                 final Optional<EntityRelationship> match = entities.stream()
                         .filter(entityRel -> {
-                    return entityRel.hasNature(rel);
+                    return entityRel.hasRelationship(rel);
                 }).filter(entityRel -> {
                     return entityRel.getEntity().hasNature(typeName);
                 }).findAny();

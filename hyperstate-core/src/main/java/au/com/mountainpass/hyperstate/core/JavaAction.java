@@ -85,9 +85,9 @@ public class JavaAction<T> extends Action<T> {
     protected JavaAction() {
     }
 
-    public JavaAction(RepositoryResolver resolver,
+    public JavaAction(final RepositoryResolver resolver,
             final EntityWrapper<?> entity, final Method method) {
-        super(resolver, method.getName(), new JavaLink(resolver, entity),
+        super(method.getName(), new JavaAddress(resolver, entity),
                 extractParameters(method));
         this.method = method;
         this.entity = entity;
@@ -95,8 +95,9 @@ public class JavaAction<T> extends Action<T> {
     }
 
     @Override
-    public CompletableFuture<T> doInvoke(final Resolver resolver,
+    public CompletableFuture<T> doInvoke(
             final Map<String, Object> filteredParameters) {
+        // TODO, this should use the resovler;
         final List<Object> args = new ArrayList<>(getParameters().size());
         for (final au.com.mountainpass.hyperstate.core.Parameter param : getParameters()) {
             if (!PresentationType.SUBMIT.equals(param.getType())) {

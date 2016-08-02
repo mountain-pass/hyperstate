@@ -26,39 +26,35 @@ import com.google.common.collect.Maps;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public abstract class Action<T> extends Titled {
 
-    private String identifier;
+    private String name;
 
-    private Link link;
+    private Address address;
 
     private final List<Parameter> parameters = new ArrayList<>();
-
-    private Resolver resolver;
 
     protected Action() {
     }
 
-    public Action(final Resolver resolver, final String identifier,
-            final Link link, final Parameter... parameters) {
-        this.identifier = identifier;
+    public Action(final String name, final Address address,
+            final Parameter... parameters) {
+        this.name = name;
         this.parameters.addAll(Arrays.asList(parameters));
-        this.link = link;
-        this.resolver = resolver;
+        this.address = address;
     }
 
-    abstract protected CompletableFuture<T> doInvoke(Resolver resolver,
+    abstract protected CompletableFuture<T> doInvoke(
             Map<String, Object> filteredParameters);
 
     /**
      * @return the identifier
      */
-    @JsonProperty("name")
-    public String getIdentifier() {
-        return identifier;
+    public String getName() {
+        return name;
     }
 
     @JsonUnwrapped
-    public Link getLink() {
-        return this.link;
+    public Address getAddress() {
+        return this.address;
     }
 
     /**
@@ -97,9 +93,9 @@ public abstract class Action<T> extends Titled {
         final Set<String> parameterKeys = getParameterKeys();
         final Map<String, Object> filteredParameters = new HashMap<>(
                 Maps.filterKeys(context, Predicates.in(parameterKeys)));
-        final String id = getIdentifier();
+        final String id = getName();
         filteredParameters.put("action", id);
-        return doInvoke(resolver, filteredParameters);
+        return doInvoke(filteredParameters);
     }
 
 }

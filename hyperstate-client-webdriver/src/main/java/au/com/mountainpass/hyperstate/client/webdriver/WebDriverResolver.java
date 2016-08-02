@@ -32,6 +32,7 @@ import com.google.common.collect.ImmutableSet;
 import au.com.mountainpass.hyperstate.client.CreateAction;
 import au.com.mountainpass.hyperstate.client.GetAction;
 import au.com.mountainpass.hyperstate.core.Action;
+import au.com.mountainpass.hyperstate.core.Address;
 import au.com.mountainpass.hyperstate.core.EntityRelationship;
 import au.com.mountainpass.hyperstate.core.Link;
 import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
@@ -112,7 +113,7 @@ public class WebDriverResolver implements Resolver {
         return proxy;
     }
 
-    public CompletableFuture<Void> delete(final Link link,
+    public CompletableFuture<Void> delete(final Address link,
             final Map<String, Object> filteredParameters) {
         throw new NotImplementedException("TODO");
     }
@@ -144,6 +145,7 @@ public class WebDriverResolver implements Resolver {
         }
     }
 
+    @Override
     public <E extends EntityWrapper<?>> CompletableFuture<E> get(
             final String path, final Class<E> type) {
         return get(getBaseUri().resolve(path), type);
@@ -192,11 +194,11 @@ public class WebDriverResolver implements Resolver {
 
                 switch (form.getAttribute("method")) {
                 case "get":
-                    return new GetAction(resolver, form.getAttribute("name"),
-                            new WebDriverLink(resolver, form), fields);
+                    return new GetAction(form.getAttribute("name"),
+                            new WebDriverAddress(resolver, form), fields);
                 case "post":
-                    return new CreateAction(resolver, form.getAttribute("name"),
-                            new WebDriverLink(resolver, form), fields);
+                    return new CreateAction(form.getAttribute("name"),
+                            new WebDriverAddress(resolver, form), fields);
                 default:
 
                     throw new NotImplementedException("unimplemented method: "
@@ -229,7 +231,7 @@ public class WebDriverResolver implements Resolver {
                         .collect(Collectors.toSet()));
             }
 
-            private Object getNatures() {
+            private Object getClasses() {
                 waitTillLoaded(5);
 
                 final HashSet<String> rval = new HashSet<String>(
@@ -317,7 +319,7 @@ public class WebDriverResolver implements Resolver {
 
                 } else if (method.getName().equals("getNatures")) {
 
-                    return getNatures();
+                    return getClasses();
 
                 } else if (method.getName().equals("getActions")) {
 
@@ -329,8 +331,10 @@ public class WebDriverResolver implements Resolver {
 
                 } else if (method.getName().equals("getLink")) {
                     final Optional<NavigationalRelationship> link = getLinks(
-                            resolver).stream()
-                                    .filter(l -> l.hasNature((String) args[0]))
+                            resolver)
+                                    .stream()
+                                    .filter(l -> l
+                                            .hasRelationship((String) args[0]))
                                     .findAny();
                     if (link.isPresent()) {
                         return link.get().getLink();

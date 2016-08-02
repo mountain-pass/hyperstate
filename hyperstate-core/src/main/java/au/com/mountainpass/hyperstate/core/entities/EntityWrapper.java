@@ -154,7 +154,7 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
 
     public Link getLink(final String rel) {
         final Optional<NavigationalRelationship> link = getLinks().stream()
-                .filter(l -> l.hasNature(rel)).findAny();
+                .filter(l -> l.hasRelationship(rel)).findAny();
         if (link.isPresent()) {
             return link.get().getLink();
         } else {
@@ -186,18 +186,9 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
         return (L) this;
     }
 
-    // @Autowired
-    // public void setApplicationContext(ApplicationContext context) {
-    // this.context = context;
-    // AutowiredAnnotationBeanPostProcessor bpp = new
-    // AutowiredAnnotationBeanPostProcessor();
-    // bpp.setBeanFactory(context.getAutowireCapableBeanFactory());
-    // bpp.processInjection(properties);
-    // }
-
     public void setActions(final Action<?>[] actions) {
         for (final Action<?> action : actions) {
-            this.actions.put(action.getIdentifier(), action);
+            this.actions.put(action.getName(), action);
         }
 
     }
@@ -206,10 +197,6 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
             final Collection<EntityRelationship> entityRelationships) {
         this.entities = entityRelationships;
     }
-
-    // public <L extends EntityWrapper<T>> L refresh() {
-    // return (L) getLink(Relationship.SELF).resolve(this.getClass());
-    // }
 
     public void setRepository(final EntityRepository repository) {
         this.repository = repository;

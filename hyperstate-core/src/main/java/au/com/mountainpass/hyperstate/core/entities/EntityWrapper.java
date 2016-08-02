@@ -29,7 +29,6 @@ import com.google.common.collect.ImmutableSet;
 import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.Action;
 import au.com.mountainpass.hyperstate.core.EntityRelationship;
-import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.JavaAction;
 import au.com.mountainpass.hyperstate.core.JavaAddress;
 import au.com.mountainpass.hyperstate.core.Link;
@@ -55,7 +54,7 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
 
     T properties;
 
-    private EntityRepository repository;
+    private RepositoryResolver resolver;
 
     public EntityWrapper(final EntityWrapper<T> src) {
         super(src);
@@ -70,6 +69,7 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
             final String path, final T properties, final String title,
             final String... classes) {
         super(title, classes);
+        this.resolver = resolver;
         this.properties = properties;
         this.path = path;
         add(new NavigationalRelationship(
@@ -130,11 +130,12 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
         if (entities != null) {
             return CompletableFuture.supplyAsync(() -> entities);
         }
-        if (repository != null) {
-            return repository.findChildren(this).thenApplyAsync(results -> {
-                return results.skip(page * PAGE_SIZE).limit(PAGE_SIZE)
-                        .collect(Collectors.toList());
-            });
+        if (resolver != null) {
+            return resolver.getRepository().findChildren(this)
+                    .thenApplyAsync(results -> {
+                        return results.skip(page * PAGE_SIZE).limit(PAGE_SIZE)
+                                .collect(Collectors.toList());
+                    });
         }
         final List<EntityRelationship> rval = new ArrayList<>();
         return CompletableFuture.supplyAsync(() -> rval);
@@ -197,10 +198,6 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
     public void setEntities(
             final Collection<EntityRelationship> entityRelationships) {
         this.entities = entityRelationships;
-    }
-
-    public void setRepository(final EntityRepository repository) {
-        this.repository = repository;
     }
 
     @Override

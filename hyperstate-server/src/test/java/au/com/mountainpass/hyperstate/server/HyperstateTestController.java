@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.MediaTypes;
-import au.com.mountainpass.hyperstate.core.entities.VanillaEntity;
 
 @Controller
 @RequestMapping(value = "/", produces = { MediaTypes.SIREN_JSON_VALUE,
@@ -25,10 +24,6 @@ public class HyperstateTestController extends HyperstateController {
     protected void onConstructed() {
         final HyperstateTestRootEntity root = new HyperstateTestRootEntity(
                 resolver, this.getClass());
-        root.setRepository(repository);
-        repository.save(root);
-
-        root.create(VanillaEntity.class, "accounts", "Accounts", "Accounts");
 
     }
 

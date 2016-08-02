@@ -1,10 +1,7 @@
 package au.com.mountainpass.hyperstate.server;
 
-import java.util.concurrent.CompletableFuture;
-
 import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
-import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
 import au.com.mountainpass.hyperstate.core.entities.VanillaEntity;
 import au.com.mountainpass.hyperstate.server.entities.HyperstateRootEntity;
 
@@ -19,20 +16,11 @@ public class HyperstateTestRootEntity extends HyperstateRootEntity {
             Class<? extends HyperstateController> controllerClass) {
         super(resolver, controllerClass);
         this.resolver = resolver;
-    }
-
-    public CompletableFuture<CreatedEntity> create(Class<?> type, String path,
-            String title, String natures) {
+        resolver.getRepository().save(this);
         final VanillaEntity accounts = new VanillaEntity(resolver,
-                this.getId() + path, title, "Accounts");
-        return resolver.getRepository().save(accounts)
-                .thenApplyAsync(entity -> {
-                    accounts.setRepository(resolver.getRepository());
-
-                    this.add(
-                            new NavigationalRelationship(accounts, "accounts"));
-                    return new CreatedEntity(entity);
-                });
-
+                this.getId() + "accounts", "Accounts", "Accounts");
+        resolver.getRepository().save(accounts);
+        this.add(new NavigationalRelationship(accounts, "accounts"));
     }
+
 }

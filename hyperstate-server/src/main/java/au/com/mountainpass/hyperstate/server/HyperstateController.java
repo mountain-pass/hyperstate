@@ -148,6 +148,11 @@ public abstract class HyperstateController {
         return requestMapping.value()[0];
     }
 
+    // TODO: Help wanted. Ideally we should be able to configure something
+    // in spring (the dispatcher) so that if the request is for something
+    // that isn't an entity, then it will try the resource handlers.
+    // I can't figure out how to do that, so I effectively have a bespoke
+    // resource handler here :(
     @RequestMapping(value = "**", method = RequestMethod.GET, produces = {
             MediaType.ALL_VALUE })
     @ResponseBody
@@ -163,29 +168,38 @@ public abstract class HyperstateController {
             RequestContextHolder.setRequestAttributes(
                     RequestContextHolder.getRequestAttributes());
             if (entity == null) {
-                InputStream inputStream = this.getClass()
-                        .getResourceAsStream(path);
-                if (inputStream == null) {
-                    String webjarPath = "/META-INF/resources" + path;
-                    inputStream = this.getClass()
-                            .getResourceAsStream(webjarPath);
-                }
-                if (inputStream == null) {
-                    return ResponseEntity.notFound().build();
-                } else {
-                    InputStreamResource inputStreamResource = new InputStreamResource(
-                            inputStream);
-                    return ResponseEntity.ok(inputStreamResource);
-                }
+                return getResource(path);
             } else {
-                InputStream inputStream = this.getClass()
-                        .getResourceAsStream("/static/index.html");
-
-                InputStreamResource inputStreamResource = new InputStreamResource(
-                        inputStream);
-                return ResponseEntity.ok(inputStreamResource);
+                return getIndex();
             }
         });
+    }
+
+    private ResponseEntity<?> getIndex() {
+        InputStream inputStream = this.getClass()
+                .getResourceAsStream("/static/index.html");
+
+        InputStreamResource inputStreamResource = new InputStreamResource(
+                inputStream);
+        return ResponseEntity.ok(inputStreamResource);
+    }
+
+    private ResponseEntity<?> getResource(String path) {
+
+        InputStream inputStream = this.getClass()
+                .getResourceAsStream("/static" + path.toString());
+        if (inputStream == null) {
+            String webjarPath = "/META-INF/resources" + path;
+            inputStream = this.getClass().getResourceAsStream(webjarPath);
+        }
+        if (inputStream == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            InputStreamResource inputStreamResource = new InputStreamResource(
+                    inputStream);
+            return ResponseEntity.ok(inputStreamResource);
+        }
+
     }
 
     @ExceptionHandler(value = Exception.class)

@@ -8,9 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.MediaTypes;
-import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
-import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.VanillaEntity;
+import au.com.mountainpass.hyperstate.server.entities.HyperstateRootEntity;
 
 @Controller
 @RequestMapping(value = "/", produces = { MediaTypes.SIREN_JSON_VALUE,
@@ -18,19 +17,20 @@ import au.com.mountainpass.hyperstate.core.entities.VanillaEntity;
 public class HyperstateTestController extends HyperstateController {
 
     @Autowired
-    EntityRepository repository;
+    private EntityRepository repository;
 
     @Autowired
-    RepositoryResolver resolver;
+    private RepositoryResolver resolver;
 
     @Override
-    protected void onConstructed(EntityWrapper<?> root) {
-        final VanillaEntity accounts = new VanillaEntity(resolver,
-                root.getId() + "accounts", "Accounts", "Accounts");
-        repository.save(accounts);
-        accounts.setRepository(repository);
-
-        root.add(new NavigationalRelationship(accounts, "accounts"));
+    protected void onConstructed(HyperstateRootEntity root) {
+        root.create(VanillaEntity.class, "accounts", "Accounts", "Accounts");
+        // final VanillaEntity accounts = new VanillaEntity(resolver,
+        // root.getId() + "accounts", "Accounts", "Accounts");
+        // repository.save(accounts);
+        // accounts.setRepository(repository);
+        //
+        // root.add(new NavigationalRelationship(accounts, "accounts"));
     }
 
 }

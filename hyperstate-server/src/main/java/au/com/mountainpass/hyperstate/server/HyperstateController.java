@@ -69,7 +69,7 @@ public abstract class HyperstateController {
         objectMapper.addMixIn(Link.class, LinkSerialisationMixin.class);
         objectMapper.addMixIn(Titled.class, TitledSerialisationMixin.class);
 
-        final EntityWrapper<?> root = new HyperstateRootEntity(resolver,
+        final HyperstateRootEntity root = new HyperstateRootEntity(resolver,
                 this.getClass());
         root.setRepository(repository);
         repository.save(root);
@@ -77,7 +77,7 @@ public abstract class HyperstateController {
         onConstructed(root);
     }
 
-    protected abstract void onConstructed(EntityWrapper<?> root);
+    protected abstract void onConstructed(HyperstateRootEntity root);
 
     @RequestMapping(value = "**", method = RequestMethod.DELETE, produces = {
             "application/vnd.siren+json",

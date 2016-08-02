@@ -73,4 +73,8 @@ public class RepositoryResolver implements Resolver {
         });
     }
 
+    public EntityRepository getRepository() {
+        return repository;
+    }
+
 }

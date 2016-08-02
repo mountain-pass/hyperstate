@@ -68,8 +68,8 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
 
     protected EntityWrapper(final RepositoryResolver resolver,
             final String path, final T properties, final String title,
-            final String... natures) {
-        super(title, natures);
+            final String... classes) {
+        super(title, classes);
         this.properties = properties;
         this.path = path;
         add(new NavigationalRelationship(
@@ -112,8 +112,8 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
         navigationalRelationships.add(navigationalRelationship);
     }
 
-    public Action<?> getAction(final String identifier) {
-        return actions.get(identifier);
+    public Action<?> getAction(final String name) {
+        return actions.get(name);
     }
 
     @JsonProperty("actions")

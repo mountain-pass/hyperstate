@@ -12,12 +12,12 @@ import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
 public class NavigationalRelationshipBuilder {
 
     private URI address;
-    private String label;
+    private String title;
     private String[] natures;
 
     public NavigationalRelationship build() {
         return new NavigationalRelationship(
-                new RestLink(resolver, address, label, natures), natures);
+                new RestLink(resolver, address, title, natures), natures);
     }
 
     @JacksonInject
@@ -36,8 +36,8 @@ public class NavigationalRelationshipBuilder {
     }
 
     @JsonProperty("title")
-    public NavigationalRelationshipBuilder setLabel(final String label) {
-        this.label = label;
+    public NavigationalRelationshipBuilder setTitle(final String title) {
+        this.title = title;
         return this;
     }
 }

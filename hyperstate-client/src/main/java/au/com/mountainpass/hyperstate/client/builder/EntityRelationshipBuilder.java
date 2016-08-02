@@ -14,7 +14,7 @@ public class EntityRelationshipBuilder {
 
     private URI address;
     private String[] entityNatures;
-    private String label;
+    private String title;
     private String[] relationshipNatures;
 
     @JacksonInject
@@ -23,7 +23,7 @@ public class EntityRelationshipBuilder {
 
     public EntityRelationship build() {
         final LinkedEntity entity = new LinkedEntity(
-                new RestLink(resolver, address, label, null), label,
+                new RestLink(resolver, address, title, null), title,
                 entityNatures);
         return new EntityRelationship(entity, relationshipNatures);
     }
@@ -41,8 +41,8 @@ public class EntityRelationshipBuilder {
     }
 
     @JsonProperty("title")
-    public EntityRelationshipBuilder setLabel(final String label) {
-        this.label = label;
+    public EntityRelationshipBuilder setTitle(final String title) {
+        this.title = title;
         return this;
     }
 

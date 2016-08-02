@@ -6,9 +6,9 @@ import org.springframework.core.ParameterizedTypeReference;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import au.com.mountainpass.hyperstate.core.Labelled;
+import au.com.mountainpass.hyperstate.core.Titled;
 
-public abstract class Entity extends Labelled {
+public abstract class Entity extends Titled {
 
     public Entity() {
     }
@@ -17,8 +17,8 @@ public abstract class Entity extends Labelled {
         super(entity);
     }
 
-    public Entity(final String label, final String... natures) {
-        super(label, natures);
+    public Entity(final String title, final String... natures) {
+        super(title, natures);
     }
 
     public abstract <K, T extends EntityWrapper<K>> T reload(Class<T> type);

@@ -38,9 +38,9 @@ public class JavaLink extends Link {
 
     public JavaLink(@JacksonInject RepositoryResolver resolver,
             final EntityWrapper<?> entity,
-            @JsonProperty("title") final String label,
+            @JsonProperty("title") final String title,
             @JsonProperty("class") final String... natures) {
-        super(label, natures);
+        super(title, natures);
         this.resolver = resolver;
         this.entity = entity;
         assert(entity != null);

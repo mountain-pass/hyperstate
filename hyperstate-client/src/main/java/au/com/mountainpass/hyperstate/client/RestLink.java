@@ -31,9 +31,9 @@ public class RestLink extends Link {
     @JsonCreator
     public RestLink(@JacksonInject RestTemplateResolver resolver,
             @JsonProperty("href") final URI address,
-            @JsonProperty("title") final String label,
+            @JsonProperty("title") final String title,
             @JsonProperty("class") final String[] natures) {
-        super(label, natures);
+        super(title, natures);
         this.resolver = resolver;
         this.address = address;
     }

@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import au.com.mountainpass.hyperstate.server.serialization.MessageSourceAwareSerializer;
 
-public abstract class LabelledMixin {
+public abstract class TitledMixin {
 
     @JsonSerialize(using = MessageSourceAwareSerializer.class)
     @JsonProperty("title")
-    public abstract String getLabel();
+    public abstract String getTitle();
 
 }

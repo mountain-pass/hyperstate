@@ -15,11 +15,11 @@ import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-abstract public class Link extends Labelled {
+abstract public class Link extends Titled {
 
-    public Link(@JsonProperty("title") final String label,
+    public Link(@JsonProperty("title") final String title,
             @JsonProperty("class") final String... natures) {
-        super(label, natures);
+        super(title, natures);
     }
 
     public Link() {

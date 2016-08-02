@@ -10,38 +10,38 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-abstract public class Labelled {
+abstract public class Titled {
 
     @Nullable
-    String label = null;
+    String title = null;
 
     private Set<String> natures = new HashSet<>();
 
-    public Labelled() {
+    public Titled() {
     }
 
-    public Labelled(final Labelled labelled) {
+    public Titled(final Titled titled) {
         this();
-        this.label = labelled.label;
-        this.natures = labelled.natures;
+        this.title = titled.title;
+        this.natures = titled.natures;
     }
 
-    public Labelled(final String label, final Set<String> natures) {
-        this.label = label;
+    public Titled(final String title, final Set<String> natures) {
+        this.title = title;
         this.natures = natures;
     }
 
-    public Labelled(final String label, final String... natures) {
-        this.label = label;
+    public Titled(final String title, final String... natures) {
+        this.title = title;
         this.natures.addAll(Arrays.asList(natures));
     }
 
     /**
-     * @return the label
+     * @return the title
      */
     @JsonProperty("title")
-    public String getLabel() {
-        return label;
+    public String getTitle() {
+        return title;
     }
 
     /**
@@ -72,8 +72,8 @@ abstract public class Labelled {
         }
     }
 
-    void setLabel(final String template, final String... args) {
-        label = interpolate(template, args);
+    void setTitle(final String template, final String... args) {
+        title = interpolate(template, args);
     }
 
     /**
@@ -87,10 +87,10 @@ abstract public class Labelled {
 
     /**
      * @param title
-     *            the label to set
+     *            the title to set
      */
     public void setTitle(final String title) {
-        this.label = title;
+        this.title = title;
     }
 
 }

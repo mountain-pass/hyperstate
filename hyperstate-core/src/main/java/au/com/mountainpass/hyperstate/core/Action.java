@@ -24,7 +24,7 @@ import com.google.common.collect.Maps;
  *            the type returned by invoking the action
  */
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public abstract class Action<T> extends Labelled {
+public abstract class Action<T> extends Titled {
 
     private String identifier;
 

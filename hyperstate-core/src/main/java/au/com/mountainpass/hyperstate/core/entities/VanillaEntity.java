@@ -11,8 +11,8 @@ public class VanillaEntity extends EntityWrapper<Properties> {
     }
 
     public VanillaEntity(final RepositoryResolver resolver, final String path,
-            final String label, final String... natures) {
-        super(resolver, path, new Properties(), label, natures);
+            final String title, final String... natures) {
+        super(resolver, path, new Properties(), title, natures);
     }
 
     public VanillaEntity(final VanillaEntity src) {

@@ -19,18 +19,18 @@ public class LinkedEntity extends Entity {
         this.link = link;
     }
 
-    public LinkedEntity(final Link link, final String label,
+    public LinkedEntity(final Link link, final String title,
             final Set<String> natures) {
         this.link = link;
         setNatures(natures);
-        setTitle(label);
+        setTitle(title);
     }
 
-    public LinkedEntity(final Link link, final String label,
+    public LinkedEntity(final Link link, final String title,
             final String... natures) {
         this.link = link;
         setNatures(new HashSet<String>(Arrays.asList(natures)));
-        setTitle(label);
+        setTitle(title);
     }
 
     @JsonUnwrapped

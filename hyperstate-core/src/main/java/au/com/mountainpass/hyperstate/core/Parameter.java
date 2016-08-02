@@ -13,7 +13,7 @@ public class Parameter {
   private String identifier;
 
   @Nullable
-  private String label;
+  private String title;
 
   private final String[] natures = {};
 
@@ -37,9 +37,9 @@ public class Parameter {
   }
 
   public Parameter(final String identifier, final String type, final String value,
-      final String label) {
+      final String title) {
     this(identifier, type, value);
-    this.label = label;
+    this.title = title;
   }
 
   /**
@@ -51,11 +51,11 @@ public class Parameter {
   }
 
   /**
-   * @return the label
+   * @return the title
    */
   @JsonProperty("title")
-  public String getLabel() {
-    return label;
+  public String getTitle() {
+    return title;
   }
 
   /**

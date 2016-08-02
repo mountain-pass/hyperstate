@@ -6,7 +6,7 @@ import au.com.mountainpass.hyperstate.core.Relationship;
 public class UpdatedEntity extends LinkedEntity {
 
   public UpdatedEntity(final EntityWrapper<?> entity) {
-    super(entity.getLink(Relationship.SELF), entity.getLabel(), entity.getNatures());
+    super(entity.getLink(Relationship.SELF), entity.getTitle(), entity.getNatures());
   }
 
   public UpdatedEntity(final Link link) {

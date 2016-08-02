@@ -67,9 +67,9 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
     }
 
     protected EntityWrapper(final RepositoryResolver resolver,
-            final String path, final T properties, final String label,
+            final String path, final T properties, final String title,
             final String... natures) {
-        super(label, natures);
+        super(title, natures);
         this.properties = properties;
         this.path = path;
         add(new NavigationalRelationship(new JavaLink(resolver, this),
@@ -218,7 +218,7 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
     @Override
     public LinkedEntity toLinkedEntity() {
         final LinkedEntity linkedEntity = new LinkedEntity(
-                getLink(Relationship.SELF), getLabel(), getNatures());
+                getLink(Relationship.SELF), getTitle(), getNatures());
         return linkedEntity;
     }
 

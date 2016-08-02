@@ -44,7 +44,6 @@ import au.com.mountainpass.hyperstate.core.MediaTypes;
 import au.com.mountainpass.hyperstate.core.Titled;
 import au.com.mountainpass.hyperstate.core.entities.Entity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
-import au.com.mountainpass.hyperstate.server.entities.HyperstateRootEntity;
 import au.com.mountainpass.hyperstate.server.serialization.mixins.LinkSerialisationMixin;
 import au.com.mountainpass.hyperstate.server.serialization.mixins.TitledSerialisationMixin;
 
@@ -69,15 +68,10 @@ public abstract class HyperstateController {
         objectMapper.addMixIn(Link.class, LinkSerialisationMixin.class);
         objectMapper.addMixIn(Titled.class, TitledSerialisationMixin.class);
 
-        final HyperstateRootEntity root = new HyperstateRootEntity(resolver,
-                this.getClass());
-        root.setRepository(repository);
-        repository.save(root);
-
-        onConstructed(root);
+        onConstructed();
     }
 
-    protected abstract void onConstructed(HyperstateRootEntity root);
+    protected abstract void onConstructed();
 
     @RequestMapping(value = "**", method = RequestMethod.DELETE, produces = {
             "application/vnd.siren+json",

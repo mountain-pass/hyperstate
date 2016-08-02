@@ -23,7 +23,12 @@ public class HyperstateTestController extends HyperstateController {
     private RepositoryResolver resolver;
 
     @Override
-    protected void onConstructed(HyperstateRootEntity root) {
+    protected void onConstructed() {
+        final HyperstateRootEntity root = new HyperstateRootEntity(resolver,
+                this.getClass());
+        root.setRepository(repository);
+        repository.save(root);
+
         root.create(VanillaEntity.class, "accounts", "Accounts", "Accounts");
         // final VanillaEntity accounts = new VanillaEntity(resolver,
         // root.getId() + "accounts", "Accounts", "Accounts");

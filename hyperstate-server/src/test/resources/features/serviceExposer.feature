@@ -32,3 +32,18 @@ Scenario: Expose single domain entity
     And it will have no actions
     And it will have no links apart from "self"
     And it will have a self link referencing "/test/testAccount"
+
+Scenario: Delete domain entity
+    Given an "Account" domain entity with
+    | username     | tom        |
+    | creationDate | 2016/01/15 |
+    And it has a "delete" action
+    And it is exposed at "/test/testAccount"
+    When request is made to "/test/testAccount" for an "au.com.mountainpass.hyperstate.server.entities.Account"
+    Then the response will be an "Account" domain entity with
+    | username     | tom        |
+    | creationDate | 2016/01/15 |
+    And it will have a "delete" action
+    And it will have no links apart from "self"
+    And it will have a self link referencing "/test/testAccount"
+    

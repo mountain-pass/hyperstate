@@ -48,12 +48,12 @@ abstract public class Titled {
      * @return the natures
      */
     @JsonProperty("class")
-    public Set<String> getNatures() {
+    public Set<String> getClasses() {
         return natures;
     }
 
     public boolean hasNature(final String nature) {
-        return this.getNatures().contains(nature);
+        return this.getClasses().contains(nature);
     }
 
     private String interpolate(final String value, final String... args) {

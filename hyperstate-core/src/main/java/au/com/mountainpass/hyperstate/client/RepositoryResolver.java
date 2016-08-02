@@ -77,4 +77,8 @@ public class RepositoryResolver implements Resolver {
         return repository;
     }
 
+    public CompletableFuture<Void> delete(EntityWrapper<?> entity) {
+        return repository.delete(entity);
+    }
+
 }

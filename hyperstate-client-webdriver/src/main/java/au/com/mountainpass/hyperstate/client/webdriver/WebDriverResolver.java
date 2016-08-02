@@ -315,7 +315,7 @@ public class WebDriverResolver implements Resolver {
                     return propertiesEnhancer.create(new Class[] {},
                             new Object[] {});
 
-                } else if (method.getName().equals("getNatures")) {
+                } else if (method.getName().equals("getClasses")) {
 
                     return getClasses();
 

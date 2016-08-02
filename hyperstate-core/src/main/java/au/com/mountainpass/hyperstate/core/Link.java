@@ -98,4 +98,5 @@ public class Link extends Titled {
     public void setAddress(Address address) {
         this.address = address;
     }
+
 }

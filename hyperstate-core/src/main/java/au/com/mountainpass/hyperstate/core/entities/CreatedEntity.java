@@ -7,7 +7,7 @@ public class CreatedEntity extends LinkedEntity {
 
     public CreatedEntity(final EntityWrapper<?> entity) {
         super(entity.getLink(Relationship.SELF), entity.getTitle(),
-                entity.getNatures());
+                entity.getClasses());
     }
 
     public CreatedEntity(final Link link) {

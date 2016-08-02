@@ -13,6 +13,7 @@ public class AccountBuilder {
      */
     private String creationDate;
     private String username;
+    private boolean deletable;
 
     public AccountBuilder() {
         // TODO Auto-generated constructor stub
@@ -23,8 +24,14 @@ public class AccountBuilder {
                     throws InterruptedException, ExecutionException {
         AccountProperties properties = new AccountProperties(username,
                 creationDate);
-        final Account entity = new Account(resolver, properties, path,
-                "The Account");
+
+        Account entity;
+        if (deletable) {
+            entity = new AccountWithDelete(resolver, properties, path,
+                    "The Account");
+        } else {
+            entity = new Account(resolver, properties, path, "The Account");
+        }
         return repository.save(entity);
     }
 
@@ -36,6 +43,10 @@ public class AccountBuilder {
     public AccountBuilder userName(String username) {
         this.username = username;
         return this;
+    }
+
+    public void isDeletable(boolean b) {
+        this.deletable = true;
     }
 
 }

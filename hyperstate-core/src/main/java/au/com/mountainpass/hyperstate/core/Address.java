@@ -38,4 +38,5 @@ public interface Address {
 
     public <T extends EntityWrapper<?>> CompletableFuture<T> get(
             ParameterizedTypeReference<T> type);
+
 }

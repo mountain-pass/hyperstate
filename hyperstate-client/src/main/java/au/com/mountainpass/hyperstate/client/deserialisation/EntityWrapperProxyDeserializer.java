@@ -59,7 +59,7 @@ public class EntityWrapperProxyDeserializer extends DelegatingDeserializer {
                             || method.getName().equals("getEntities")
                             || method.getName().equals("getProperties")
                             || method.getName().equals("getTitle")
-                            || method.getName().equals("getNatures")
+                            || method.getName().equals("getClasses")
                             || method.getName().equals("getLinks")
                             || method.getName().equals("getLink")) {
                         return proxy.invokeSuper(obj, args);

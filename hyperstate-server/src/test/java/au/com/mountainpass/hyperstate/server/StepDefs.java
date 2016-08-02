@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.client.RestTemplateResolver;
 import au.com.mountainpass.hyperstate.client.webdriver.WebDriverResolver;
+import au.com.mountainpass.hyperstate.core.Action;
 import au.com.mountainpass.hyperstate.core.EntityRelationship;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.Link;
@@ -207,7 +208,7 @@ public class StepDefs {
     @Then("^the response will be an? \"([^\"]*)\" domain entity$")
     public void the_response_will_be_an_domain_entity(final String type)
             throws Throwable {
-        final Set<String> natures = currentEntity.getNatures();
+        final Set<String> natures = currentEntity.getClasses();
         assertThat(natures, hasItem(type));
     }
 
@@ -231,6 +232,19 @@ public class StepDefs {
             throw new PendingException("checking properties for a " + type
                     + " has not been coded");
         }
+    }
+
+    @Given("^it has a \"([^\"]*)\" action$")
+    public void it_has_a_action(String actionName) throws Throwable {
+        if ("delete".equals(actionName)) {
+            currentAccountBuilder.isDeletable(true);
+        }
+    }
+
+    @Then("^it will have a \"([^\"]*)\" action$")
+    public void it_will_have_a_action(String actionName) throws Throwable {
+        Action<?> action = currentEntity.getAction(actionName);
+        assertThat(action, notNullValue());
     }
 
 }

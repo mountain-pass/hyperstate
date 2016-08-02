@@ -203,8 +203,13 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
     @Override
     public LinkedEntity toLinkedEntity() {
         final LinkedEntity linkedEntity = new LinkedEntity(
-                getLink(Relationship.SELF), getTitle(), getNatures());
+                getLink(Relationship.SELF), getTitle(), getClasses());
         return linkedEntity;
+    }
+
+    @JsonIgnore
+    public RepositoryResolver getResolver() {
+        return this.resolver;
     }
 
 }

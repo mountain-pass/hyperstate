@@ -7,7 +7,7 @@ public class UpdatedEntity extends LinkedEntity {
 
     public UpdatedEntity(final EntityWrapper<?> entity) {
         super(entity.getLink(Relationship.SELF), entity.getTitle(),
-                entity.getNatures());
+                entity.getClasses());
     }
 
     public UpdatedEntity(final Link link) {

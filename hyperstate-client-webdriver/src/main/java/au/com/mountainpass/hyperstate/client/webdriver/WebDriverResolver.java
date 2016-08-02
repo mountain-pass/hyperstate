@@ -80,7 +80,8 @@ public class WebDriverResolver implements Resolver {
         this.webDriver = webDriver;
     }
 
-    public CompletableFuture<CreatedEntity> create(final WebDriverLink link,
+    public CompletableFuture<CreatedEntity> create(
+            final WebDriverAddress address,
             final Map<String, Object> filteredParameters) {
         return CompletableFuture.supplyAsync(() -> {
             final WebElement form = (new WebDriverWait(webDriver, 5))
@@ -99,9 +100,10 @@ public class WebDriverResolver implements Resolver {
                 }
             }
             form.findElement(By.cssSelector("button[type='submit']")).click();
+            Address newAddress = new WebDriverAddress(this,
+                    webDriver.findElement(By.tagName("html")));
             final CreatedEntity linkedEntity = new CreatedEntity(
-                    new WebDriverLink(this,
-                            webDriver.findElement(By.tagName("html"))));
+                    new Link(newAddress, null));
             return linkedEntity;
         });
     }
@@ -118,31 +120,24 @@ public class WebDriverResolver implements Resolver {
         throw new NotImplementedException("TODO");
     }
 
-    public <T> CompletableFuture<T> get(final WebDriverLink link,
+    public <T> CompletableFuture<T> get(final WebDriverAddress address,
             final Map<String, Object> filteredParameters, Class<T> type) {
-        if (link instanceof WebDriverLink) {
-            final WebDriverLink wdl = link;
-            final WebElement form = wdl.getWebElement();
-            if ("form".equals(form.getTagName())) {
-                for (final WebElement input : form
-                        .findElements(By.name("input"))) {
-                    final Object value = filteredParameters
-                            .get(input.getAttribute("name"));
-                    if (value != null) {
-                        input.sendKeys(value.toString());
-                    }
+        final WebElement form = address.getWebElement();
+        if ("form".equals(form.getTagName())) {
+            for (final WebElement input : form.findElements(By.name("input"))) {
+                final Object value = filteredParameters
+                        .get(input.getAttribute("name"));
+                if (value != null) {
+                    input.sendKeys(value.toString());
                 }
-                form.findElement(By.cssSelector("button[type='submit']"))
-                        .click();
-            } else {
-                form.click();
             }
-            return CompletableFuture.supplyAsync(() -> {
-                return createProxy(type);
-            });
+            form.findElement(By.cssSelector("button[type='submit']")).click();
         } else {
-            throw new NotImplementedException("TODO");
+            form.click();
         }
+        return CompletableFuture.supplyAsync(() -> {
+            return createProxy(type);
+        });
     }
 
     @Override
@@ -218,7 +213,8 @@ public class WebDriverResolver implements Resolver {
 
             private Link getLink(final WebDriverResolver resolver,
                     final WebElement a) {
-                return new WebDriverLink(resolver, a);
+                return new Link(new WebDriverAddress(resolver, a), a.getText(),
+                        a.getAttribute("class").split("\\s"));
             }
 
             private ImmutableSet<NavigationalRelationship> getLinks(
@@ -271,9 +267,11 @@ public class WebDriverResolver implements Resolver {
                         final String title = entity.getText();
                         final String[] entityRelationships = new String[0];
                         // TODO read entity relationships from page
-                        rval.add(new EntityRelationship(new LinkedEntity(
-                                new WebDriverLink(resolver, entity), title,
-                                entityRelationships), classes));
+                        rval.add(
+                                new EntityRelationship(new LinkedEntity(
+                                        new Link(new WebDriverAddress(resolver,
+                                                entity), title),
+                                        title, entityRelationships), classes));
                     }
                     return rval;
                 } else if (method.getName().equals("getProperties")) {
@@ -402,17 +400,19 @@ public class WebDriverResolver implements Resolver {
         return e;
     }
 
-    public CompletableFuture<UpdatedEntity> update(final WebDriverLink link,
+    public CompletableFuture<UpdatedEntity> update(
+            final WebDriverAddress address,
             final Map<String, Object> filteredParameters) {
         throw new NotImplementedException("TODO");
     }
 
-    public <T> CompletableFuture<T> get(WebDriverLink link, Class<T> type) {
+    public <T> CompletableFuture<T> get(WebDriverAddress address,
+            Class<T> type) {
         Map<String, Object> parameters = new HashMap<>();
-        return get(link, parameters, type);
+        return get(address, parameters, type);
     }
 
-    public <T> CompletableFuture<T> get(WebDriverLink link,
+    public <T> CompletableFuture<T> get(WebDriverAddress address,
             ParameterizedTypeReference<T> type) {
         throw new NotImplementedException("TODO");
     }

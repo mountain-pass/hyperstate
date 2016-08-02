@@ -31,7 +31,7 @@ import au.com.mountainpass.hyperstate.core.Action;
 import au.com.mountainpass.hyperstate.core.EntityRelationship;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.JavaAction;
-import au.com.mountainpass.hyperstate.core.JavaLink;
+import au.com.mountainpass.hyperstate.core.JavaAddress;
 import au.com.mountainpass.hyperstate.core.Link;
 import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
 import au.com.mountainpass.hyperstate.core.Relationship;
@@ -72,7 +72,8 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
         super(title, natures);
         this.properties = properties;
         this.path = path;
-        add(new NavigationalRelationship(new JavaLink(resolver, this),
+        add(new NavigationalRelationship(
+                new Link(new JavaAddress(resolver, this), title),
                 Relationship.SELF));
         final Method[] methods = this.getClass().getMethods();
         for (final Method method : methods) {

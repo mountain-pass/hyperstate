@@ -1,5 +1,6 @@
 package au.com.mountainpass.hyperstate.client;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -12,6 +13,14 @@ import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 
 public class RestAddress implements Address {
+
+    private URI href;
+    private RestTemplateResolver resolver;
+
+    public RestAddress(RestTemplateResolver resolver, URI href) {
+        this.resolver = resolver;
+        this.href = href;
+    }
 
     @Override
     public <T> CompletableFuture<T> resolve(Class<T> type) {
@@ -26,7 +35,7 @@ public class RestAddress implements Address {
 
     @Override
     public String getPath() {
-        throw new NotImplementedException("TODO");
+        return href.toString();
     }
 
     @Override
@@ -56,6 +65,22 @@ public class RestAddress implements Address {
     @Override
     public CompletableFuture<EntityWrapper<?>> get() {
         throw new NotImplementedException("TODO");
+    }
+
+    @Override
+    public <T extends EntityWrapper<?>> CompletableFuture<T> get(
+            Class<T> type) {
+        return resolver.get(this, type);
+    }
+
+    @Override
+    public <T extends EntityWrapper<?>> CompletableFuture<T> get(
+            ParameterizedTypeReference<T> type) {
+        throw new NotImplementedException("TODO");
+    }
+
+    public URI getHref() {
+        return href;
     }
 
 }

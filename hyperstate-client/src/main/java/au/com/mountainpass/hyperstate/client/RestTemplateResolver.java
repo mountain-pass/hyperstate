@@ -21,13 +21,14 @@ import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import au.com.mountainpass.hyperstate.client.deserialisation.mixins.ActionMixin;
+import au.com.mountainpass.hyperstate.client.deserialisation.mixins.AddressMixin;
 import au.com.mountainpass.hyperstate.client.deserialisation.mixins.EntityRelationshipMixin;
-import au.com.mountainpass.hyperstate.client.deserialisation.mixins.LinkMixin;
 import au.com.mountainpass.hyperstate.client.deserialisation.mixins.NavigationalRelationshipMixin;
 import au.com.mountainpass.hyperstate.core.Action;
+import au.com.mountainpass.hyperstate.core.Address;
 import au.com.mountainpass.hyperstate.core.EntityRelationship;
 import au.com.mountainpass.hyperstate.core.FutureConverter;
-import au.com.mountainpass.hyperstate.core.Address;
+import au.com.mountainpass.hyperstate.core.Link;
 import au.com.mountainpass.hyperstate.core.MediaTypes;
 import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
 import au.com.mountainpass.hyperstate.core.Resolver;
@@ -46,7 +47,7 @@ public class RestTemplateResolver implements Resolver {
         this.baseUri = baseUri;
         this.asyncRestTemplate = asyncRestTemplate;
         om.addMixIn(Action.class, ActionMixin.class);
-        om.addMixIn(Address.class, LinkMixin.class);
+        om.addMixIn(Address.class, AddressMixin.class);
         om.addMixIn(EntityRelationship.class, EntityRelationshipMixin.class);
         om.addMixIn(NavigationalRelationship.class,
                 NavigationalRelationshipMixin.class);
@@ -54,7 +55,7 @@ public class RestTemplateResolver implements Resolver {
                 .addValue(RestTemplateResolver.class, this));
     }
 
-    public CompletableFuture<CreatedEntity> create(final RestLink link,
+    public CompletableFuture<CreatedEntity> create(final RestAddress address,
             final Map<String, Object> filteredParameters) {
         final MultiValueMap<String, Object> body = new LinkedMultiValueMap<>(
                 filteredParameters.size());
@@ -62,20 +63,20 @@ public class RestTemplateResolver implements Resolver {
                 .entrySet()) {
             body.add(entry.getKey(), entry.getValue());
         }
-        final RequestEntity<?> request = RequestEntity.post(link.getAddress())
+        final RequestEntity<?> request = RequestEntity.post(address.getHref())
                 .accept(MediaTypes.SIREN_JSON)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(body);
         final ListenableFuture<URI> locationFuture = asyncRestTemplate
-                .postForLocation(link.getAddress(), request);
+                .postForLocation(address.getHref(), request);
         return FutureConverter.convert(locationFuture).thenApplyAsync(uri -> {
             final CreatedEntity linkedEntity = new CreatedEntity(
-                    new RestLink(this, uri, null, null));
+                    new Link(new RestAddress(this, uri), null, null));
 
             return linkedEntity;
         });
     }
 
-    public CompletableFuture<Void> delete(final RestLink link,
+    public CompletableFuture<Void> delete(final RestAddress address,
             final Map<String, Object> filteredParameters) {
         final MultiValueMap<String, Object> body = new LinkedMultiValueMap<>(
                 filteredParameters.size());
@@ -83,12 +84,12 @@ public class RestTemplateResolver implements Resolver {
                 .entrySet()) {
             body.add(entry.getKey(), entry.getValue());
         }
-        final RequestEntity<?> request = RequestEntity.put(link.getAddress())
+        final RequestEntity<?> request = RequestEntity.put(address.getHref())
                 .accept(MediaTypes.SIREN_JSON)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(body);
 
         final ListenableFuture<ResponseEntity<Void>> responseFuture = asyncRestTemplate
-                .exchange(link.getAddress(), HttpMethod.DELETE, request,
+                .exchange(address.getHref(), HttpMethod.DELETE, request,
                         Void.class);
         return FutureConverter.convert(responseFuture)
                 .thenApplyAsync(response -> {
@@ -96,7 +97,7 @@ public class RestTemplateResolver implements Resolver {
                 });
     }
 
-    public <T> CompletableFuture<T> get(final RestLink link,
+    public <T> CompletableFuture<T> get(final RestAddress address,
             final Map<String, Object> filteredParameters, Class<T> type) {
         final MultiValueMap<String, Object> body = new LinkedMultiValueMap<>(
                 filteredParameters.size());
@@ -104,13 +105,13 @@ public class RestTemplateResolver implements Resolver {
                 .entrySet()) {
             body.add(entry.getKey(), entry.getValue());
         }
-        final RequestEntity<?> request = RequestEntity.put(link.getAddress())
+        final RequestEntity<?> request = RequestEntity.put(address.getHref())
                 .accept(MediaTypes.SIREN_JSON)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(body);
 
         @SuppressWarnings("rawtypes")
         final ListenableFuture<ResponseEntity<EntityWrapper>> responseFuture = asyncRestTemplate
-                .exchange(link.getAddress(), HttpMethod.GET, request,
+                .exchange(address.getHref(), HttpMethod.GET, request,
                         EntityWrapper.class);
         return (CompletableFuture<T>) FutureConverter.convert(responseFuture)
                 .thenApplyAsync(response -> {
@@ -119,9 +120,9 @@ public class RestTemplateResolver implements Resolver {
 
     }
 
-    public <T> CompletableFuture<T> get(RestLink link, Class<T> type) {
+    public <T> CompletableFuture<T> get(RestAddress address, Class<T> type) {
         Map<String, Object> filteredParameters = new HashMap<>();
-        return get(link, filteredParameters, type);
+        return get(address, filteredParameters, type);
     }
 
     @Override
@@ -140,7 +141,7 @@ public class RestTemplateResolver implements Resolver {
         return baseUri;
     }
 
-    public CompletableFuture<UpdatedEntity> update(final RestLink link,
+    public CompletableFuture<UpdatedEntity> update(final RestAddress address,
             final Map<String, Object> filteredParameters) {
         final MultiValueMap<String, Object> body = new LinkedMultiValueMap<>(
                 filteredParameters.size());
@@ -148,19 +149,26 @@ public class RestTemplateResolver implements Resolver {
                 .entrySet()) {
             body.add(entry.getKey(), entry.getValue());
         }
-        final RequestEntity<?> request = RequestEntity.put(link.getAddress())
+        final RequestEntity<?> request = RequestEntity.put(address.getHref())
                 .accept(MediaTypes.SIREN_JSON)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(body);
 
         final ListenableFuture<ResponseEntity<Void>> responseFuture = asyncRestTemplate
-                .exchange(link.getAddress(), HttpMethod.PUT, request,
+                .exchange(address.getHref(), HttpMethod.PUT, request,
                         Void.class);
-        return FutureConverter.convert(responseFuture)
-                .thenApplyAsync(response -> new UpdatedEntity(new RestLink(this,
-                        response.getHeaders().getLocation(), null, null)));
+        return FutureConverter
+                .convert(
+                        responseFuture)
+                .thenApplyAsync(
+                        response -> new UpdatedEntity(
+                                new Link(
+                                        new RestAddress(this,
+                                                response.getHeaders()
+                                                        .getLocation()),
+                                        null, null)));
     }
 
-    public <T> CompletableFuture<T> get(RestLink link,
+    public <T> CompletableFuture<T> get(RestAddress address,
             ParameterizedTypeReference<T> type) {
         throw new NotImplementedException("TODO");
     }

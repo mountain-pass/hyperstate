@@ -14,8 +14,12 @@ import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 
 public class WebDriverAddress implements Address {
 
+    private WebElement element;
+    private WebDriverResolver resolver;
+
     public WebDriverAddress(WebDriverResolver resolver, WebElement element) {
-        // TODO Auto-generated constructor stub
+        this.resolver = resolver;
+        this.element = element;
     }
 
     @Override
@@ -31,7 +35,7 @@ public class WebDriverAddress implements Address {
 
     @Override
     public String getPath() {
-        throw new NotImplementedException("TODO");
+        return element.getAttribute("href");
     }
 
     @Override
@@ -61,6 +65,22 @@ public class WebDriverAddress implements Address {
     @Override
     public CompletableFuture<EntityWrapper<?>> get() {
         throw new NotImplementedException("TODO");
+    }
+
+    @Override
+    public <T extends EntityWrapper<?>> CompletableFuture<T> get(
+            Class<T> type) {
+        return resolver.get(this, type);
+    }
+
+    @Override
+    public <T extends EntityWrapper<?>> CompletableFuture<T> get(
+            ParameterizedTypeReference<T> type) {
+        throw new NotImplementedException("TODO");
+    }
+
+    public WebElement getWebElement() {
+        return this.element;
     }
 
 }

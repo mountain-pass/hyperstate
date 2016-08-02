@@ -3,50 +3,99 @@ package au.com.mountainpass.hyperstate.core;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-abstract public class Link extends Titled {
+public class Link extends Titled {
 
-    public Link(@JsonProperty("title") final String title,
-            @JsonProperty("class") final String... natures) {
-        super(title, natures);
+    @Nullable
+    private MediaType representationFormat = MediaTypes.SIREN_JSON;
+    private Address address;
+
+    public Link(Address address, @JsonProperty("title") final String title,
+            @JsonProperty("class") final String... classes) {
+        super(title, classes);
+        this.address = address;
     }
 
     public Link() {
     }
 
     @JsonProperty("type")
-    public abstract MediaType getRepresentationFormat();
+    public MediaType getRepresentationFormat() {
+        return representationFormat == null ? MediaTypes.SIREN_JSON
+                : representationFormat;
+    }
 
-    public abstract <T> CompletableFuture<T> resolve(Class<T> type);
+    public <T extends EntityWrapper<?>> CompletableFuture<T> resolve(
+            Class<T> type) {
+        return address.get(type);
+    }
 
-    public abstract <T> CompletableFuture<T> resolve(
-            ParameterizedTypeReference<T> type);
+    public <T extends EntityWrapper<?>> CompletableFuture<T> resolve(
+            ParameterizedTypeReference<T> type) {
+        return address.get(type);
+    }
 
     @JsonIgnore
-    public abstract String getPath();
+    public String getPath() {
+        return address.getPath();
+    }
 
-    public abstract CompletableFuture<EntityWrapper<?>> get(
-            Map<String, Object> filteredParameters);
+    public CompletableFuture<EntityWrapper<?>> get(
+            Map<String, Object> filteredParameters) {
+        return address.get(filteredParameters);
+    }
 
-    public abstract CompletableFuture<Void> delete(
-            Map<String, Object> filteredParameters);
+    public CompletableFuture<Void> delete(
+            Map<String, Object> filteredParameters) {
+        return address.delete(filteredParameters);
 
-    public abstract CompletableFuture<CreatedEntity> create(
-            Map<String, Object> filteredParameters);
+    }
 
-    public abstract CompletableFuture<UpdatedEntity> update(
-            Map<String, Object> filteredParameters);
+    public CompletableFuture<CreatedEntity> create(
+            Map<String, Object> filteredParameters) {
+        return address.create(filteredParameters);
+    }
 
-    public abstract CompletableFuture<EntityWrapper<?>> get();
+    public CompletableFuture<UpdatedEntity> update(
+            Map<String, Object> filteredParameters) {
+        return address.update(filteredParameters);
+    }
+
+    public CompletableFuture<EntityWrapper<?>> get() {
+        return address.get();
+    }
+
+    public <T extends EntityWrapper<?>> CompletableFuture<T> get(
+            Class<T> type) {
+        return address.get(type);
+    }
+
+    /**
+     * @return the address
+     */
+    @JsonUnwrapped
+    public Address getAddress() {
+        return address;
+    }
+
+    /**
+     * @param address
+     *            the address to set
+     */
+    public void setAddress(Address address) {
+        this.address = address;
+    }
 }

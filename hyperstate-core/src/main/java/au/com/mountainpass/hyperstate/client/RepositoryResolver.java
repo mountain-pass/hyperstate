@@ -7,7 +7,7 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.core.ParameterizedTypeReference;
 
 import au.com.mountainpass.hyperstate.core.EntityRepository;
-import au.com.mountainpass.hyperstate.core.JavaLink;
+import au.com.mountainpass.hyperstate.core.JavaAddress;
 import au.com.mountainpass.hyperstate.core.Resolver;
 import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
@@ -21,45 +21,46 @@ public class RepositoryResolver implements Resolver {
         this.repository = repository;
     }
 
-    public CompletableFuture<CreatedEntity> create(final JavaLink link,
+    public CompletableFuture<CreatedEntity> create(final JavaAddress address,
             final Map<String, Object> filteredParameters) {
         throw new NotImplementedException("todo");
     }
 
-    public CompletableFuture<Void> delete(final JavaLink link,
+    public CompletableFuture<Void> delete(final JavaAddress address,
             final Map<String, Object> filteredParameters) {
         throw new NotImplementedException("todo");
 
     }
 
-    public <T> CompletableFuture<T> get(final JavaLink link,
+    public <T> CompletableFuture<T> get(final JavaAddress address,
             final Map<String, Object> filteredParameters, Class<T> type) {
         throw new NotImplementedException("todo");
     }
 
-    public CompletableFuture<UpdatedEntity> update(final JavaLink link,
+    public CompletableFuture<UpdatedEntity> update(final JavaAddress address,
             final Map<String, Object> filteredParameters) {
         throw new NotImplementedException("todo");
     }
 
-    public <T> CompletableFuture<T> get(final JavaLink link, Class<T> type) {
-        return repository.findOne(link.getPath()).thenApply(entity -> {
+    public <T> CompletableFuture<T> get(final JavaAddress address,
+            Class<T> type) {
+        return repository.findOne(address.getPath()).thenApply(entity -> {
             return (T) entity;
         });
     }
 
-    public <T> CompletableFuture<T> get(final JavaLink link,
+    public <T> CompletableFuture<T> get(final JavaAddress address,
             ParameterizedTypeReference<T> type) {
-        return repository.findOne(link.getPath()).thenApply(entity -> {
+        return repository.findOne(address.getPath()).thenApply(entity -> {
             return (T) entity;
         });
     }
 
-    public CompletableFuture<EntityWrapper<?>> get(JavaLink javaLink) {
+    public CompletableFuture<EntityWrapper<?>> get(JavaAddress address) {
         throw new NotImplementedException("todo");
     }
 
-    public CompletableFuture<EntityWrapper<?>> get(JavaLink javaLink,
+    public CompletableFuture<EntityWrapper<?>> get(JavaAddress address,
             Map<String, Object> filteredParameters) {
         throw new NotImplementedException("todo");
     }

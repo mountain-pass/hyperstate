@@ -35,7 +35,7 @@ public class RestActionBuilder {
     }
 
     public Action<?> build() {
-        RestAddress address = new RestAddress();
+        RestAddress address = new RestAddress(resolver, href);
         switch (method) {
         case POST:
             return new CreateAction(name, address, fields);

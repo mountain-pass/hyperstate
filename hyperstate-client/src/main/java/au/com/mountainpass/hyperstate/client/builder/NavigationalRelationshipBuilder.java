@@ -5,33 +5,42 @@ import java.net.URI;
 import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import au.com.mountainpass.hyperstate.client.RestLink;
+import au.com.mountainpass.hyperstate.client.RestAddress;
 import au.com.mountainpass.hyperstate.client.RestTemplateResolver;
+import au.com.mountainpass.hyperstate.core.Link;
 import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
 
 public class NavigationalRelationshipBuilder {
 
-    private URI address;
+    private URI href;
     private String title;
-    private String[] natures;
+    private String[] rels = new String[0];
+    private String[] classes = new String[0];
 
     public NavigationalRelationship build() {
         return new NavigationalRelationship(
-                new RestLink(resolver, address, title, natures), natures);
+                new Link(new RestAddress(resolver, href), title, classes),
+                rels);
     }
 
     @JacksonInject
     private RestTemplateResolver resolver;
 
     @JsonProperty("href")
-    public NavigationalRelationshipBuilder setAddress(final URI address) {
-        this.address = address;
+    public NavigationalRelationshipBuilder setHref(final URI href) {
+        this.href = href;
         return this;
     }
 
     @JsonProperty("rel")
-    public NavigationalRelationshipBuilder setHref(final String[] natures) {
-        this.natures = natures;
+    public NavigationalRelationshipBuilder setRels(final String[] rels) {
+        this.rels = rels;
+        return this;
+    }
+
+    @JsonProperty("class")
+    public NavigationalRelationshipBuilder setClasses(final String[] classes) {
+        this.classes = classes;
         return this;
     }
 
@@ -40,4 +49,5 @@ public class NavigationalRelationshipBuilder {
         this.title = title;
         return this;
     }
+
 }

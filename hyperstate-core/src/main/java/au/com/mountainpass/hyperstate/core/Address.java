@@ -33,4 +33,9 @@ public interface Address {
             Map<String, Object> filteredParameters);
 
     public CompletableFuture<EntityWrapper<?>> get();
+
+    public <T extends EntityWrapper<?>> CompletableFuture<T> get(Class<T> type);
+
+    public <T extends EntityWrapper<?>> CompletableFuture<T> get(
+            ParameterizedTypeReference<T> type);
 }

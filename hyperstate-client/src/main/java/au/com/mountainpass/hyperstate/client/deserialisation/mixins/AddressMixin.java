@@ -2,9 +2,9 @@ package au.com.mountainpass.hyperstate.client.deserialisation.mixins;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import au.com.mountainpass.hyperstate.client.RestLink;
+import au.com.mountainpass.hyperstate.client.RestAddress;
 
-@JsonDeserialize(as = RestLink.class)
-public abstract class LinkMixin {
+@JsonDeserialize(as = RestAddress.class)
+public abstract class AddressMixin {
 
 }

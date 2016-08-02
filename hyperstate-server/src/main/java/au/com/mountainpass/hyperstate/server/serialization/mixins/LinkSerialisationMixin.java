@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import au.com.mountainpass.hyperstate.server.serialization.MediaTypeSerializer;
 
-public abstract class LinkMixin {
+public abstract class LinkSerialisationMixin {
 
     @JsonSerialize(using = MediaTypeSerializer.class)
     @JsonProperty("type")

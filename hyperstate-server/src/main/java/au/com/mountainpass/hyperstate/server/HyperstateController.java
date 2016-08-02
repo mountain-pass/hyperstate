@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import javax.annotation.PostConstruct;
 import javax.script.ScriptException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -32,13 +33,19 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.HandlerMapping;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.Action;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.JavaAddress;
+import au.com.mountainpass.hyperstate.core.Link;
 import au.com.mountainpass.hyperstate.core.MediaTypes;
+import au.com.mountainpass.hyperstate.core.Titled;
 import au.com.mountainpass.hyperstate.core.entities.Entity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
+import au.com.mountainpass.hyperstate.server.serialization.mixins.LinkSerialisationMixin;
+import au.com.mountainpass.hyperstate.server.serialization.mixins.TitledSerialisationMixin;
 
 public abstract class HyperstateController {
 
@@ -50,7 +57,16 @@ public abstract class HyperstateController {
     @Autowired
     private RepositoryResolver resolver;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
     public HyperstateController() {
+    }
+
+    @PostConstruct
+    public void onConstructed() {
+        objectMapper.addMixIn(Link.class, LinkSerialisationMixin.class);
+        objectMapper.addMixIn(Titled.class, TitledSerialisationMixin.class);
     }
 
     @RequestMapping(value = "**", method = RequestMethod.DELETE, produces = {

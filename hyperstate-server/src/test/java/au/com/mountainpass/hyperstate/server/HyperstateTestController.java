@@ -7,20 +7,13 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import au.com.mountainpass.hyperstate.client.RepositoryResolver;
-import au.com.mountainpass.hyperstate.client.deserialisation.mixins.AddressMixin;
-import au.com.mountainpass.hyperstate.core.Address;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
-import au.com.mountainpass.hyperstate.core.JavaAddress;
 import au.com.mountainpass.hyperstate.core.MediaTypes;
 import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
-import au.com.mountainpass.hyperstate.core.Titled;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.VanillaEntity;
 import au.com.mountainpass.hyperstate.server.entities.HyperstateRootEntity;
-import au.com.mountainpass.hyperstate.server.serialization.mixins.LinkMixin;
 
 @Controller
 @RequestMapping(value = "/", produces = { MediaTypes.SIREN_JSON_VALUE,
@@ -33,14 +26,9 @@ public class HyperstateTestController extends HyperstateController {
     @Autowired
     RepositoryResolver resolver;
 
-    @Autowired
-    ObjectMapper objectMapper;
-
+    @Override
     @PostConstruct
     public void onConstructed() {
-        objectMapper.addMixIn(JavaAddress.class, AddressMixin.class);
-        objectMapper.addMixIn(Address.class, LinkMixin.class);
-        objectMapper.addMixIn(Titled.class, Titled.class);
 
         final EntityWrapper<?> root = new HyperstateRootEntity(resolver,
                 this.getClass());

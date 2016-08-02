@@ -9,7 +9,6 @@ import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.MediaTypes;
 import au.com.mountainpass.hyperstate.core.entities.VanillaEntity;
-import au.com.mountainpass.hyperstate.server.entities.HyperstateRootEntity;
 
 @Controller
 @RequestMapping(value = "/", produces = { MediaTypes.SIREN_JSON_VALUE,
@@ -24,18 +23,13 @@ public class HyperstateTestController extends HyperstateController {
 
     @Override
     protected void onConstructed() {
-        final HyperstateRootEntity root = new HyperstateRootEntity(resolver,
-                this.getClass());
+        final HyperstateTestRootEntity root = new HyperstateTestRootEntity(
+                resolver, this.getClass());
         root.setRepository(repository);
         repository.save(root);
 
         root.create(VanillaEntity.class, "accounts", "Accounts", "Accounts");
-        // final VanillaEntity accounts = new VanillaEntity(resolver,
-        // root.getId() + "accounts", "Accounts", "Accounts");
-        // repository.save(accounts);
-        // accounts.setRepository(repository);
-        //
-        // root.add(new NavigationalRelationship(accounts, "accounts"));
+
     }
 
 }

@@ -47,7 +47,7 @@ public class WebDriverAddress implements Address {
     @Override
     public CompletableFuture<Void> delete(
             Map<String, Object> filteredParameters) {
-        throw new NotImplementedException("TODO");
+        return resolver.delete(this, filteredParameters);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class WebDriverAddress implements Address {
 
     @Override
     public CompletableFuture<EntityWrapper<?>> get() {
-        throw new NotImplementedException("TODO");
+        return (CompletableFuture<EntityWrapper<?>>) resolver.get(this);
     }
 
     @Override

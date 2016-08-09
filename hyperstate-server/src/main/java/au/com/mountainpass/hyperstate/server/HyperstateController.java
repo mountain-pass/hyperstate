@@ -2,10 +2,10 @@ package au.com.mountainpass.hyperstate.server;
 
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -79,38 +78,58 @@ public abstract class HyperstateController {
     @ResponseBody
     @Async
     public CompletableFuture<ResponseEntity<?>> delete(
-            final HttpServletRequest request)
+            @RequestParam final MultiValueMap<String, Object> allRequestParams,
+            final HttpServletRequest req)
                     throws URISyntaxException, NoSuchMethodException,
                     SecurityException, ScriptException, IllegalAccessException,
                     IllegalArgumentException, InvocationTargetException,
                     InterruptedException, ExecutionException {
-        final String url = (String) request.getAttribute(
-                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        return getEntity(url).thenApplyAsync(entity -> {
-            if (entity == null) {
-                return ResponseEntity.noContent().build();
-            }
-            final Optional<Action<?>> actionOptional = entity.getActions()
-                    .stream()
-                    .filter(e -> e.getNature().equals(HttpMethod.DELETE))
-                    .findAny();
 
-            if (!actionOptional.isPresent()) {
-                deleteEntity(entity);
-            } else {
-                try {
-                    final Action<?> action = actionOptional.get();
-                    final CompletableFuture<?> invocationResult = action
-                            .invoke(new HashMap<>());
-                    invocationResult.join();
-                } catch (final Exception e) {
-                    LOGGER.error(e.getMessage(), e);
-                    return ResponseEntity
-                            .status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-                }
-            }
+        final String url = (String) req.getAttribute(
+                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+
+        StringBuffer fullUrl = req.getRequestURL();
+        String uri = req.getRequestURI();
+        String ctx = req.getContextPath();
+        String base = fullUrl.substring(0,
+                fullUrl.length() - uri.length() + ctx.length());
+
+        // todo: we don't need to fetch the entity to delete it.
+        return getEntity(url)
+                .thenApplyAsync(entity -> deleteEntityAndRespond(entity,
+                        allRequestParams, URI.create(base)));
+    }
+
+    private ResponseEntity<?> deleteEntityAndRespond(EntityWrapper<?> entity,
+            MultiValueMap<String, Object> allRequestParams, URI location) {
+        if (entity == null) {
+            // trying to delete something that potentially already deleted
+            // let them know it's gone, rather than complaining that
+            // we can't find the thing we want them to delete.
             return ResponseEntity.noContent().build();
-        });
+        }
+
+        Object actionName = allRequestParams.getFirst("action");
+        if (actionName == null) {
+            actionName = "delete";
+        }
+        final Action<?> action = entity.getAction(actionName.toString());
+        if (action == null) {
+            // todo add body with classes indicating what is missing
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            final CompletableFuture<?> invocationResult = action
+                    .invoke(new HashMap<>());
+            invocationResult.join();
+        } catch (final Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
+
+        return ResponseEntity.noContent().location(location).build();
+
     }
 
     protected CompletableFuture<Void> deleteEntity(
@@ -190,18 +209,19 @@ public abstract class HyperstateController {
             if (entity == null) {
                 return getResource(path);
             } else {
-                return getIndex();
+                return getIndex(HttpStatus.OK);
             }
         });
     }
 
-    private ResponseEntity<?> getIndex() {
+    private ResponseEntity<?> getIndex(HttpStatus status) {
         InputStream inputStream = this.getClass()
                 .getResourceAsStream("/static/index.html");
 
         InputStreamResource inputStreamResource = new InputStreamResource(
                 inputStream);
-        return ResponseEntity.ok(inputStreamResource);
+
+        return ResponseEntity.status(status).body(inputStreamResource);
     }
 
     private ResponseEntity<?> getResource(String path) {
@@ -213,7 +233,9 @@ public abstract class HyperstateController {
             inputStream = this.getClass().getResourceAsStream(webjarPath);
         }
         if (inputStream == null) {
-            return ResponseEntity.notFound().build();
+            // even though there is no resource that matches, we want to present
+            // the index page, but with a 404 status.
+            return getIndex(HttpStatus.NOT_FOUND);
         } else {
             InputStreamResource inputStreamResource = new InputStreamResource(
                     inputStream);
@@ -225,7 +247,7 @@ public abstract class HyperstateController {
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<?> onException(final Exception e) {
         LOGGER.error(e.getLocalizedMessage(), e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        return getIndex(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @RequestMapping(value = "**", method = RequestMethod.POST, produces = {
@@ -262,9 +284,7 @@ public abstract class HyperstateController {
                 .invoke(allRequestParams.toSingleValueMap()).get();
 
         return ResponseEntity
-                .created(new JavaAddress(resolver, entity).getHref())
-
-        .build();
+                .created(new JavaAddress(resolver, entity).getHref()).build();
     }
 
     @RequestMapping(value = "**", method = RequestMethod.PUT, produces = {

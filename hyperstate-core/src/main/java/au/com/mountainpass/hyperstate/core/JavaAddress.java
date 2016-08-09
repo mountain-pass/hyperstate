@@ -18,6 +18,8 @@ import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 public class JavaAddress implements Address {
 
     private RepositoryResolver resolver;
+
+    // TODO: use an entity path, here rather than the entity itself
     private EntityWrapper<?> entity;
 
     public JavaAddress(RepositoryResolver resolver, EntityWrapper<?> entity) {
@@ -82,7 +84,7 @@ public class JavaAddress implements Address {
 
     @Override
     public CompletableFuture<EntityWrapper<?>> get() {
-        throw new NotImplementedException("TODO");
+        return resolver.get(this);
     }
 
     @Override

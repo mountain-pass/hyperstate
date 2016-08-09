@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 <base href="/">
-<title>Service Gateway</title>
+<title>{{controller.appName}}</title>
 <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/3.3.6/css/bootstrap.min.css" />
 <link rel="stylesheet" type="text/css" href="/webjars/angularjs/1.5.7/angular-csp.css" />
 <link rel="stylesheet" href="/css/style.css">
@@ -49,7 +49,9 @@
     <div class="page-header">
       <h2 ng-if="controller.entity.title">{{controller.entity.title}}</h2>
     </div>
-
+    <div id="messages">
+        <div ng-if="controller.status == 404" class="alert alert-danger status404" role="alert">Not Found</div>
+    </div>
     <div id="properties">
       <div class="row" ng-repeat="(key, value) in controller.entity.properties">
         <div class="{{key}}">

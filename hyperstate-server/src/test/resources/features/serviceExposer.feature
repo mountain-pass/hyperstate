@@ -24,26 +24,36 @@ Scenario: Expose single domain entity
     | creationDate | 2016/01/15 |
     And it has no actions
     And it has no additional links
-    And it is exposed at "/test/testAccount"
-    When request is made to "/test/testAccount" for an "au.com.mountainpass.hyperstate.server.entities.Account"
+    And it is exposed at "/accounts/testAccount"
+    When request is made to "/accounts/testAccount" for an "au.com.mountainpass.hyperstate.server.entities.Account"
     Then the response will be an "Account" domain entity with
     | username     | tom        |
     | creationDate | 2016/01/15 |
     And it will have no actions
     And it will have no links apart from "self"
-    And it will have a self link referencing "/test/testAccount"
+    And it will have a self link referencing "/accounts/testAccount"
+
+Scenario: Expose single domain entity with delete action
+    Given an "Account" domain entity with
+    | username     | tom        |
+    | creationDate | 2016/01/15 |
+    And it has a "delete" action
+    And it is exposed at "/accounts/testAccount"
+    When request is made to "/accounts/testAccount" for an "au.com.mountainpass.hyperstate.server.entities.AccountWithDelete"
+    Then the response will be an "Account" domain entity with
+    | username     | tom        |
+    | creationDate | 2016/01/15 |
+    And it will have a "delete" action
+    And it will have no links apart from "self"
+    And it will have a self link referencing "/accounts/testAccount"
 
 Scenario: Delete domain entity
     Given an "Account" domain entity with
     | username     | tom        |
     | creationDate | 2016/01/15 |
     And it has a "delete" action
-    And it is exposed at "/test/testAccount"
-    When request is made to "/test/testAccount" for an "au.com.mountainpass.hyperstate.server.entities.Account"
-    Then the response will be an "Account" domain entity with
-    | username     | tom        |
-    | creationDate | 2016/01/15 |
-    And it will have a "delete" action
-    And it will have no links apart from "self"
-    And it will have a self link referencing "/test/testAccount"
+    And it is exposed at "/accounts/testAccount"
+    When request is made to "/accounts/testAccount" for an "au.com.mountainpass.hyperstate.server.entities.AccountWithDelete"
+    And the response entity is deleted
+    Then there will no longer be an entity at "/accounts/testAccount"
     

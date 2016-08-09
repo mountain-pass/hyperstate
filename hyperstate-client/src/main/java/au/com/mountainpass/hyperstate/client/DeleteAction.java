@@ -16,6 +16,8 @@ public class DeleteAction extends Action<Void> {
         super(name, address, fields);
     }
 
+    // TODO: instead or returning void, return the entity with a "deleted" class
+    // might not be able to do this if the entity has already been deleted.
     @Override
     public CompletableFuture<Void> doInvoke(
             final Map<String, Object> filteredParameters) {

@@ -53,6 +53,7 @@ public class RestTemplateResolver implements Resolver {
                 NavigationalRelationshipMixin.class);
         om.setInjectableValues(new InjectableValues.Std()
                 .addValue(RestTemplateResolver.class, this));
+        asyncRestTemplate.setErrorHandler(new HyperstateRestErrorHandler(this));
     }
 
     public CompletableFuture<CreatedEntity> create(final RestAddress address,
@@ -120,7 +121,8 @@ public class RestTemplateResolver implements Resolver {
 
     }
 
-    public <T> CompletableFuture<T> get(RestAddress address, Class<T> type) {
+    public <E extends EntityWrapper<?>> CompletableFuture<E> get(
+            RestAddress address, Class<E> type) {
         Map<String, Object> filteredParameters = new HashMap<>();
         return get(address, filteredParameters, type);
     }
@@ -171,6 +173,10 @@ public class RestTemplateResolver implements Resolver {
     public <T> CompletableFuture<T> get(RestAddress address,
             ParameterizedTypeReference<T> type) {
         throw new NotImplementedException("TODO");
+    }
+
+    public <T> CompletableFuture<T> get(RestAddress restAddress) {
+        return (CompletableFuture<T>) get(restAddress, EntityWrapper.class);
     }
 
 }

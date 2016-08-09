@@ -12,6 +12,7 @@ import au.com.mountainpass.hyperstate.core.Resolver;
 import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
+import au.com.mountainpass.hyperstate.exceptions.EntityNotFoundException;
 
 public class RepositoryResolver implements Resolver {
 
@@ -44,20 +45,26 @@ public class RepositoryResolver implements Resolver {
 
     public <T> CompletableFuture<T> get(final JavaAddress address,
             Class<T> type) {
-        return repository.findOne(address.getPath()).thenApply(entity -> {
+        return get(address).thenApply(entity -> {
             return (T) entity;
         });
     }
 
     public <T> CompletableFuture<T> get(final JavaAddress address,
             ParameterizedTypeReference<T> type) {
-        return repository.findOne(address.getPath()).thenApply(entity -> {
+        return get(address).thenApply(entity -> {
             return (T) entity;
         });
     }
 
     public CompletableFuture<EntityWrapper<?>> get(JavaAddress address) {
-        throw new NotImplementedException("todo");
+        return repository.findOne(address.getPath()).thenApply(entity -> {
+            if (entity == null) {
+                throw new EntityNotFoundException(address);
+            } else {
+                return entity;
+            }
+        });
     }
 
     public CompletableFuture<EntityWrapper<?>> get(JavaAddress address,
@@ -65,11 +72,16 @@ public class RepositoryResolver implements Resolver {
         throw new NotImplementedException("todo");
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <E extends EntityWrapper<?>> CompletableFuture<E> get(String path,
             Class<E> type) {
         return repository.findOne(path).thenApply(entity -> {
-            return (E) entity;
+            if (entity == null) {
+                throw new EntityNotFoundException(null);
+            } else {
+                return (E) entity;
+            }
         });
     }
 

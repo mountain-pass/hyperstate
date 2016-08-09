@@ -9,8 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -36,10 +39,12 @@ import au.com.mountainpass.hyperstate.core.Relationship;
 import au.com.mountainpass.hyperstate.core.Resolver;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.VanillaEntity;
+import au.com.mountainpass.hyperstate.exceptions.EntityNotFoundException;
 import au.com.mountainpass.hyperstate.server.config.HyperstateTestConfiguration;
 import au.com.mountainpass.hyperstate.server.entities.Account;
 import au.com.mountainpass.hyperstate.server.entities.AccountBuilder;
 import au.com.mountainpass.hyperstate.server.entities.AccountProperties;
+import au.com.mountainpass.hyperstate.server.entities.AccountWithDelete;
 import cucumber.api.PendingException;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
@@ -51,6 +56,8 @@ import cucumber.api.java.en.When;
 @SpringApplicationConfiguration(classes = { HyperstateTestConfiguration.class })
 @WebIntegrationTest({ "server.port=0", "management.port=0" })
 public class StepDefs {
+
+    private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private AsyncRestTemplate asyncRestTemplate;
@@ -245,6 +252,32 @@ public class StepDefs {
     public void it_will_have_a_action(String actionName) throws Throwable {
         Action<?> action = currentEntity.getAction(actionName);
         assertThat(action, notNullValue());
+    }
+
+    @When("^the response entity is deleted$")
+    public void the_response_entity_is_deleted() throws Throwable {
+        assertTrue(currentEntity instanceof AccountWithDelete);
+        AccountWithDelete account = (AccountWithDelete) currentEntity;
+        account.delete().get();
+    }
+
+    @Then("^there will no longer be an entity at \"([^\"]*)\"$")
+    public void there_will_no_longer_be_an_entity_at(String path)
+            throws Throwable {
+
+        try {
+            resolver.get(path, VanillaEntity.class).handle((entity, ee) -> {
+                assertThat(entity, nullValue());
+                assertThat(ee, notNullValue());
+                LOGGER.error("Exception resolving entity", ee.getCause());
+                assertThat(ee.getCause(),
+                        instanceOf(EntityNotFoundException.class));
+                return entity;
+                // throw new RuntimeException(ee);
+            }).get();
+        } catch (ExecutionException ee) {
+            throw ee.getCause();
+        }
     }
 
 }

@@ -40,25 +40,48 @@ app.controller('EntityController', function($scope, $http, $location, $window) {
     var controller = this;
     var loading = true;
 
-    controller.processNavClick = function(event) {
-        console.log("processNavClick");
-        console.log(event);
-        controller.loading = true;
-        controller.entity = {};
-        $http.get(event.target.href, {
-            cache : false
-        }).success(function(data) {
-            controller.entity = data;
+
+    controller.errorCallback = function(response) {
+        controller.loading = false;
+        console.log(response);
+        controller.status = response.status;
+        controller.entity = response.data;
+    };
+
+    controller.successCallback = function(response) {
+        console.log("status: " + response.status);
+        console.log(response);
+        controller.status = response.status;
+        if (response.status == 200) {
+            controller.entity = response.data;
             controller.loading = false;
-        });
+        } else if (response.status == 201 || response.status == 204) {
+            var location = getLocation(response.headers("Location"));
+            var currLoc = getLocation($location.absUrl());
+            console.log("loading: " + location);
+            if (location.protocol == currLoc.protocol && location.host == currLoc.host) {
+
+                controller.loading = true;
+                controller.entity = {};
+                console.log("updating $location");
+                $location.url(location.pathname + location.search + location.hash);
+
+                $http.get("" + location).then(controller.successCallback, controller.errorCallback);
+            } else {
+                console.log("updating href LOC: " + location);
+                controller.entity = response.data;
+                controller.loading = false;
+                $window.location.href = location;
+            }
+        } else {
+            controller.loading = false;
+            alert("TODO: handle " + response.status + " responses");
+        }
     };
 
     $http.get($window.location.href, {
         cache : false
-    }).success(function(data) {
-        controller.entity = data;
-        controller.loading = false;
-    });
+    }).then(controller.successCallback, controller.errorCallback);
 
     controller.processForm = function(form) {
         console.log("processForm");
@@ -73,47 +96,19 @@ app.controller('EntityController', function($scope, $http, $location, $window) {
             headers : {
                 'Content-Type' : action.type || "application/x-www-form-urlencoded"
             }
-        }).then(function successCallback(response) {
-
-            if (response.status == 201) {
-                var location = getLocation(response.headers("Location"));
-                var currLoc = getLocation($location.absUrl());
-                console.log("LOC: " + location);
-                console.log("proto: " + location.protocol);
-                console.log("host: " + location.host);
-                console.log("CLOC: " + currLoc);
-                console.log("Cproto: " + currLoc.protocol);
-                console.log("Chost: " + currLoc.host);
-                console.log("Eproto: " + (location.protocol == currLoc.protocol));
-                console.log("Ehost: " + (location.host == currLoc.host));
-                if (location.protocol == currLoc.protocol && location.host == currLoc.host) {
-
-                    controller.loading = true;
-                    controller.entity = {};
-
-                    $location.url(location.pathname + location.search + location.hash);
-
-                    $http.get(location).then(function successCallback(response) {
-                        controller.entity = response.data;
-                        controller.loading = false;
-                    }, function errorCallback(response) {
-                        controller.loading = false;
-                        alert("TODO: location follow error handing");
-                    });
-                } else {
-                    console.log("updating href LOC: " + location);
-                    $window.location.href = location;
-                    controller.entity = response.data;
-                    controller.loading = false;
-                }
-            } else {
-                controller.loading = false;
-                alert("TODO: handle " + response.status + " responses");
-            }
-        }, function errorCallback(response) {
-            controller.loading = false;
-            alert("TODO: error handing");
-        });
+        }).then(controller.successCallback, controller.errorCallback);
         return false;
     };
+    
+    controller.processNavClick = function(event) {
+        console.log("processNavClick");
+        console.log(event);
+        controller.loading = true;
+        controller.entity = {};
+        
+        $http.get(event.target.href, {
+            cache : false
+        }).then(controller.successCallback, controller.errorCallback);
+    };
+
 });

@@ -14,10 +14,10 @@ public class Account extends EntityWrapper<AccountProperties> {
     }
 
     @Autowired
-    ApplicationContext context;
+    private ApplicationContext context;
 
     @Autowired
-    EntityRepository repository;
+    private EntityRepository repository;
 
     protected Account() {
         super(new AccountProperties());

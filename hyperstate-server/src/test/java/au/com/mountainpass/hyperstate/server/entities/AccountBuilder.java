@@ -13,7 +13,8 @@ public class AccountBuilder {
      */
     private String creationDate;
     private String username;
-    private boolean deletable;
+    private boolean deletable = false;
+    private boolean updateable = false;
 
     public AccountBuilder() {
         // TODO Auto-generated constructor stub
@@ -28,6 +29,9 @@ public class AccountBuilder {
         Account entity;
         if (deletable) {
             entity = new AccountWithDelete(resolver, properties, path,
+                    "The Account");
+        } else if (updateable) {
+            entity = new AccountWithUpdate(resolver, properties, path,
                     "The Account");
         } else {
             entity = new Account(resolver, properties, path, "The Account");
@@ -47,6 +51,10 @@ public class AccountBuilder {
 
     public void isDeletable(boolean b) {
         this.deletable = true;
+    }
+
+    public void isUpdatable(boolean b) {
+        this.updateable = true;
     }
 
 }

@@ -9,31 +9,35 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class AccountProperties implements Serializable {
 
-  /**
-   *
-   */
-  private static final long serialVersionUID = -5101362070340337389L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = -5101362070340337389L;
 
-  private String creationDate;
+    private String creationDate;
 
-  @JsonIgnore
-  private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+    @JsonIgnore
+    private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-  private String username;
+    private String username;
 
-  public AccountProperties() {
-  }
+    public AccountProperties() {
+    }
 
-  public AccountProperties(final String username, final String creationDate) {
-    this.username = username;
-    this.creationDate = creationDate;
-  }
+    public AccountProperties(final String username, final String creationDate) {
+        this.username = username;
+        this.creationDate = creationDate;
+    }
 
-  public String getCreationDate() {
-    return this.creationDate;
-  }
+    public String getCreationDate() {
+        return this.creationDate;
+    }
 
-  public String getUsername() {
-    return this.username;
-  }
+    public String getUsername() {
+        return this.username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 }

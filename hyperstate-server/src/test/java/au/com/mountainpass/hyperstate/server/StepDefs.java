@@ -245,6 +245,10 @@ public class StepDefs {
     public void it_has_a_action(String actionName) throws Throwable {
         if ("delete".equals(actionName)) {
             currentAccountBuilder.isDeletable(true);
+        } else if ("update".equals(actionName)) {
+            currentAccountBuilder.isUpdatable(true);
+        } else {
+            throw new PendingException("TODO");
         }
     }
 

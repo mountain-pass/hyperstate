@@ -58,13 +58,13 @@ public class WebDriverAddress implements Address {
 
     @Override
     public CompletableFuture<UpdatedEntity> update(
-            Map<String, Object> filteredParameters) {
-        throw new NotImplementedException("TODO");
+            Map<String, Object> parameters) {
+        return resolver.update(this, parameters);
     }
 
     @Override
     public CompletableFuture<EntityWrapper<?>> get() {
-        return (CompletableFuture<EntityWrapper<?>>) resolver.get(this);
+        return resolver.get(this);
     }
 
     @Override

@@ -2,6 +2,7 @@ package au.com.mountainpass.hyperstate.server;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.junit.Assume.*;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -38,6 +39,7 @@ import au.com.mountainpass.hyperstate.core.Link;
 import au.com.mountainpass.hyperstate.core.Relationship;
 import au.com.mountainpass.hyperstate.core.Resolver;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
+import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 import au.com.mountainpass.hyperstate.core.entities.VanillaEntity;
 import au.com.mountainpass.hyperstate.exceptions.EntityNotFoundException;
 import au.com.mountainpass.hyperstate.server.config.HyperstateTestConfiguration;
@@ -45,6 +47,7 @@ import au.com.mountainpass.hyperstate.server.entities.Account;
 import au.com.mountainpass.hyperstate.server.entities.AccountBuilder;
 import au.com.mountainpass.hyperstate.server.entities.AccountProperties;
 import au.com.mountainpass.hyperstate.server.entities.AccountWithDelete;
+import au.com.mountainpass.hyperstate.server.entities.AccountWithUpdate;
 import cucumber.api.PendingException;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
@@ -263,6 +266,17 @@ public class StepDefs {
         assertTrue(currentEntity instanceof AccountWithDelete);
         AccountWithDelete account = (AccountWithDelete) currentEntity;
         account.delete().get();
+    }
+
+    @When("^the response entity is updated with$")
+    public void the_response_entity_is_updated_with(
+            final Map<String, String> properties) throws Throwable {
+        assumeThat(properties.keySet(), contains("username"));
+        assertTrue(currentEntity instanceof AccountWithUpdate);
+        AccountWithUpdate account = (AccountWithUpdate) currentEntity;
+        UpdatedEntity updatedEntity = account.update(properties.get("username"))
+                .get();
+        currentEntity = updatedEntity.resolve(AccountWithUpdate.class);
     }
 
     @Then("^there will no longer be an entity at \"([^\"]*)\"$")

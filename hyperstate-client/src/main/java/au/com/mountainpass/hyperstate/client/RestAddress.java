@@ -59,7 +59,7 @@ public class RestAddress implements Address {
     @Override
     public CompletableFuture<UpdatedEntity> update(
             Map<String, Object> filteredParameters) {
-        throw new NotImplementedException("TODO");
+        return resolver.update(this, filteredParameters);
     }
 
     @Override

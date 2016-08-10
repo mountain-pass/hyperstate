@@ -119,12 +119,12 @@ public class WebDriverResolver implements Resolver {
     }
 
     private void submitForm(final WebDriverAddress address,
-            final Map<String, Object> filteredParameters) {
+            final Map<String, Object> parameters) {
         final WebElement form = address.getWebElement();
         if ("form".equals(form.getTagName())) {
-            for (final WebElement input : form.findElements(By.name("input"))) {
-                final Object value = filteredParameters
-                        .get(input.getAttribute("name"));
+            for (final WebElement input : form
+                    .findElements(By.tagName("input"))) {
+                final Object value = parameters.get(input.getAttribute("name"));
                 if (value != null) {
                     input.sendKeys(value.toString());
                 }
@@ -176,8 +176,12 @@ public class WebDriverResolver implements Resolver {
 
     public CompletableFuture<UpdatedEntity> update(
             final WebDriverAddress address,
-            final Map<String, Object> filteredParameters) {
-        throw new NotImplementedException("TODO");
+            final Map<String, Object> parameters) {
+        return CompletableFuture.supplyAsync(() -> {
+            submitForm(address, parameters);
+            return new UpdatedEntity(new Link(new WebDriverAddress(this,
+                    webDriver.findElement(By.tagName("html")))));
+        });
     }
 
     public <T> CompletableFuture<T> get(WebDriverAddress address,

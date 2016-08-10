@@ -56,7 +56,7 @@ Scenario: Delete domain entity
     And the response entity is deleted
     Then there will no longer be an entity at "/accounts/testAccount"
 
-@tom
+
 Scenario: Expose single domain entity with update action
     Given an "Account" domain entity with
     | username     | tom        |
@@ -70,4 +70,18 @@ Scenario: Expose single domain entity with update action
     And it will have a "update" action
     And it will have no links apart from "self"
     And it will have a self link referencing "/accounts/testAccount"
+    
+@tom
+Scenario: Update a domain entity
+    Given an "Account" domain entity with
+    | username     | tom        |
+    | creationDate | 2016/01/15 |
+    And it has a "update" action
+    And it is exposed at "/accounts/testAccount"
+    When request is made to "/accounts/testAccount" for an "au.com.mountainpass.hyperstate.server.entities.AccountWithUpdate"
+    And the response entity is updated with
+    | username | nick |
+    Then the response will be an "Account" domain entity with
+    | username     | nick       |
+    | creationDate | 2016/01/15 |
     

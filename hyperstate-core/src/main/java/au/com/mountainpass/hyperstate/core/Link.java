@@ -32,6 +32,10 @@ public class Link extends Titled {
     public Link() {
     }
 
+    public Link(Address address) {
+        this.address = address;
+    }
+
     @JsonProperty("type")
     public MediaType getRepresentationFormat() {
         return representationFormat == null ? MediaTypes.SIREN_JSON

@@ -110,14 +110,10 @@ public class RestTemplateResolver implements Resolver {
                 .accept(MediaTypes.SIREN_JSON)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(body);
 
-        @SuppressWarnings("rawtypes")
-        final ListenableFuture<ResponseEntity<EntityWrapper>> responseFuture = asyncRestTemplate
-                .exchange(address.getHref(), HttpMethod.GET, request,
-                        EntityWrapper.class);
-        return (CompletableFuture<T>) FutureConverter.convert(responseFuture)
-                .thenApplyAsync(response -> {
-                    return response.getBody();
-                });
+        final ListenableFuture<ResponseEntity<T>> responseFuture = asyncRestTemplate
+                .exchange(address.getHref(), HttpMethod.GET, request, type);
+        return FutureConverter.convert(responseFuture)
+                .thenApplyAsync(response -> response.getBody());
 
     }
 
@@ -158,16 +154,11 @@ public class RestTemplateResolver implements Resolver {
         final ListenableFuture<ResponseEntity<Void>> responseFuture = asyncRestTemplate
                 .exchange(address.getHref(), HttpMethod.PUT, request,
                         Void.class);
-        return FutureConverter
-                .convert(
-                        responseFuture)
-                .thenApplyAsync(
-                        response -> new UpdatedEntity(
-                                new Link(
-                                        new RestAddress(this,
-                                                response.getHeaders()
-                                                        .getLocation()),
-                                        null, null)));
+        return FutureConverter.convert(responseFuture)
+                .thenApplyAsync(response -> {
+                    Link link = new Link(address);
+                    return new UpdatedEntity(link);
+                });
     }
 
     public <T> CompletableFuture<T> get(RestAddress address,

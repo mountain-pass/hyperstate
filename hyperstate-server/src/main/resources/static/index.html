@@ -59,6 +59,7 @@
     <div id="properties">
       <div ng-repeat="(key, value) in controller.entity.properties">
         <div class="{{key}}">
+          <!-- TODO: find a nice way to replace key names with nice titles -->
           <label for="property:{{key}}">{{key}}</label>
           <div id="property:{{key}}">{{value}}</div>
         </div>
@@ -75,12 +76,18 @@
 
     <div id="actions">
       <div ng-repeat="action in controller.entity.actions">
+        <!-- TODO: if we find a nice way to replace key names with titles
+        then we should probably do the same for action names, and not use
+        action titles -->
         <h3>{{action.title || action.name}}</h3>
         <form ng-submit="controller.processForm(this)" class="{{action.class}}" name="{{action.name}}"
-          method="{{action.method}}">
+          method="{{action.method}}" action="">
           <div class="row">
             <div ng-repeat="field in action.fields" class="{{field.class.join(' ')}} form-group col-sm-4">
               <div ng-if="field.type != 'submit'">
+                <!-- TODO: if we find a nice way to replace key names with titles
+        then we should probably do the same for field names, and not use
+        field titles -->
                 <label for="{{action.name}}:{{field.name}}">{{field.title || field.name}}</label> <input
                   type="{{field.type || 'text'}}" ng-model="field.value" name="{{field.name}}"
                   id="{{action.name}}:{{field.name}}" class="form-control" />
@@ -98,7 +105,7 @@
       </div>
     </div>
 
-    <pre ng-if="controller.debug && controller.debugData"><code class="language-js" data-lang="js">{{controller.debugData}}</code></pre>
+    <pre ng-if="controller.debug &amp;&amp; controller.debugData"><code class="language-js" data-lang="js">{{controller.debugData}}</code></pre>
 
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
@@ -107,5 +114,6 @@
     <script type="text/javascript" src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="/webjars/angularjs/1.5.8/angular.min.js" type="text/javascript"></script>
     <script src="/js/entity.js" type="text/javascript"></script>
+  </div>
 </body>
 </html>

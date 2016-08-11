@@ -51,8 +51,10 @@
       <h2 ng-if="controller.entity.title">{{controller.entity.title}}</h2>
     </div>
     <div id="messages">
-      <div ng-show="controller.status === 404" class="ng-hide alert alert-danger status404" role="alert">Oops! I'm not sure what you are looking for. Whatever it is, I can't find it, sorry.</div>
-      <div ng-show="controller.status === 500" class="ng-hide alert alert-danger status500" role="alert">Sorry, I borke.</div>
+      <div ng-show="controller.status === 404" class="ng-hide alert alert-danger status404" role="alert">Oops! I'm
+        not sure what you are looking for. Whatever it is, I can't find it, sorry.</div>
+      <div ng-show="controller.status === 500" class="ng-hide alert alert-danger status500" role="alert">Sorry, I
+        borke.</div>
     </div>
     <div id="properties">
       <div ng-repeat="(key, value) in controller.entity.properties">
@@ -96,9 +98,8 @@
       </div>
     </div>
 
-    <pre ng-if="controller.debug && controller.entity">
-        <code class="language-js" data-lang="js">{{controller.entity}}</code>
-    </pre>
+    <pre ng-if="controller.debug && controller.debugData"><code class="language-js" data-lang="js">{{controller.debugData}}</code></pre>
+
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="/webjars/jquery/3.1.0/jquery.min.js" type="text/javascript"></script>

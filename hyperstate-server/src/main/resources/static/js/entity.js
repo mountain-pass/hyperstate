@@ -43,6 +43,7 @@ app.controller('EntityController', function($scope, $http, $location, $window) {
     var controller = this;
     
     controller.debug = true;
+    controller.debugData = "";
     
     controller.loading = true;
 
@@ -64,33 +65,37 @@ app.controller('EntityController', function($scope, $http, $location, $window) {
     controller.errorCallback = function(response) {
         controller.status = response.status;
         controller.entity = response.data;
+        controller.debugData = "" + JSON.stringify(response.data, null, 2);
     };
 
     controller.successCallback = function(response) {
         controller.status = response.status;
         if (response.status === 200) {
             controller.entity = response.data;
+            controller.debugData = "" + JSON.stringify(response.data, null, 2);
         } else if (response.status === 201 || response.status === 204) {
             var location = controller.getLocation(response.headers("Location"));
             var currLoc = controller.getLocation($location.absUrl());
             if (location.protocol === currLoc.protocol && location.host === currLoc.host) {
 
                 controller.entity = {};
+                controller.debugData = JSON.stringify({}, null, 2);
                 $location.url(location.pathname + location.search + location.hash);
 
                 $http.get("" + location).then(controller.successCallback, controller.errorCallback);
             } else {
                 controller.entity = response.data;
+                controller.debugData = "" + JSON.stringify(response.data, null, 2);
                 $window.location.href = location;
             }
         } else {
+            controller.entity = response.data;
+            controller.debugData = "" + JSON.stringify(response.data, null, 2);
             alert("TODO: handle " + response.status + " responses");
         }
     };
 
-    $http.get($window.location.href, {
-        cache : false
-    }).then(controller.successCallback, controller.errorCallback);
+    $http.get($window.location.href).then(controller.successCallback, controller.errorCallback);
 
     controller.processForm = function(form) {
         console.log("processForm");

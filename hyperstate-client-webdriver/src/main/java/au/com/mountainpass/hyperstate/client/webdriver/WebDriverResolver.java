@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.openqa.selenium.By;
@@ -145,8 +146,11 @@ public class WebDriverResolver implements Resolver {
 
         return CompletableFuture.supplyAsync(() -> {
             getWebDriver().get(uri.toString());
-            if (getWebDriver().findElements(By.className("status404"))
-                    .isEmpty()) {
+            List<WebElement> elements404 = getWebDriver()
+                    .findElements(By.className("status404")).stream()
+                    .filter(WebElement::isDisplayed)
+                    .collect(Collectors.toList());
+            if (elements404.isEmpty()) {
                 return createProxy(klass);
             } else {
                 throw new EntityNotFoundException(new WebDriverAddress(this,

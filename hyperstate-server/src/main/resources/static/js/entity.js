@@ -4,48 +4,67 @@ app.config(function($locationProvider, $httpProvider) {
     $locationProvider.html5Mode(true);
     $httpProvider.defaults.cache=false;
     $httpProvider.defaults.headers.common.Accept = 'application/vnd.siren+json';
-    
-    $httpProvider.interceptors.push(function($q) {
+
+    var handleResponse = function(response, scope) {
+        console.log('response', new Date());
+        console.log(response);
+        scope.status = response.status;
+        scope.entity = response.data;
+        if( scope.debug ) {
+            scope.debugData = "" + JSON.stringify(response.data, null, 2);
+        }
+        scope.loading = false;
+    }
+        
+    var interceptor = [
+                       '$q',
+                       '$rootScope',
+                       function($q, $rootScope) {
         return {
             'request' : function(config) {
-                angular.element(document.getElementById('controller')).scope().controller.loading = true;
+                $rootScope.loading = true;
+                $rootScope.entity = null;
+                $rootScope.requestError = null;
+                $rootScope.debugData = null
                 console.log('request', new Date());
                 console.log(config);
                 return config;
             },
 
             'requestError' : function(rejection) {
-                angular.element(document.getElementById('controller')).scope().controller.loading = false;
                 console.log('requestError', new Date());
                 console.log(rejection);
+                $rootScope.requestError = "Whoa! What just happend? I can't talk to my brains!"
+                $rootScope.status = 400;
+                $rootScope.loading = false;
                 return $q.reject(rejection);
             },
 
             'response' : function(response) {
-                angular.element(document.getElementById('controller')).scope().controller.loading = false;
-                console.log('response', new Date());
-                console.log(response);
+                handleResponse(response, $rootScope);
                 return response;
             },
 
             'responseError' : function(rejection) {
-                angular.element(document.getElementById('controller')).scope().controller.loading = false;
-                console.log('responseError', new Date());
-                console.log(rejection);
+                handleResponse(rejection, $rootScope);
                 return $q.reject(rejection);
             }
         };
-    });
+    }];
+    $httpProvider.interceptors.push(interceptor);
 });
 
 
-app.controller('EntityController', function($scope, $http, $location, $window) {
+app.controller('EntityController', function($scope, $http, $location, $window, $rootScope) {
     var controller = this;
+    $rootScope.appUrl=$window.location.href
+    $rootScope.appName="Hyperstate Tester"
     
-    controller.debug = true;
-    controller.debugData = "";
     
-    controller.loading = true;
+    $rootScope.debug = true;
+    $rootScope.debugData = "";
+    
+    $rootScope.loading = true;
 
 
     controller.getLocation = function(href) {
@@ -63,34 +82,25 @@ app.controller('EntityController', function($scope, $http, $location, $window) {
     };
     
     controller.errorCallback = function(response) {
-        controller.status = response.status;
-        controller.entity = response.data;
-        controller.debugData = "" + JSON.stringify(response.data, null, 2);
+        // all handled in the intercepter
     };
 
     controller.successCallback = function(response) {
         controller.status = response.status;
         if (response.status === 200) {
-            controller.entity = response.data;
-            controller.debugData = "" + JSON.stringify(response.data, null, 2);
+            // all handled in the intercepter
         } else if (response.status === 201 || response.status === 204) {
             var location = controller.getLocation(response.headers("Location"));
             var currLoc = controller.getLocation($location.absUrl());
             if (location.protocol === currLoc.protocol && location.host === currLoc.host) {
 
-                controller.entity = {};
-                controller.debugData = JSON.stringify({}, null, 2);
                 $location.url(location.pathname + location.search + location.hash);
 
                 $http.get("" + location).then(controller.successCallback, controller.errorCallback);
             } else {
-                controller.entity = response.data;
-                controller.debugData = "" + JSON.stringify(response.data, null, 2);
                 $window.location.href = location;
             }
         } else {
-            controller.entity = response.data;
-            controller.debugData = "" + JSON.stringify(response.data, null, 2);
             alert("TODO: handle " + response.status + " responses");
         }
     };
@@ -101,7 +111,6 @@ app.controller('EntityController', function($scope, $http, $location, $window) {
         console.log("processForm");
         console.log(form);
         var action = form.action;
-        controller.entity = {};
         $http({
             method : action.method || "GET",
             url : action.href,
@@ -116,7 +125,7 @@ app.controller('EntityController', function($scope, $http, $location, $window) {
     controller.processNavClick = function(event) {
         console.log("processNavClick");
         console.log(event);
-        controller.entity = {};
+        $rootScope.entity = {};
         
         controller.doLoad(event.target.href);
     };

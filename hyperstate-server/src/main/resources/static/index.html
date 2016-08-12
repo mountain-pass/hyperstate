@@ -1,13 +1,13 @@
 <!doctype html>
 <html id="controller" ng-app="hyperstate" ng-controller="EntityController as controller"
-  class="{{controller.entity.class.join(' ') + ' status' + controller.status}}">
+  class="{{entity.class.join(' ') + ' status' + status}}">
 <head>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 <base href="/">
-<title>{{controller.appName}}</title>
+<title>{{appName}}</title>
 <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
 <link rel="stylesheet" type="text/css" href="/webjars/angularjs/1.5.8/angular-csp.css" />
 <link rel="stylesheet" href="/css/style.css">
@@ -28,17 +28,17 @@
           <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span
             class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="{{controller.appUrl}}">{{controller.appName}}</a>
+        <a class="navbar-brand" href="{{appUrl}}">{{appName}}</a>
       </div>
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav" id="links">
-          <li ng-repeat="link in controller.entity.links" class="{{$.inArray('self', link.rel) ? 'active' : ''}}"><a
+          <li ng-repeat="link in entity.links" class="{{$.inArray('self', link.rel) ? 'active' : ''}}"><a
             href="{{link.href}}" rel="{{link.rel.join(' ')}}" ng-click="controller.processNavClick($event)">{{link.title
               ? link.title : link.rel[0] }}</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-          <li ng-hide="!controller.loading" class="" id="loading"><a href="#">Loading...</a></li>
-          <li ng-show="!controller.loading" class="ng-hide" id="loaded"><a href="#">Loaded</a></li>
+          <li ng-hide="!loading" class="" id="loading"><a href="#">Loading...</a></li>
+          <li ng-show="!loading" class="ng-hide" id="loaded"><a href="#">Loaded</a></li>
         </ul>
       </div>
       <!--/.nav-collapse -->
@@ -48,16 +48,18 @@
 
   <div class="container">
     <div class="page-header">
-      <h2 ng-if="controller.entity.title">{{controller.entity.title}}</h2>
+      <h2 ng-if="entity.title">{{entity.title}}</h2>
     </div>
     <div id="messages">
-      <div ng-show="controller.status === 404" class="ng-hide alert alert-danger status404" role="alert">Oops! I'm
+      <div ng-show="status === 400" class="ng-hide alert alert-danger status404" role="alert">{{requestError || "Oops! I'm
+        not sure what you are looking for. Whatever it is, I can't find it, sorry." }</div>
+      <div ng-show="status === 404" class="ng-hide alert alert-danger status404" role="alert">Oops! I'm
         not sure what you are looking for. Whatever it is, I can't find it, sorry.</div>
-      <div ng-show="controller.status === 500" class="ng-hide alert alert-danger status500" role="alert">Sorry, I
+      <div ng-show="status === 500" class="ng-hide alert alert-danger status500" role="alert">Sorry, I
         borke.</div>
     </div>
     <div id="properties">
-      <div ng-repeat="(key, value) in controller.entity.properties">
+      <div ng-repeat="(key, value) in entity.properties">
         <div class="{{key}}">
           <!-- TODO: find a nice way to replace key names with nice titles -->
           <label for="property:{{key}}">{{key}}</label>
@@ -67,7 +69,7 @@
     </div>
 
     <div id="entities">
-      <div class="row" ng-repeat="entity in controller.entity.entities">
+      <div class="row" ng-repeat="entity in entity.entities">
         <a ng-if="entity.href" href="{{entity.href}}" rel="{{entity.rel.join(' ')}}"
           class="col-sm-12 entity {{field.class.join(' ')}}" ng-click="controller.processNavClick($event)">{{entity.title
           || 'entity'}}</a>
@@ -75,7 +77,7 @@
     </div>
 
     <div id="actions">
-      <div ng-repeat="action in controller.entity.actions">
+      <div ng-repeat="action in entity.actions">
         <!-- TODO: if we find a nice way to replace key names with titles
         then we should probably do the same for action names, and not use
         action titles -->
@@ -105,7 +107,7 @@
       </div>
     </div>
 
-    <pre ng-if="controller.debug &amp;&amp; controller.debugData"><code class="language-js" data-lang="js">{{controller.debugData}}</code></pre>
+    <pre ng-if="debug &amp;&amp; debugData"><code class="language-js" data-lang="js">{{debugData}}</code></pre>
 
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

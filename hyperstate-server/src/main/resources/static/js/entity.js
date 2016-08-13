@@ -97,10 +97,6 @@ app.controller('EntityController', function($scope, $http, $location, $window, $
         return location;
     };
     
-    controller.errorCallback = function(response) {
-        // all handled in the intercepter
-    };
-
     controller.successCallback = function(response) {
          if (response.headers("Location")) {
             var location = parseLocation(response.headers("Location"));
@@ -109,14 +105,14 @@ app.controller('EntityController', function($scope, $http, $location, $window, $
 
                 $location.url(location.pathname + location.search + location.hash);
 
-                $http.get("" + location).then(controller.successCallback, controller.errorCallback);
+                $http.get("" + location).then(controller.successCallback);
             } else {
                 $window.location.href = location;
             }
         }
     };
 
-    $http.get($window.location.href).then(controller.successCallback, controller.errorCallback);
+    $http.get($window.location.href).then(controller.successCallback);
 
     controller.processForm = function(form) {
         console.log("processForm");
@@ -129,20 +125,18 @@ app.controller('EntityController', function($scope, $http, $location, $window, $
             headers : {
                 'Content-Type' : action.type || "application/x-www-form-urlencoded"
             }
-        }).then(controller.successCallback, controller.errorCallback);
+        }).then(controller.successCallback);
         return false;
     };
     
     controller.processNavClick = function(event) {
         console.log("processNavClick");
         console.log(event);
-        $rootScope.entity = {};
-        
         controller.doLoad(event.target.href);
     };
 
     controller.doLoad = function(href) {
-        $http.get(href).then(controller.successCallback, controller.errorCallback);
+        $http.get(href).then(controller.successCallback);
     }
     
     $scope.$on('$locationChangeStart', function(event, newUrl, oldUrl) {

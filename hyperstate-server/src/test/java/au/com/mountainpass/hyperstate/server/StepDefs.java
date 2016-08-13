@@ -6,6 +6,7 @@ import static org.junit.Assume.*;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,9 +34,9 @@ import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.client.RestTemplateResolver;
 import au.com.mountainpass.hyperstate.client.webdriver.WebDriverResolver;
 import au.com.mountainpass.hyperstate.core.Action;
-import au.com.mountainpass.hyperstate.core.EntityRelationship;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.Link;
+import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
 import au.com.mountainpass.hyperstate.core.Relationship;
 import au.com.mountainpass.hyperstate.core.Resolver;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
@@ -201,17 +202,24 @@ public class StepDefs {
     @Given("^the controller's root has an? \"([^\"]*)\" link to an \"([^\"]*)\" domain entity$")
     public void the_controller_s_root_has_an_link_to_an_domain_entity(
             final String rel, final String typeName) throws Throwable {
-        controller.getRoot().thenAcceptAsync(root -> {
-            root.getEntities().thenAcceptAsync(entities -> {
-                final Optional<EntityRelationship> match = entities.stream()
-                        .filter(entityRel -> {
-                    return entityRel.hasRelationship(rel);
-                }).filter(entityRel -> {
-                    return entityRel.getEntity().hasNature(typeName);
+        EntityWrapper<?> root = controller.getRoot().get();
+
+        Collection<NavigationalRelationship> links = root.getLinks();
+
+        Optional<NavigationalRelationship> match;
+        match = links.stream()
+                .filter(entityRel -> entityRel.hasRelationship(rel))
+                .filter(entityRel -> {
+                    VanillaEntity resovled;
+                    try {
+                        resovled = entityRel.getLink()
+                                .resolve(VanillaEntity.class).get();
+                        return resovled.hasNature(typeName);
+                    } catch (Exception e) {
+                        return false;
+                    }
                 }).findAny();
-                assertThat(match.isPresent(), is(equalTo(true)));
-            });
-        });
+        assertThat(match.isPresent(), is(equalTo(true)));
     }
 
     @Then("^the response will be an? \"([^\"]*)\" domain entity$")

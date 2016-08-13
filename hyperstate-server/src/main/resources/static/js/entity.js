@@ -14,10 +14,9 @@ var parseLocation = function(href) {
     return location;
 };
 
-
 app.config(function($locationProvider, $httpProvider) {
     $locationProvider.html5Mode(true);
-    $httpProvider.defaults.cache=false;
+    $httpProvider.defaults.cache = false;
     $httpProvider.defaults.headers.common.Accept = 'application/vnd.siren+json';
 
     var handleResponse = function(response, scope) {
@@ -25,17 +24,13 @@ app.config(function($locationProvider, $httpProvider) {
         console.log(response);
         scope.status = response.status;
         scope.entity = response.data;
-        if( scope.debug ) {
+        if (scope.debug) {
             scope.debugData = "" + JSON.stringify(response.data, null, 2);
         }
         scope.loading = false;
     }
-    
-    
-    var interceptor = [
-                       '$q',
-                       '$rootScope',
-                       function($q, $rootScope) {
+
+    var interceptor = [ '$q', '$rootScope', function($q, $rootScope) {
         return {
             'request' : function(config) {
                 $rootScope.loading = true;
@@ -66,53 +61,43 @@ app.config(function($locationProvider, $httpProvider) {
                 return $q.reject(rejection);
             }
         };
-    }];
+    } ];
     $httpProvider.interceptors.push(interceptor);
 });
 
-
 app.controller('EntityController', function($scope, $http, $location, $window, $rootScope) {
     var controller = this;
-    $rootScope.appUrl=$window.location.href
-    $rootScope.appName="Hyperstate Tester"
-    
-    
+    $rootScope.appUrl = $window.location.href
+    $rootScope.appName = "Hyperstate Tester"
+
     $rootScope.debug = true;
     $rootScope.debugData = "";
-    
+
     $rootScope.loading = true;
 
-
-    controller.getLocation = function(href) {
-        var location = document.createElement("a");
-        location.href = href;
-        // IE doesn't populate all link properties when setting .href with a
-        // relative URL,
-        // however .href will return an absolute URL which then can be used on
-        // itself
-        // to populate these additional fields.
-        if (location.host == "") {
-            location.href = location.href;
-        }
-        return location;
-    };
-    
     controller.successCallback = function(response) {
-         if (response.headers("Location")) {
+        if (response.headers("Location")) {
             var location = parseLocation(response.headers("Location"));
             var currLoc = parseLocation($location.absUrl());
             if (location.protocol === currLoc.protocol && location.host === currLoc.host) {
 
                 $location.url(location.pathname + location.search + location.hash);
 
-                $http.get("" + location).then(controller.successCallback);
+                controller.doLoad($location.url());
             } else {
-                $window.location.href = location;
+                $window.location.href = location.href;
             }
+        } else if (response.status === 204) {
+            controller.doLoad($location.url());
         }
     };
 
-    $http.get($window.location.href).then(controller.successCallback);
+    
+    controller.doLoad = function(href) {
+        $http.get(href).then(controller.successCallback);
+    }
+
+    controller.doLoad($window.location.href);
 
     controller.processForm = function(form) {
         console.log("processForm");
@@ -128,25 +113,20 @@ app.controller('EntityController', function($scope, $http, $location, $window, $
         }).then(controller.successCallback);
         return false;
     };
-    
+
     controller.processNavClick = function(event) {
         console.log("processNavClick");
         console.log(event);
         controller.doLoad(event.target.href);
     };
 
-    controller.doLoad = function(href) {
-        $http.get(href).then(controller.successCallback);
-    }
-    
+
     $scope.$on('$locationChangeStart', function(event, newUrl, oldUrl) {
         console.log('$locationChangeStart:', oldUrl + " -> " + newUrl, new Date());
     });
 
     $scope.$on('$locationChangeSuccess', function(event, newUrl, oldUrl) {
         console.log('$locationChangeSuccess:', oldUrl + " -> " + newUrl, new Date());
-        if (newUrl != null) {
-            controller.doLoad(newUrl);
-        }
+        controller.doLoad(newUrl);
     });
 });

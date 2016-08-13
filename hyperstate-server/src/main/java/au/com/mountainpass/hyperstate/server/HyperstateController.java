@@ -319,8 +319,7 @@ public abstract class HyperstateController {
 
         action.invoke(params.toSingleValueMap());
         // todo: automatically treat actions that return void as PUT actions
-        return ResponseEntity.noContent()
-                .location(new JavaAddress(resolver, entity).getHref()).build();
+        return ResponseEntity.noContent().build();
     }
 
 }

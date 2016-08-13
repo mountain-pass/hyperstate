@@ -1,5 +1,20 @@
 var app = angular.module('hyperstate', []);
 
+var parseLocation = function(href) {
+    var location = document.createElement("a");
+    location.href = href;
+    // IE doesn't populate all link properties when setting .href with a
+    // relative URL,
+    // however .href will return an absolute URL which then can be used on
+    // itself
+    // to populate these additional fields.
+    if (location.host == "") {
+        location.href = location.href;
+    }
+    return location;
+};
+
+
 app.config(function($locationProvider, $httpProvider) {
     $locationProvider.html5Mode(true);
     $httpProvider.defaults.cache=false;
@@ -15,7 +30,8 @@ app.config(function($locationProvider, $httpProvider) {
         }
         scope.loading = false;
     }
-        
+    
+    
     var interceptor = [
                        '$q',
                        '$rootScope',
@@ -86,12 +102,9 @@ app.controller('EntityController', function($scope, $http, $location, $window, $
     };
 
     controller.successCallback = function(response) {
-        controller.status = response.status;
-        if (response.status === 200) {
-            // all handled in the intercepter
-        } else if (response.status === 201 || response.status === 204) {
-            var location = controller.getLocation(response.headers("Location"));
-            var currLoc = controller.getLocation($location.absUrl());
+         if (response.headers("Location")) {
+            var location = parseLocation(response.headers("Location"));
+            var currLoc = parseLocation($location.absUrl());
             if (location.protocol === currLoc.protocol && location.host === currLoc.host) {
 
                 $location.url(location.pathname + location.search + location.hash);
@@ -100,8 +113,6 @@ app.controller('EntityController', function($scope, $http, $location, $window, $
             } else {
                 $window.location.href = location;
             }
-        } else {
-            alert("TODO: handle " + response.status + " responses");
         }
     };
 

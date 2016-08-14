@@ -1,27 +1,12 @@
 var app = angular.module('hyperstate', []);
 
-var parseLocation = function(href) {
-    var location = document.createElement("a");
-    location.href = href;
-    // IE doesn't populate all link properties when setting .href with a
-    // relative URL,
-    // however .href will return an absolute URL which then can be used on
-    // itself
-    // to populate these additional fields.
-    if (location.host == "") {
-        location.href = location.href;
-    }
-    return location;
-};
-
 app.config(function($locationProvider, $httpProvider) {
     $locationProvider.html5Mode(true);
     $httpProvider.defaults.cache = false;
     $httpProvider.defaults.headers.common.Accept = 'application/vnd.siren+json';
 
     var handleResponse = function(response, scope) {
-        console.log('response', new Date());
-        console.log(response);
+        console.log('response', response, new Date());
         scope.status = response.status;
         scope.entity = response.data;
         if (scope.debug) {
@@ -37,14 +22,12 @@ app.config(function($locationProvider, $httpProvider) {
                 $rootScope.entity = null;
                 $rootScope.requestError = null;
                 $rootScope.debugData = null
-                console.log('request', new Date());
-                console.log(config);
+                console.log('request', config, new Date());
                 return config;
             },
 
             'requestError' : function(rejection) {
-                console.log('requestError', new Date());
-                console.log(rejection);
+                console.log('requestError', rejection, new Date());
                 $rootScope.requestError = "Whoa! What just happend? I can't talk to my brains!"
                 $rootScope.status = 400;
                 $rootScope.loading = false;
@@ -75,17 +58,32 @@ app.controller('EntityController', function($scope, $http, $location, $window, $
 
     $rootScope.loading = true;
 
+    controller.parseLocation = function(href) {
+        var location = document.createElement("a");
+        location.href = href;
+        // IE doesn't populate all link properties when setting .href with a
+        // relative URL,
+        // however .href will return an absolute URL which then can be used on
+        // itself
+        // to populate these additional fields.
+        if (location.host === "") {
+            location.href = location.href;
+        }
+        return location;
+    };
+
+    
     controller.successCallback = function(response) {
         if (response.headers("Location")) {
-            var location = parseLocation(response.headers("Location"));
-            var currLoc = parseLocation($location.absUrl());
-            if (location.protocol === currLoc.protocol && location.host === currLoc.host) {
+            var newLoc = controller.parseLocation(response.headers("Location"));
+            var currLoc = controller.parseLocation($location.absUrl());
+            if (newLoc.protocol === currLoc.protocol && newLoc.host === currLoc.host) {
 
-                $location.url(location.pathname + location.search + location.hash);
+                $location.url(newLoc.pathname + newLoc.search + newLoc.hash);
 
                 controller.doLoad($location.url());
             } else {
-                $window.location.href = location.href;
+                $window.location.href = newLoc.href;
             }
         } else if (response.status === 204) {
             controller.doLoad($location.url());
@@ -100,8 +98,7 @@ app.controller('EntityController', function($scope, $http, $location, $window, $
     controller.doLoad($window.location.href);
 
     controller.processForm = function(form) {
-        console.log("processForm");
-        console.log(form);
+        console.log("processForm", form, new Date());
         var action = form.action;
         $http({
             method : action.method || "GET",
@@ -115,8 +112,7 @@ app.controller('EntityController', function($scope, $http, $location, $window, $
     };
 
     controller.processNavClick = function(event) {
-        console.log("processNavClick");
-        console.log(event);
+        console.log("processNavClick", event, new Date());
         controller.doLoad(event.target.href);
     };
 

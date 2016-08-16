@@ -1,5 +1,8 @@
 package au.com.mountainpass.hyperstate.server.entities;
 
+import java.util.Date;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
@@ -33,6 +36,16 @@ public class Account extends EntityWrapper<AccountProperties> {
             final AccountProperties properties, final String path,
             final String title) {
         super(resolver, path, properties, title, "Account");
+    }
+
+    public Account(RepositoryResolver resolver, String parentPath,
+            String username) {
+        super(resolver, parentPath + "/" + UUID.randomUUID(),
+                createProperties(username), username, "Account");
+    }
+
+    private static AccountProperties createProperties(String username) {
+        return new AccountProperties(username, new Date().toString());
     }
 
 }

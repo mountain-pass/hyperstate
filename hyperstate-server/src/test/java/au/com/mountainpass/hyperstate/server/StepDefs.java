@@ -7,6 +7,7 @@ import static org.junit.Assume.*;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -49,6 +50,7 @@ import au.com.mountainpass.hyperstate.server.entities.AccountBuilder;
 import au.com.mountainpass.hyperstate.server.entities.AccountProperties;
 import au.com.mountainpass.hyperstate.server.entities.AccountWithDelete;
 import au.com.mountainpass.hyperstate.server.entities.AccountWithUpdate;
+import au.com.mountainpass.hyperstate.server.entities.Accounts;
 import cucumber.api.PendingException;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
@@ -104,26 +106,51 @@ public class StepDefs {
 
         controller = context.getAutowireCapableBeanFactory().getBean(beanName,
                 HyperstateController.class);
-        assertThat(controller, is(notNullValue()));
+        assumeThat(controller, is(notNullValue()));
 
         // check path
         final RequestMapping requestMapping = AnnotationUtils
                 .findAnnotation(controller.getClass(), RequestMapping.class);
-        assertThat(requestMapping, is(notNullValue()));
-        assertThat(requestMapping.value(), is(arrayContaining(path)));
+        assumeThat(requestMapping, is(notNullValue()));
+        assumeThat(requestMapping.value(), is(arrayContaining(path)));
 
     }
 
     @Given("^an \"([^\"]*)\" domain entity with$")
     public void an_domain_entity_with(final String entityName,
             final Map<String, String> properties) throws Throwable {
+        EntityWrapper<?> root;
+        Optional<NavigationalRelationship> rel;
+        switch (entityName) {
+        case "Account":
+            assumeThat(properties.keySet(),
+                    contains("username", "creationDate"));
 
-        assertThat(entityName, equalTo("Account"));
-        assertThat(properties.keySet(), contains("username", "creationDate"));
+            currentAccountBuilder = Account.builder()
+                    .userName(properties.get("username"))
+                    .creationDate(properties.get("creationDate"));
+            break;
+        case "Accounts":
+            rel = getAccountsLink();
 
-        currentAccountBuilder = Account.builder()
-                .userName(properties.get("username"))
-                .creationDate(properties.get("creationDate"));
+            assumeThat(rel.isPresent(), equalTo(true));
+            break;
+        default:
+            throw new PendingException("TODO: " + entityName);
+        }
+    }
+
+    private Optional<NavigationalRelationship> getAccountsLink()
+            throws InterruptedException, ExecutionException {
+        HyperstateController testController = context
+                .getAutowireCapableBeanFactory().getBean(
+                        "hyperstateTestController", HyperstateController.class);
+        EntityWrapper<?> root = testController.getRoot().get();
+        Collection<NavigationalRelationship> links = root.getLinks();
+        Optional<NavigationalRelationship> rel = links.stream()
+                .filter(entityRel -> entityRel.hasRelationship("accounts"))
+                .findAny();
+        return rel;
     }
 
     @Before
@@ -156,7 +183,14 @@ public class StepDefs {
 
     @Given("^it is exposed at \"([^\"]*)\"$")
     public void it_is_exposed_at(final String path) throws Throwable {
-        currentAccountBuilder.build(repositoryResovler, repository, path).get();
+        if (currentAccountBuilder != null) {
+            currentAccountBuilder.build(repositoryResovler, repository, path)
+                    .get();
+        } else {
+            // we are doing with "accounts" rather than "account"
+            assumeThat(getAccountsLink().get().getLink().getPath(),
+                    endsWith(path));
+        }
     }
 
     @Then("^it will have a self link referencing \"([^\"]*)\"$")
@@ -210,10 +244,10 @@ public class StepDefs {
         match = links.stream()
                 .filter(entityRel -> entityRel.hasRelationship(rel))
                 .filter(entityRel -> {
-                    VanillaEntity resovled;
+                    Accounts resovled;
                     try {
-                        resovled = entityRel.getLink()
-                                .resolve(VanillaEntity.class).get();
+                        resovled = entityRel.getLink().resolve(Accounts.class)
+                                .get();
                         return resovled.hasNature(typeName);
                     } catch (Exception e) {
                         return false;
@@ -253,11 +287,19 @@ public class StepDefs {
 
     @Given("^it has a \"([^\"]*)\" action$")
     public void it_has_a_action(String actionName) throws Throwable {
-        if ("delete".equals(actionName)) {
+        switch (actionName) {
+        case "createAccount":
+            Accounts accounts = getAccountsLink().get().getLink()
+                    .resolve(Accounts.class).get();
+            assumeThat(accounts.getAction(actionName), notNullValue());
+            break;
+        case "delete":
             currentAccountBuilder.isDeletable(true);
-        } else if ("update".equals(actionName)) {
+            break;
+        case "update":
             currentAccountBuilder.isUpdatable(true);
-        } else {
+            break;
+        default:
             throw new PendingException("TODO");
         }
     }
@@ -305,4 +347,8 @@ public class StepDefs {
         }
     }
 
+    @Given("^an \"([^\"]*)\" domain entity$")
+    public void an_domain_entity(String entityName) throws Throwable {
+        an_domain_entity_with(entityName, new HashMap<>());
+    }
 }

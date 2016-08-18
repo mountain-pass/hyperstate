@@ -9,10 +9,6 @@ public class AccountWithDelete extends Account {
     protected AccountWithDelete() {
     }
 
-    protected AccountWithDelete(final AccountWithDelete src) {
-        super(src);
-    }
-
     public AccountWithDelete(final RepositoryResolver resolver,
             final AccountProperties properties, final String path,
             final String title) {

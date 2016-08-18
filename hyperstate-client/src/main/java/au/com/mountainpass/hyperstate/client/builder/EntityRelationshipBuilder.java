@@ -1,6 +1,7 @@
 package au.com.mountainpass.hyperstate.client.builder;
 
 import java.net.URI;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,7 +15,7 @@ import au.com.mountainpass.hyperstate.core.entities.LinkedEntity;
 public class EntityRelationshipBuilder {
 
     private URI address;
-    private String[] entityClasses;
+    private Set<String> entityClasses;
     private String title;
     private String[] rels;
 
@@ -36,8 +37,8 @@ public class EntityRelationshipBuilder {
     }
 
     @JsonProperty("class")
-    public EntityRelationshipBuilder setClass(final String[] natures) {
-        this.entityClasses = natures;
+    public EntityRelationshipBuilder setClass(final Set<String> classes) {
+        this.entityClasses = classes;
         return this;
     }
 
@@ -48,8 +49,8 @@ public class EntityRelationshipBuilder {
     }
 
     @JsonProperty("rel")
-    public EntityRelationshipBuilder setRel(final String[] natures) {
-        this.rels = natures;
+    public EntityRelationshipBuilder setRel(final String[] rels) {
+        this.rels = rels;
         return this;
     }
 

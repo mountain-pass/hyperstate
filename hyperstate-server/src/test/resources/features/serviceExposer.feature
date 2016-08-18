@@ -104,3 +104,16 @@ Scenario: Create a domain entity
     Then the response will be an "Account" domain entity with
     | username     | nick       |
     And it's creation date will be today    
+    
+    
+# todo: test with a get action
+# todo: test with embedded entities (including rel check)
+# todo: test that tries to remotely execute an unexposed method
+# todo: test that validates the mediatype serializer
+# todo: test delete of already deleted entity
+# todo: test response header vary
+# todo: test message source deserializer
+# todo: test exists in repository
+# todo: test rest output complies with siren json schema
+# todo: test titles & tool tips with translation
+# todo: test caching

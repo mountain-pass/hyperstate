@@ -53,7 +53,7 @@ public class RestTemplateResolver implements Resolver {
                 NavigationalRelationshipMixin.class);
         om.setInjectableValues(new InjectableValues.Std()
                 .addValue(RestTemplateResolver.class, this));
-        asyncRestTemplate.setErrorHandler(new HyperstateRestErrorHandler(this));
+        asyncRestTemplate.setErrorHandler(new HyperstateRestErrorHandler());
     }
 
     public CompletableFuture<CreatedEntity> create(final RestAddress address,

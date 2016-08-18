@@ -1,7 +1,5 @@
 package au.com.mountainpass.hyperstate.core.entities;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -24,13 +22,6 @@ public class LinkedEntity extends Entity {
             final Set<String> classes) {
         this.link = link;
         setClasses(classes);
-        setTitle(title);
-    }
-
-    public LinkedEntity(final Link link, final String title,
-            final String... classes) {
-        this.link = link;
-        setClasses(new HashSet<String>(Arrays.asList(classes)));
         setTitle(title);
     }
 

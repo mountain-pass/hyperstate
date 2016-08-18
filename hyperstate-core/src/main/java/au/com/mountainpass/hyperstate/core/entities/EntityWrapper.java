@@ -57,15 +57,6 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
 
     private RepositoryResolver resolver;
 
-    public EntityWrapper(final EntityWrapper<T> src) {
-        super(src);
-        this.properties = src.properties;
-        this.path = src.path;
-        this.actions = src.actions;
-        this.entities = src.entities;
-        this.navigationalRelationships = src.navigationalRelationships;
-    }
-
     protected EntityWrapper(final RepositoryResolver resolver,
             final String path, final T properties, final String title,
             final String... classes) {

@@ -13,13 +13,6 @@ public class HyperstateRestErrorHandler implements ResponseErrorHandler {
 
     private DefaultResponseErrorHandler defaultResponseErrorHandler = new DefaultResponseErrorHandler();
 
-    private RestTemplateResolver resolver;
-
-    public HyperstateRestErrorHandler(
-            RestTemplateResolver restTemplateResolver) {
-        resolver = restTemplateResolver;
-    }
-
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
         return defaultResponseErrorHandler.hasError(response);
@@ -28,7 +21,7 @@ public class HyperstateRestErrorHandler implements ResponseErrorHandler {
     @Override
     public void handleError(ClientHttpResponse response) throws IOException {
         if (response.getStatusCode() == HttpStatus.NOT_FOUND) {
-            throw new EntityNotFoundException(new RestAddress(resolver, null));
+            throw new EntityNotFoundException();
         }
         defaultResponseErrorHandler.handleError(response);
     }

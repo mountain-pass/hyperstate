@@ -26,12 +26,6 @@ public class Account extends EntityWrapper<AccountProperties> {
         super(new AccountProperties());
     }
 
-    protected Account(final Account src) {
-        super(src);
-        this.context = src.context;
-        this.repository = src.repository;
-    }
-
     public Account(final RepositoryResolver resolver,
             final AccountProperties properties, final String path,
             final String title) {

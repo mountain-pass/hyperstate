@@ -15,8 +15,4 @@ public class VanillaEntity extends EntityWrapper<Properties> {
         super(resolver, path, new Properties(), title, classes);
     }
 
-    public VanillaEntity(final VanillaEntity src) {
-        super(src);
-    }
-
 }

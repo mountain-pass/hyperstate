@@ -3,8 +3,6 @@ package au.com.mountainpass.hyperstate.core;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -18,17 +16,6 @@ abstract public class Titled {
     private Set<String> natures = new HashSet<>();
 
     public Titled() {
-    }
-
-    public Titled(final Titled titled) {
-        this();
-        this.title = titled.title;
-        this.natures = titled.natures;
-    }
-
-    public Titled(final String title, final Set<String> natures) {
-        this.title = title;
-        this.natures = natures;
     }
 
     public Titled(final String title, final String... natures) {
@@ -56,26 +43,6 @@ abstract public class Titled {
 
     public boolean hasNature(final String nature) {
         return this.getClasses().contains(nature);
-    }
-
-    private String interpolate(final String value, final String... args) {
-        if (args.length == 0) {
-            return value;
-        } else {
-            final Pattern patt = Pattern.compile("\\{(.*?)\\}");
-            final Matcher m = patt.matcher(value);
-            final StringBuffer sb = new StringBuffer(value.length());
-            for (int i = 0; m.find(); ++i) {
-                final String code = m.group(1);
-                m.appendReplacement(sb, Matcher.quoteReplacement(args[i]));
-            }
-            m.appendTail(sb);
-            return sb.toString();
-        }
-    }
-
-    void setTitle(final String template, final String... args) {
-        title = interpolate(template, args);
     }
 
     /**

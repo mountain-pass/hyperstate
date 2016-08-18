@@ -153,18 +153,13 @@ public class WebDriverResolver implements Resolver {
             if (elements404.isEmpty()) {
                 return createProxy(klass);
             } else {
-                throw new EntityNotFoundException(new WebDriverAddress(this,
-                        getWebDriver().findElement(By.tagName("html"))));
+                throw new EntityNotFoundException();
             }
         });
     }
 
     private URI getBaseUri() {
         return baseUri;
-    }
-
-    public String getUrl() {
-        return getWebDriver().getCurrentUrl();
     }
 
     <E> Enhancer initEnhancer(final Class<E> klass) {

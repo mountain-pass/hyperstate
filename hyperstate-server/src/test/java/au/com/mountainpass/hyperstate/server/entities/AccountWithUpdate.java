@@ -10,10 +10,6 @@ public class AccountWithUpdate extends Account {
     protected AccountWithUpdate() {
     }
 
-    protected AccountWithUpdate(final AccountWithUpdate src) {
-        super(src);
-    }
-
     public AccountWithUpdate(final RepositoryResolver resolver,
             final AccountProperties properties, final String path,
             final String title) {

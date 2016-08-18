@@ -142,14 +142,17 @@ class WebDriverEntityInterceptor<E> implements MethodInterceptor {
                     .findElements(By.cssSelector("#entities > div.row > a"));
             final Collection<EntityRelationship> rval = new ArrayList<EntityRelationship>();
             for (final WebElement entity : entities) {
-                final String[] classes = entity.getAttribute("class")
-                        .split("\\s");
+                final Set<String> classes = new HashSet<>(Arrays
+                        .asList(entity.getAttribute("class").split("\\s")));
                 final String title = entity.getText();
-                final String[] entityRelationships = new String[0];
+                final String[] rels = new String[0];
                 // TODO read entity relationships from page
-                rval.add(new EntityRelationship(new LinkedEntity(
-                        new Link(new WebDriverAddress(resolver, entity), title),
-                        title, entityRelationships), classes));
+                WebDriverAddress webDriverAddress = new WebDriverAddress(
+                        resolver, entity);
+                Link link = new Link(webDriverAddress, title);
+                LinkedEntity linkedEntity = new LinkedEntity(link, title,
+                        classes);
+                rval.add(new EntityRelationship(linkedEntity, rels));
             }
             return rval;
         } else if (method.getName().equals("getProperties")) {
@@ -243,23 +246,6 @@ class WebDriverEntityInterceptor<E> implements MethodInterceptor {
                 return result;
             }
         }
-
-        // WebElement form = (new WebDriverWait(webDriver, 5))
-        // .until(ExpectedConditions.presenceOfElementLocated(
-        // By.name(method.getName())));
-        //
-        // Parameter[] params = method.getParameters();
-        // for (int i = 0; i < params.length; ++i) {
-        // WebElement input = form
-        // .findElement(By.name(params[i].getName()));
-        // input.sendKeys(args[i].toString());
-        // }
-        // return CompletableFuture.supplyAsync(() -> {
-        // form.findElement(By.cssSelector("button[type='submit']"))
-        // .click();
-        // Entity result = null;
-        // return result;
-        // });
     }
 
     private void waitTillLoaded(final long timeoutInSeconds) {

@@ -14,10 +14,6 @@ public abstract class Entity extends Titled {
     public Entity() {
     }
 
-    public Entity(final Entity entity) {
-        super(entity);
-    }
-
     public Entity(final String title, final String... natures) {
         super(title, natures);
     }

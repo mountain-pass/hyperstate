@@ -60,7 +60,7 @@ public class RepositoryResolver implements Resolver {
     public CompletableFuture<EntityWrapper<?>> get(JavaAddress address) {
         return repository.findOne(address.getPath()).thenApply(entity -> {
             if (entity == null) {
-                throw new EntityNotFoundException(address);
+                throw new EntityNotFoundException();
             } else {
                 return entity;
             }
@@ -78,7 +78,7 @@ public class RepositoryResolver implements Resolver {
             Class<E> type) {
         return repository.findOne(path).thenApply(entity -> {
             if (entity == null) {
-                throw new EntityNotFoundException(null);
+                throw new EntityNotFoundException();
             } else {
                 return (E) entity;
             }

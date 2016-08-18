@@ -2,8 +2,6 @@ package au.com.mountainpass.hyperstate.client.builder;
 
 import java.net.URI;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.http.HttpMethod;
 
 import com.fasterxml.jackson.annotation.JacksonInject;
@@ -48,11 +46,6 @@ public class RestActionBuilder {
         default:
             return null;
         }
-    }
-
-    @PostConstruct
-    public void postConstruct() {
-
     }
 
     @JsonProperty("fields")

@@ -6,10 +6,7 @@ import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 
 public class NavigationalRelationship extends Relationship {
 
-    private Link link;
-
-    private NavigationalRelationship() {
-    }
+    private final Link link;
 
     public NavigationalRelationship(final EntityWrapper<?> entity,
             final String... rels) {
@@ -25,10 +22,6 @@ public class NavigationalRelationship extends Relationship {
     @JsonUnwrapped
     public Link getLink() {
         return this.link;
-    }
-
-    public void setLink(final Link link) {
-        this.link = link;
     }
 
 }

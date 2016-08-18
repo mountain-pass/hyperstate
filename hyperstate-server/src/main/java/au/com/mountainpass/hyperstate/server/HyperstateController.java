@@ -127,11 +127,6 @@ public abstract class HyperstateController {
 
     }
 
-    protected CompletableFuture<Void> deleteEntity(
-            final EntityWrapper<?> entity) {
-        return repository.delete(entity);
-    }
-
     @RequestMapping(value = "**", method = RequestMethod.GET, produces = {
             MediaTypes.SIREN_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE })
     @ResponseBody

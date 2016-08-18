@@ -13,8 +13,8 @@ public class EntityRelationship extends Relationship {
     protected EntityRelationship() {
     }
 
-    public EntityRelationship(final Entity entity, final String... natures) {
-        super(natures);
+    public EntityRelationship(final Entity entity, final String... rels) {
+        super(rels);
         this.entity = entity;
     }
 

@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.MediaTypes;
+import au.com.mountainpass.hyperstate.server.entities.AccountProperties;
+import au.com.mountainpass.hyperstate.server.serialization.mixins.AccountPropertiesMixin;
 
 @Controller
 @RequestMapping(value = "/", produces = { MediaTypes.SIREN_JSON_VALUE,
@@ -22,6 +24,9 @@ public class HyperstateTestController extends HyperstateController {
 
     @Override
     protected void onConstructed() {
+        super.getObjectMapper().addMixIn(AccountProperties.class,
+                AccountPropertiesMixin.class);
+
         final HyperstateTestRootEntity root = new HyperstateTestRootEntity(
                 resolver, this.getClass());
 

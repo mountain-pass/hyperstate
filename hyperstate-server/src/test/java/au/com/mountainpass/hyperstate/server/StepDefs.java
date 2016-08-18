@@ -285,8 +285,8 @@ public class StepDefs {
                             equalTo(expectedProperty.getValue()));
                     break;
                 case "creationDate":
-                    assertThat(entityProperties.getCreationDate(),
-                            equalTo(expectedProperty.getValue()));
+                    assertThat(entityProperties.getCreationDate(), equalTo(
+                            LocalDateTime.parse(expectedProperty.getValue())));
                     break;
                 default:
                     throw new PendingException("checking for property " + type

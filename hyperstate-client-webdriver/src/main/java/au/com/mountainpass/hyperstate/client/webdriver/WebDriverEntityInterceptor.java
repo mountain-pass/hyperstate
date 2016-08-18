@@ -2,6 +2,7 @@ package au.com.mountainpass.hyperstate.client.webdriver;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -160,6 +161,8 @@ class WebDriverEntityInterceptor<E> implements MethodInterceptor {
             propertiesEnhancer.setSuperclass(instance.getClass());
             propertiesEnhancer.setCallback(new MethodInterceptor() {
 
+                // todo: use an object mapper of similar here to perform the
+                // conversion from string to desired type.
                 @Override
                 public Object intercept(final Object properties,
                         final Method propertiesMethod,
@@ -178,6 +181,9 @@ class WebDriverEntityInterceptor<E> implements MethodInterceptor {
                     } else if (propertiesMethod.getReturnType()
                             .isAssignableFrom(boolean.class)) {
                         return Boolean.parseBoolean(value);
+                    } else if (propertiesMethod.getReturnType()
+                            .isAssignableFrom(LocalDateTime.class)) {
+                        return LocalDateTime.parse(value);
                     } else {
                         throw new NotImplementedException(
                                 "conversion not implemented for "

@@ -20,14 +20,14 @@ Scenario: Add Relationship
 Scenario: Expose single domain entity
     Given an "Account" domain entity with
     | username     | tom        |
-    | creationDate | 2016/01/15 |
+    | creationDate | 2016-01-15T12:00:00 |
     And it has no actions
     And it has no additional links
     And it is exposed at "/accounts/testAccount"
     When request is made to "/accounts/testAccount" for an "au.com.mountainpass.hyperstate.server.entities.Account"
     Then the response will be an "Account" domain entity with
     | username     | tom        |
-    | creationDate | 2016/01/15 |
+    | creationDate | 2016-01-15T12:00:00 |
     And it will have no actions
     And it will have no links apart from "self"
     And it will have a self link referencing "/accounts/testAccount"
@@ -35,13 +35,13 @@ Scenario: Expose single domain entity
 Scenario: Expose single domain entity with delete action
     Given an "Account" domain entity with
     | username     | tom        |
-    | creationDate | 2016/01/15 |
+    | creationDate | 2016-01-15T12:00:00 |
     And it has a "delete" action
     And it is exposed at "/accounts/testAccount"
     When request is made to "/accounts/testAccount" for an "au.com.mountainpass.hyperstate.server.entities.AccountWithDelete"
     Then the response will be an "Account" domain entity with
     | username     | tom        |
-    | creationDate | 2016/01/15 |
+    | creationDate | 2016-01-15T12:00:00 |
     And it will have a "delete" action
     And it will have no links apart from "self"
     And it will have a self link referencing "/accounts/testAccount"
@@ -49,7 +49,7 @@ Scenario: Expose single domain entity with delete action
 Scenario: Delete domain entity
     Given an "Account" domain entity with
     | username     | tom        |
-    | creationDate | 2016/01/15 |
+    | creationDate | 2016-01-15T12:00:00 |
     And it has a "delete" action
     And it is exposed at "/accounts/testAccount"
     When request is made to "/accounts/testAccount" for an "au.com.mountainpass.hyperstate.server.entities.AccountWithDelete"
@@ -60,13 +60,13 @@ Scenario: Delete domain entity
 Scenario: Expose single domain entity with update action
     Given an "Account" domain entity with
     | username     | tom        |
-    | creationDate | 2016/01/15 |
+    | creationDate | 2016-01-15T12:00:00 |
     And it has a "update" action
     And it is exposed at "/accounts/testAccount"
     When request is made to "/accounts/testAccount" for an "au.com.mountainpass.hyperstate.server.entities.AccountWithUpdate"
     Then the response will be an "Account" domain entity with
     | username     | tom        |
-    | creationDate | 2016/01/15 |
+    | creationDate | 2016-01-15T12:00:00 |
     And it will have a "update" action
     And it will have no links apart from "self"
     And it will have a self link referencing "/accounts/testAccount"
@@ -74,7 +74,7 @@ Scenario: Expose single domain entity with update action
 Scenario: Update a domain entity
     Given an "Account" domain entity with
     | username     | tom        |
-    | creationDate | 2016/01/15 |
+    | creationDate | 2016-01-15T12:00:00 |
     And it has a "update" action
     And it is exposed at "/accounts/testAccount"
     When request is made to "/accounts/testAccount" for an "au.com.mountainpass.hyperstate.server.entities.AccountWithUpdate"
@@ -82,7 +82,7 @@ Scenario: Update a domain entity
     | username | nick |
     Then the response will be an "Account" domain entity with
     | username     | nick       |
-    | creationDate | 2016/01/15 |
+    | creationDate | 2016-01-15T12:00:00 |
 
 Scenario: Expose single domain entity with create action
     Given an "Accounts" domain entity

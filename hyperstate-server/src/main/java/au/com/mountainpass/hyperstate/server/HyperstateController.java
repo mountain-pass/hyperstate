@@ -34,7 +34,6 @@ import org.springframework.web.servlet.HandlerMapping;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.Action;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.Link;
@@ -51,9 +50,6 @@ public abstract class HyperstateController {
 
     @Autowired
     private EntityRepository repository;
-
-    @Autowired
-    private RepositoryResolver resolver;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -323,6 +319,10 @@ public abstract class HyperstateController {
         action.invoke(params.toSingleValueMap());
         // todo: automatically treat actions that return void as PUT actions
         return ResponseEntity.noContent().build();
+    }
+
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
     }
 
 }

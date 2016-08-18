@@ -1,5 +1,6 @@
 package au.com.mountainpass.hyperstate.core;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -38,5 +39,7 @@ public interface Address {
 
     public <T extends EntityWrapper<?>> CompletableFuture<T> get(
             ParameterizedTypeReference<T> type);
+
+    public URI getHref();
 
 }

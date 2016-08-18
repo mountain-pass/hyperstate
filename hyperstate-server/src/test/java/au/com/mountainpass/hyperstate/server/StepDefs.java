@@ -1,15 +1,18 @@
 package au.com.mountainpass.hyperstate.server;
 
+import static org.exparity.hamcrest.date.LocalDateTimeMatchers.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -40,6 +43,7 @@ import au.com.mountainpass.hyperstate.core.Link;
 import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
 import au.com.mountainpass.hyperstate.core.Relationship;
 import au.com.mountainpass.hyperstate.core.Resolver;
+import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 import au.com.mountainpass.hyperstate.core.entities.VanillaEntity;
@@ -125,10 +129,10 @@ public class StepDefs {
         case "Account":
             assumeThat(properties.keySet(),
                     contains("username", "creationDate"));
-
             currentAccountBuilder = Account.builder()
                     .userName(properties.get("username"))
-                    .creationDate(properties.get("creationDate"));
+                    .creationDate(LocalDateTime
+                            .parse(properties.get("creationDate")));
             break;
         case "Accounts":
             rel = getAccountsLink();
@@ -265,23 +269,34 @@ public class StepDefs {
 
     @Then("^the response will be an? \"([^\"]*)\" domain entity with$")
     public void the_response_will_be_an_domain_entity_with(final String type,
-            final Map<String, String> properties) throws Throwable {
+            final Map<String, String> expectedProperties) throws Throwable {
         the_response_will_be_an_domain_entity(type);
 
+        // TODO: better duck typing
         switch (type) {
         case "Account":
-            assertThat(properties.keySet(),
-                    contains("username", "creationDate"));
             final AccountProperties entityProperties = (AccountProperties) currentEntity
                     .getProperties();
-            assertThat(entityProperties.getUsername(),
-                    equalTo(properties.get("username")));
-            assertThat(entityProperties.getCreationDate(),
-                    equalTo(properties.get("creationDate")));
+            for (Entry<String, String> expectedProperty : expectedProperties
+                    .entrySet()) {
+                switch (expectedProperty.getKey()) {
+                case "username":
+                    assertThat(entityProperties.getUsername(),
+                            equalTo(expectedProperty.getValue()));
+                    break;
+                case "creationDate":
+                    assertThat(entityProperties.getCreationDate(),
+                            equalTo(expectedProperty.getValue()));
+                    break;
+                default:
+                    throw new PendingException("checking for property " + type
+                            + " has not been implemented");
+                }
+            }
             break;
         default:
             throw new PendingException("checking properties for a " + type
-                    + " has not been coded");
+                    + " has not been implemented");
         }
     }
 
@@ -350,5 +365,25 @@ public class StepDefs {
     @Given("^an \"([^\"]*)\" domain entity$")
     public void an_domain_entity(String entityName) throws Throwable {
         an_domain_entity_with(entityName, new HashMap<>());
+    }
+
+    @When("^the response entity's \"([^\"]*)\" action is called with$")
+    public void the_response_entity_s_action_is_called_with(
+            final String actionName, final Map<String, String> properties)
+                    throws Throwable {
+        assumeThat(properties.keySet(), contains("username"));
+        assumeThat(currentEntity, instanceOf(Accounts.class));
+        Accounts accounts = (Accounts) currentEntity;
+        CreatedEntity createdEntity = accounts
+                .createAccount(properties.get("username")).get();
+        currentEntity = createdEntity.resolve(Account.class);
+    }
+
+    @Then("^it's creation date will be today$")
+    public void it_s_creation_date_will_be_today() throws Throwable {
+
+        AccountProperties props = (AccountProperties) currentEntity
+                .getProperties();
+        assertThat(props.getCreationDate(), sameDay(LocalDateTime.now()));
     }
 }

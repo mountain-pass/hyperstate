@@ -6,6 +6,7 @@ import org.springframework.core.ParameterizedTypeReference;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import au.com.mountainpass.hyperstate.core.Address;
 import au.com.mountainpass.hyperstate.core.Titled;
 
 public abstract class Entity extends Titled {
@@ -32,5 +33,7 @@ public abstract class Entity extends Titled {
 
     @JsonIgnore
     public abstract LinkedEntity toLinkedEntity();
+
+    public abstract Address getAddress();
 
 }

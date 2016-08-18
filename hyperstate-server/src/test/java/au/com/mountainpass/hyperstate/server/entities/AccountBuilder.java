@@ -1,5 +1,6 @@
 package au.com.mountainpass.hyperstate.server.entities;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -11,7 +12,7 @@ public class AccountBuilder {
     /**
      * 
      */
-    private String creationDate;
+    private LocalDateTime creationDate;
     private String username;
     private boolean deletable = false;
     private boolean updateable = false;
@@ -39,7 +40,7 @@ public class AccountBuilder {
         return repository.save(entity);
     }
 
-    public AccountBuilder creationDate(String creationDate) {
+    public AccountBuilder creationDate(LocalDateTime creationDate) {
         this.creationDate = creationDate;
         return this;
     }

@@ -1,5 +1,6 @@
 package au.com.mountainpass.hyperstate.client.webdriver;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -81,6 +82,11 @@ public class WebDriverAddress implements Address {
 
     public WebElement getWebElement() {
         return this.element;
+    }
+
+    @Override
+    public URI getHref() {
+        throw new NotImplementedException("TODO");
     }
 
 }

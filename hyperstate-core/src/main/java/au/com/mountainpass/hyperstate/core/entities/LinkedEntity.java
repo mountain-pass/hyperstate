@@ -10,6 +10,7 @@ import org.springframework.core.ParameterizedTypeReference;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
+import au.com.mountainpass.hyperstate.core.Address;
 import au.com.mountainpass.hyperstate.core.Link;
 
 public class LinkedEntity extends Entity {
@@ -59,5 +60,10 @@ public class LinkedEntity extends Entity {
     @Override
     public LinkedEntity toLinkedEntity() {
         return this;
+    }
+
+    @Override
+    public Address getAddress() {
+        return link.getAddress();
     }
 }

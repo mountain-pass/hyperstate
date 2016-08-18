@@ -47,6 +47,8 @@ public class EntityWrapperProxyDeserializer extends DelegatingDeserializer {
             e.setClassLoader(this.getClass().getClassLoader());
             e.setSuperclass(result.getClass());
             e.setCallback(new MethodInterceptor() {
+                private Object original = result;
+
                 @SuppressWarnings("unchecked")
                 @Override
                 public Object intercept(final Object obj, final Method method,
@@ -62,7 +64,8 @@ public class EntityWrapperProxyDeserializer extends DelegatingDeserializer {
                             || method.getName().equals("getClasses")
                             || method.getName().equals("getLinks")
                             || method.getName().equals("getLink")) {
-                        return proxy.invokeSuper(obj, args);
+                        return proxy.invoke(original, args);
+                        // return proxy.invokeSuper(obj, args);
                     } else if (method.getName().equals("reload")) {
                         return ((EntityWrapper<?>) obj).getLink("self").get();
                     } else {
@@ -85,8 +88,7 @@ public class EntityWrapperProxyDeserializer extends DelegatingDeserializer {
                     }
                 }
             });
-            return e.create(new Class[] { result.getClass() },
-                    new Object[] { result });
+            return e.create();
         }
 
         return result;

@@ -37,7 +37,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.Action;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
-import au.com.mountainpass.hyperstate.core.JavaAddress;
 import au.com.mountainpass.hyperstate.core.Link;
 import au.com.mountainpass.hyperstate.core.MediaTypes;
 import au.com.mountainpass.hyperstate.core.Titled;
@@ -66,7 +65,7 @@ public abstract class HyperstateController {
     public void postConstructed() {
         objectMapper.addMixIn(Link.class, LinkSerialisationMixin.class);
         objectMapper.addMixIn(Titled.class, TitledSerialisationMixin.class);
-
+        objectMapper.findAndRegisterModules();
         onConstructed();
     }
 
@@ -254,7 +253,7 @@ public abstract class HyperstateController {
             "application/vnd.siren+json",
             "application/json" }, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @ResponseBody
-    public ResponseEntity<?> post(
+    public CompletableFuture<ResponseEntity<?>> post(
             @RequestParam final MultiValueMap<String, Object> allRequestParams,
             final HttpServletRequest request)
                     throws URISyntaxException, NoSuchMethodException,
@@ -263,28 +262,32 @@ public abstract class HyperstateController {
                     InterruptedException, ExecutionException {
         final String path = (String) request.getAttribute(
                 HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        final EntityWrapper<?> entity = getEntity(path).get();
-        if (entity == null) {
-            return ResponseEntity.notFound().build();
-        }
+        return getEntity(path).thenApply(entity -> {
+            if (entity == null) {
+                return ResponseEntity.notFound().build();
+            }
 
-        final Object actionName = allRequestParams.getFirst("action");
-        if (actionName == null) {
-            // todo add body with classes indicating what is missing
-            return ResponseEntity.badRequest().build();
-        }
-        final Action<?> action = entity.getAction(actionName.toString());
-        if (action == null) {
-            // todo add body with classes indicating what is missing
-            return ResponseEntity.badRequest().build();
-        }
-        // todo: post actions should have a link return value
-        // todo: automatically treat actions that return links as POST actions
-        final Entity result = (Entity) action
-                .invoke(allRequestParams.toSingleValueMap()).get();
+            final Object actionName = allRequestParams.getFirst("action");
+            if (actionName == null) {
+                // todo add body with classes indicating what is missing
+                return ResponseEntity.badRequest().build();
+            }
+            final Action<?> action = entity.getAction(actionName.toString());
+            if (action == null) {
+                // todo add body with classes indicating what is missing
+                return ResponseEntity.badRequest().build();
+            }
+            // todo: post actions should have a link return value
+            // todo: automatically treat actions that return links as POST
+            // actions
+            final CompletableFuture<Entity> futureResult = (CompletableFuture<Entity>) action
+                    .invoke(allRequestParams.toSingleValueMap());
 
-        return ResponseEntity
-                .created(new JavaAddress(resolver, entity).getHref()).build();
+            return ResponseEntity
+                    .created(futureResult.join().getAddress().getHref())
+                    .build();
+        });
+
     }
 
     @RequestMapping(value = "**", method = RequestMethod.PUT, produces = {

@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableSet;
 
 import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.Action;
+import au.com.mountainpass.hyperstate.core.Address;
 import au.com.mountainpass.hyperstate.core.EntityRelationship;
 import au.com.mountainpass.hyperstate.core.JavaAction;
 import au.com.mountainpass.hyperstate.core.JavaAddress;
@@ -210,6 +211,12 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
     @JsonIgnore
     public RepositoryResolver getResolver() {
         return this.resolver;
+    }
+
+    @Override
+    @JsonIgnore
+    public Address getAddress() {
+        return new JavaAddress(resolver, this);
     }
 
 }

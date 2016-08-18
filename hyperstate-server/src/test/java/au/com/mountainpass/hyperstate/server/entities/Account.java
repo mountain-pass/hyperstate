@@ -1,6 +1,6 @@
 package au.com.mountainpass.hyperstate.server.entities;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,7 @@ public class Account extends EntityWrapper<AccountProperties> {
     }
 
     private static AccountProperties createProperties(String username) {
-        return new AccountProperties(username, new Date().toString());
+        return new AccountProperties(username, LocalDateTime.now());
     }
 
 }

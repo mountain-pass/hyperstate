@@ -40,26 +40,25 @@ public class RestAddress implements Address {
 
     @Override
     public CompletableFuture<EntityWrapper<?>> get(
-            Map<String, Object> filteredParameters) {
+            Map<String, Object> parameters) {
         throw new NotImplementedException("TODO");
     }
 
     @Override
-    public CompletableFuture<Void> delete(
-            Map<String, Object> filteredParameters) {
-        return resolver.delete(this, filteredParameters);
+    public CompletableFuture<Void> delete(Map<String, Object> parameters) {
+        return resolver.delete(this, parameters);
     }
 
     @Override
     public CompletableFuture<CreatedEntity> create(
-            Map<String, Object> filteredParameters) {
-        throw new NotImplementedException("TODO");
+            Map<String, Object> parameters) {
+        return resolver.create(this, parameters);
     }
 
     @Override
     public CompletableFuture<UpdatedEntity> update(
-            Map<String, Object> filteredParameters) {
-        return resolver.update(this, filteredParameters);
+            Map<String, Object> parameters) {
+        return resolver.update(this, parameters);
     }
 
     @Override

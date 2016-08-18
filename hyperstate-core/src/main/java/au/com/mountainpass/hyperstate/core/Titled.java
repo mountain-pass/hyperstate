@@ -33,7 +33,9 @@ abstract public class Titled {
 
     public Titled(final String title, final String... natures) {
         this.title = title;
-        this.natures.addAll(Arrays.asList(natures));
+        if (natures != null) {
+            this.natures.addAll(Arrays.asList(natures));
+        }
     }
 
     /**

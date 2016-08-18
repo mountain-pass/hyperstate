@@ -84,7 +84,6 @@ Scenario: Update a domain entity
     | username     | nick       |
     | creationDate | 2016/01/15 |
 
-@tom
 Scenario: Expose single domain entity with create action
     Given an "Accounts" domain entity
     And it has a "createAccount" action
@@ -92,6 +91,16 @@ Scenario: Expose single domain entity with create action
     When request is made to "/accounts"
     Then the response will be an "Accounts" domain entity
     And it will have a "createAccount" action
-    And it will have no links apart from "self"
-    And it will have a self link referencing "/accounts"
-    
+
+
+@tom
+Scenario: Create a domain entity
+    Given an "Accounts" domain entity
+    And it has a "createAccount" action
+    And it is exposed at "/accounts"
+    When request is made to "/accounts" for an "au.com.mountainpass.hyperstate.server.entities.Accounts"
+    And the response entity's "createAccount" action is called with
+    | username | nick |
+    Then the response will be an "Account" domain entity with
+    | username     | nick       |
+    And it's creation date will be today    

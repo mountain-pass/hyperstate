@@ -1,6 +1,7 @@
 package au.com.mountainpass.hyperstate.server.entities;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ public class AccountProperties implements Serializable {
      */
     private static final long serialVersionUID = -5101362070340337389L;
 
-    private String creationDate;
+    private LocalDateTime creationDate;
 
     @JsonIgnore
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
@@ -24,12 +25,13 @@ public class AccountProperties implements Serializable {
     public AccountProperties() {
     }
 
-    public AccountProperties(final String username, final String creationDate) {
+    public AccountProperties(final String username,
+            final LocalDateTime creationDate) {
         this.username = username;
         this.creationDate = creationDate;
     }
 
-    public String getCreationDate() {
+    public LocalDateTime getCreationDate() {
         return this.creationDate;
     }
 

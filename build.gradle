@@ -533,7 +533,7 @@ project(":hyperstate-server"){
     compile('org.apache.httpcomponents:httpasyncclient:4.1.2')
     compile('commons-codec:commons-codec:1.10')
 
-    compile("org.webjars:bootstrap:3.3.7") // when updating, don't forget to update index.html
+    compile("org.webjars:bootstrap:3.3.7-1") // when updating, don't forget to update index.html
     compile("org.webjars:jquery:3.1.0") // when updating, don't forget to update index.html
     compile 'org.webjars.bower:angularjs:1.5.8' // when updating, don't forget to update index.html
 

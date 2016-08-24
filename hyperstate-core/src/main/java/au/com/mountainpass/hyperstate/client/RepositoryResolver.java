@@ -10,6 +10,7 @@ import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.JavaAddress;
 import au.com.mountainpass.hyperstate.core.Resolver;
 import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
+import au.com.mountainpass.hyperstate.core.entities.DeletedEntity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 import au.com.mountainpass.hyperstate.exceptions.EntityNotFoundException;
@@ -85,11 +86,11 @@ public class RepositoryResolver implements Resolver {
         });
     }
 
-    public EntityRepository getRepository() {
+    public EntityRepository getEntityRepository() {
         return repository;
     }
 
-    public CompletableFuture<Void> delete(EntityWrapper<?> entity) {
+    public CompletableFuture<DeletedEntity> delete(EntityWrapper<?> entity) {
         return repository.delete(entity);
     }
 

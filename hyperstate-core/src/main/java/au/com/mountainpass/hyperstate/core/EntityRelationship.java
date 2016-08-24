@@ -1,21 +1,24 @@
 package au.com.mountainpass.hyperstate.core;
 
+import java.util.concurrent.CompletableFuture;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 import au.com.mountainpass.hyperstate.core.entities.Entity;
+import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.LinkedEntity;
 
 public class EntityRelationship extends Relationship {
 
-    private Entity entity;
+    private Entity toEntity;
 
     protected EntityRelationship() {
     }
 
-    public EntityRelationship(final Entity entity, final String... rels) {
+    public EntityRelationship(final Entity toEntity, final String... rels) {
         super(rels);
-        this.entity = entity;
+        this.toEntity = toEntity;
     }
 
     /**
@@ -23,12 +26,17 @@ public class EntityRelationship extends Relationship {
      */
     @JsonIgnore
     public Entity getEntity() {
-        return entity;
+        return toEntity;
     }
 
     @JsonUnwrapped
     public LinkedEntity getEntityLink() {
-        return entity.toLinkedEntity();
+        return toEntity.toLinkedEntity();
+    }
+
+    public <K, T extends EntityWrapper<K>> CompletableFuture<T> resolve(
+            Class<T> type) {
+        return toEntity.resolve(type);
     }
 
 }

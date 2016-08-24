@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.AsyncRestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableSet;
 
 import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.client.RestTemplateResolver;
@@ -43,7 +45,7 @@ import au.com.mountainpass.hyperstate.core.Link;
 import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
 import au.com.mountainpass.hyperstate.core.Relationship;
 import au.com.mountainpass.hyperstate.core.Resolver;
-import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
+import au.com.mountainpass.hyperstate.core.entities.Entity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 import au.com.mountainpass.hyperstate.core.entities.VanillaEntity;
@@ -67,8 +69,6 @@ import cucumber.api.java.en.When;
 @WebIntegrationTest({ "server.port=0", "management.port=0" })
 public class StepDefs {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
-
     @Autowired
     private AsyncRestTemplate asyncRestTemplate;
 
@@ -77,12 +77,17 @@ public class StepDefs {
 
     private HyperstateController controller;
 
+    @Autowired
+    private HyperstateTestController testController;
+
     private AccountBuilder currentAccountBuilder;
 
     private EntityWrapper<?> currentEntity;
 
     @Autowired
     private Environment environment;
+
+    private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private ObjectMapper om;
@@ -93,6 +98,9 @@ public class StepDefs {
     @Autowired
     private EntityRepository repository;
 
+    @Autowired
+    private RepositoryResolver repositoryResovler;
+
     private Resolver resolver;
 
     @Value("${au.com.mountainpass.hyperstate.test.ssl.hostname}")
@@ -101,8 +109,21 @@ public class StepDefs {
     @Autowired(required = false)
     private WebDriver webDriver;
 
-    @Autowired
-    private RepositoryResolver repositoryResovler;
+    @Before
+    public void _before() {
+        final URI baseUri = getBaseUri();
+        final List<String> activeProfiles = Arrays
+                .asList(this.environment.getActiveProfiles());
+        if (activeProfiles.contains("integration")) {
+            resolver = new RestTemplateResolver(baseUri, om, asyncRestTemplate);
+        } else if (activeProfiles.contains("ui-integration")) {
+            resolver = new WebDriverResolver(baseUri, webDriver);
+        } else {
+            resolver = repositoryResovler;
+        }
+        repository.deleteAll();
+        testController.init();
+    }
 
     @Given("^a Hyperstate controller \"([^\"]*)\" at \"([^\"]*)\"$")
     public void a_Hyperstate_controller_at(final String beanName,
@@ -118,6 +139,11 @@ public class StepDefs {
         assumeThat(requestMapping, is(notNullValue()));
         assumeThat(requestMapping.value(), is(arrayContaining(path)));
 
+    }
+
+    @Given("^an \"([^\"]*)\" domain entity$")
+    public void an_domain_entity(String entityName) throws Throwable {
+        an_domain_entity_with(entityName, new HashMap<>());
     }
 
     @Given("^an \"([^\"]*)\" domain entity with$")
@@ -157,22 +183,28 @@ public class StepDefs {
         return rel;
     }
 
-    @Before
-    public void before() {
-        final URI baseUri = getBaseUri();
-        final List<String> activeProfiles = Arrays
-                .asList(this.environment.getActiveProfiles());
-        if (activeProfiles.contains("integration")) {
-            resolver = new RestTemplateResolver(baseUri, om, asyncRestTemplate);
-        } else if (activeProfiles.contains("ui-integration")) {
-            resolver = new WebDriverResolver(baseUri, webDriver);
-        } else {
-            resolver = repositoryResovler;
-        }
-    }
-
     public URI getBaseUri() {
         return URI.create("https://" + sslHostname + ":" + port);
+    }
+
+    @Given("^it has a \"([^\"]*)\" action$")
+    public void it_has_a_action(String actionName) throws Throwable {
+        switch (actionName) {
+        case "createAccount":
+        case "get":
+            Accounts accounts = getAccountsLink().get().getLink()
+                    .resolve(Accounts.class).get();
+            assumeThat(accounts.getAction(actionName), notNullValue());
+            break;
+        case "delete":
+            currentAccountBuilder.isDeletable(true);
+            break;
+        case "update":
+            currentAccountBuilder.isUpdatable(true);
+            break;
+        default:
+            throw new PendingException("TODO");
+        }
     }
 
     @Given("^it has no actions$")
@@ -197,6 +229,20 @@ public class StepDefs {
         }
     }
 
+    @Then("^it's creation date will be today$")
+    public void it_s_creation_date_will_be_today() throws Throwable {
+
+        AccountProperties props = (AccountProperties) currentEntity
+                .getProperties();
+        assertThat(props.getCreationDate(), sameDay(LocalDateTime.now()));
+    }
+
+    @Then("^it will have a \"([^\"]*)\" action$")
+    public void it_will_have_a_action(String actionName) throws Throwable {
+        Action<?> action = currentEntity.getAction(actionName);
+        assertThat(action, notNullValue());
+    }
+
     @Then("^it will have a self link referencing \"([^\"]*)\"$")
     public void it_will_have_a_self_link_referencing(final String path)
             throws Throwable {
@@ -206,7 +252,8 @@ public class StepDefs {
 
     @Then("^it will have no actions$")
     public void it_will_have_no_actions() throws Throwable {
-        assertThat(currentEntity.getActions(), empty());
+        ImmutableSet<Action<?>> actions = currentEntity.getActions();
+        assertThat(actions, empty());
     }
 
     @Then("^it will have no links apart from \"([^\"]*)\"$")
@@ -260,71 +307,6 @@ public class StepDefs {
         assertThat(match.isPresent(), is(equalTo(true)));
     }
 
-    @Then("^the response will be an? \"([^\"]*)\" domain entity$")
-    public void the_response_will_be_an_domain_entity(final String type)
-            throws Throwable {
-        final Set<String> natures = currentEntity.getClasses();
-        assertThat(natures, hasItem(type));
-    }
-
-    @Then("^the response will be an? \"([^\"]*)\" domain entity with$")
-    public void the_response_will_be_an_domain_entity_with(final String type,
-            final Map<String, String> expectedProperties) throws Throwable {
-        the_response_will_be_an_domain_entity(type);
-
-        // TODO: better duck typing
-        switch (type) {
-        case "Account":
-            final AccountProperties entityProperties = (AccountProperties) currentEntity
-                    .getProperties();
-            for (Entry<String, String> expectedProperty : expectedProperties
-                    .entrySet()) {
-                switch (expectedProperty.getKey()) {
-                case "username":
-                    assertThat(entityProperties.getUsername(),
-                            equalTo(expectedProperty.getValue()));
-                    break;
-                case "creationDate":
-                    assertThat(entityProperties.getCreationDate(), equalTo(
-                            LocalDateTime.parse(expectedProperty.getValue())));
-                    break;
-                default:
-                    throw new PendingException("checking for property " + type
-                            + " has not been implemented");
-                }
-            }
-            break;
-        default:
-            throw new PendingException("checking properties for a " + type
-                    + " has not been implemented");
-        }
-    }
-
-    @Given("^it has a \"([^\"]*)\" action$")
-    public void it_has_a_action(String actionName) throws Throwable {
-        switch (actionName) {
-        case "createAccount":
-            Accounts accounts = getAccountsLink().get().getLink()
-                    .resolve(Accounts.class).get();
-            assumeThat(accounts.getAction(actionName), notNullValue());
-            break;
-        case "delete":
-            currentAccountBuilder.isDeletable(true);
-            break;
-        case "update":
-            currentAccountBuilder.isUpdatable(true);
-            break;
-        default:
-            throw new PendingException("TODO");
-        }
-    }
-
-    @Then("^it will have a \"([^\"]*)\" action$")
-    public void it_will_have_a_action(String actionName) throws Throwable {
-        Action<?> action = currentEntity.getAction(actionName);
-        assertThat(action, notNullValue());
-    }
-
     @When("^the response entity is deleted$")
     public void the_response_entity_is_deleted() throws Throwable {
         assertTrue(currentEntity instanceof AccountWithDelete);
@@ -340,7 +322,79 @@ public class StepDefs {
         AccountWithUpdate account = (AccountWithUpdate) currentEntity;
         UpdatedEntity updatedEntity = account.update(properties.get("username"))
                 .get();
-        currentEntity = updatedEntity.resolve(AccountWithUpdate.class);
+        currentEntity = updatedEntity.resolve(AccountWithUpdate.class).get();
+    }
+
+    @When("^the response entity's \"([^\"]*)\" action is called for an \"([^\"]*)\" with$")
+    public void the_response_entity_s_action_is_called_for_an_with(
+            String actionName, String typeName,
+            final Map<String, Object> properties) throws Throwable {
+        @SuppressWarnings("unchecked")
+        final Class<? extends EntityWrapper<?>> type = (Class<? extends EntityWrapper<?>>) Class
+                .forName(typeName);
+        Entity result = currentEntity.getAction(actionName).invoke(properties)
+                .join();
+        currentEntity = result.resolve(type).join();
+    }
+
+    @When("^the response entity's \"([^\"]*)\" action is called with$")
+    public void the_response_entity_s_action_is_called_with(
+            final String actionName, final Map<String, Object> properties)
+                    throws Throwable {
+        Entity result = currentEntity.getAction(actionName).invoke(properties)
+                .join();
+        currentEntity = result.resolve(VanillaEntity.class).join();
+    }
+
+    @Then("^the response will be an? \"([^\"]*)\" domain entity$")
+    public void the_response_will_be_an_domain_entity(final String type)
+            throws Throwable {
+        final Set<String> natures = currentEntity.getClasses();
+        assertThat(natures, hasItem(type));
+    }
+
+    @Then("^the response will be an? \"([^\"]*)\" domain entity with$")
+    public void the_response_will_be_an_domain_entity_with(final String type,
+            final Map<String, String> expectedProperties) throws Throwable {
+        the_response_will_be_an_domain_entity(type);
+
+        // TODO: better duck typing
+        switch (type) {
+        case "Account":
+            if (currentEntity.getProperties() instanceof AccountProperties) {
+                final AccountProperties entityProperties = (AccountProperties) currentEntity
+                        .getProperties();
+                for (Entry<String, String> expectedProperty : expectedProperties
+                        .entrySet()) {
+                    switch (expectedProperty.getKey()) {
+                    case "username":
+                        assertThat(entityProperties.getUsername(),
+                                equalTo(expectedProperty.getValue()));
+                        break;
+                    case "creationDate":
+                        assertThat(entityProperties.getCreationDate(),
+                                equalTo(LocalDateTime
+                                        .parse(expectedProperty.getValue())));
+                        break;
+                    default:
+                        throw new PendingException("checking for property "
+                                + type + " has not been implemented");
+                    }
+                }
+            } else {
+                final Properties entityProperties = (Properties) currentEntity
+                        .getProperties();
+                for (Entry<String, String> expectedProperty : expectedProperties
+                        .entrySet()) {
+                    assertThat(entityProperties.get(expectedProperty.getKey()),
+                            equalTo(expectedProperty.getValue()));
+                }
+            }
+            break;
+        default:
+            throw new PendingException("checking properties for a " + type
+                    + " has not been implemented");
+        }
     }
 
     @Then("^there will no longer be an entity at \"([^\"]*)\"$")
@@ -360,30 +414,5 @@ public class StepDefs {
         } catch (ExecutionException ee) {
             throw ee.getCause();
         }
-    }
-
-    @Given("^an \"([^\"]*)\" domain entity$")
-    public void an_domain_entity(String entityName) throws Throwable {
-        an_domain_entity_with(entityName, new HashMap<>());
-    }
-
-    @When("^the response entity's \"([^\"]*)\" action is called with$")
-    public void the_response_entity_s_action_is_called_with(
-            final String actionName, final Map<String, String> properties)
-                    throws Throwable {
-        assumeThat(properties.keySet(), contains("username"));
-        assumeThat(currentEntity, instanceOf(Accounts.class));
-        Accounts accounts = (Accounts) currentEntity;
-        CreatedEntity createdEntity = accounts
-                .createAccount(properties.get("username")).get();
-        currentEntity = createdEntity.resolve(Account.class);
-    }
-
-    @Then("^it's creation date will be today$")
-    public void it_s_creation_date_will_be_today() throws Throwable {
-
-        AccountProperties props = (AccountProperties) currentEntity
-                .getProperties();
-        assertThat(props.getCreationDate(), sameDay(LocalDateTime.now()));
     }
 }

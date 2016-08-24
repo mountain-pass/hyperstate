@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
+import au.com.mountainpass.hyperstate.core.entities.DeletedEntity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 
@@ -27,6 +28,7 @@ public class JavaAddress implements Address {
         this.entity = entity;
     }
 
+    @Override
     @JsonProperty("href")
     public URI getHref() {
         if (entity == null) {
@@ -55,7 +57,7 @@ public class JavaAddress implements Address {
 
     @Override
     public String getPath() {
-        return entity.getId();
+        return entity.getPath();
     }
 
     @Override
@@ -65,7 +67,7 @@ public class JavaAddress implements Address {
     }
 
     @Override
-    public CompletableFuture<Void> delete(
+    public CompletableFuture<DeletedEntity> delete(
             Map<String, Object> filteredParameters) {
         throw new NotImplementedException("TODO");
     }

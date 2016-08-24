@@ -8,8 +8,9 @@ import org.springframework.http.HttpMethod;
 import au.com.mountainpass.hyperstate.core.Action;
 import au.com.mountainpass.hyperstate.core.Address;
 import au.com.mountainpass.hyperstate.core.Parameter;
+import au.com.mountainpass.hyperstate.core.entities.DeletedEntity;
 
-public class DeleteAction extends Action<Void> {
+public class DeleteAction extends Action<DeletedEntity> {
 
     public DeleteAction(final String name, final Address address,
             final Parameter[] fields) {
@@ -19,7 +20,7 @@ public class DeleteAction extends Action<Void> {
     // TODO: instead or returning void, return the entity with a "deleted" class
     // might not be able to do this if the entity has already been deleted.
     @Override
-    public CompletableFuture<Void> doInvoke(
+    public CompletableFuture<DeletedEntity> doInvoke(
             final Map<String, Object> filteredParameters) {
         return getAddress().delete(filteredParameters);
     }

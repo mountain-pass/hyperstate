@@ -24,10 +24,10 @@ public class EntityRelationshipBuilder {
     private String type;
 
     public EntityRelationship build() {
-        final LinkedEntity entity = new LinkedEntity(
+        final LinkedEntity toEntity = new LinkedEntity(
                 new Link(new RestAddress(resolver, address), title), title,
                 entityClasses);
-        return new EntityRelationship(entity, rels);
+        return new EntityRelationship(toEntity, rels);
     }
 
     @JsonProperty("href")

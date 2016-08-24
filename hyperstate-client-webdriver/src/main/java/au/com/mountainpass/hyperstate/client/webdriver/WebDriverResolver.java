@@ -23,6 +23,7 @@ import au.com.mountainpass.hyperstate.core.Address;
 import au.com.mountainpass.hyperstate.core.Link;
 import au.com.mountainpass.hyperstate.core.Resolver;
 import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
+import au.com.mountainpass.hyperstate.core.entities.DeletedEntity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 import au.com.mountainpass.hyperstate.exceptions.EntityNotFoundException;
@@ -104,10 +105,12 @@ public class WebDriverResolver implements Resolver {
         return proxy;
     }
 
-    public CompletableFuture<Void> delete(final WebDriverAddress address,
-            final Map<String, Object> filteredParameters) {
-        return CompletableFuture.runAsync(() -> {
-            submitForm(address, filteredParameters);
+    public CompletableFuture<DeletedEntity> delete(
+            final WebDriverAddress address,
+            final Map<String, Object> parameters) {
+        return CompletableFuture.supplyAsync(() -> {
+            submitForm(address, parameters);
+            return createProxy(DeletedEntity.class);
         });
     }
 

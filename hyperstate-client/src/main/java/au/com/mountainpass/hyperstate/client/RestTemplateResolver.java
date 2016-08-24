@@ -16,6 +16,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.client.AsyncRestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,6 +34,7 @@ import au.com.mountainpass.hyperstate.core.MediaTypes;
 import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
 import au.com.mountainpass.hyperstate.core.Resolver;
 import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
+import au.com.mountainpass.hyperstate.core.entities.DeletedEntity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 
@@ -77,7 +79,7 @@ public class RestTemplateResolver implements Resolver {
         });
     }
 
-    public CompletableFuture<Void> delete(final RestAddress address,
+    public CompletableFuture<DeletedEntity> delete(final RestAddress address,
             final Map<String, Object> filteredParameters) {
         final MultiValueMap<String, Object> body = new LinkedMultiValueMap<>(
                 filteredParameters.size());
@@ -89,9 +91,9 @@ public class RestTemplateResolver implements Resolver {
                 .accept(MediaTypes.SIREN_JSON)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(body);
 
-        final ListenableFuture<ResponseEntity<Void>> responseFuture = asyncRestTemplate
+        final ListenableFuture<ResponseEntity<DeletedEntity>> responseFuture = asyncRestTemplate
                 .exchange(address.getHref(), HttpMethod.DELETE, request,
-                        Void.class);
+                        DeletedEntity.class);
         return FutureConverter.convert(responseFuture)
                 .thenApplyAsync(response -> {
                     return response.getBody();
@@ -100,18 +102,19 @@ public class RestTemplateResolver implements Resolver {
 
     public <T> CompletableFuture<T> get(final RestAddress address,
             final Map<String, Object> filteredParameters, Class<T> type) {
-        final MultiValueMap<String, Object> body = new LinkedMultiValueMap<>(
+        final MultiValueMap<String, String> body = new LinkedMultiValueMap<>(
                 filteredParameters.size());
         for (final Entry<String, Object> entry : filteredParameters
                 .entrySet()) {
-            body.add(entry.getKey(), entry.getValue());
+            body.add(entry.getKey(), entry.getValue().toString());
         }
-        final RequestEntity<?> request = RequestEntity.put(address.getHref())
-                .accept(MediaTypes.SIREN_JSON)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(body);
+        URI uri = UriComponentsBuilder.fromHttpUrl(address.getHref().toString())
+                .queryParams(body).build().toUri();
+        final RequestEntity<?> request = RequestEntity.get(uri)
+                .accept(MediaTypes.SIREN_JSON).build();
 
         final ListenableFuture<ResponseEntity<T>> responseFuture = asyncRestTemplate
-                .exchange(address.getHref(), HttpMethod.GET, request, type);
+                .exchange(uri, HttpMethod.GET, request, type);
         return FutureConverter.convert(responseFuture)
                 .thenApplyAsync(response -> response.getBody());
 
@@ -128,9 +131,11 @@ public class RestTemplateResolver implements Resolver {
             final String path, final Class<E> type) {
         final URI rootUrl = getBaseUri().resolve(path);
 
-        return FutureConverter.convert(
-                asyncRestTemplate.exchange(rootUrl, HttpMethod.GET, null, type))
-                .thenApply(r -> {
+        final RequestEntity<?> request = RequestEntity.get(rootUrl)
+                .accept(MediaTypes.SIREN_JSON).build();
+
+        return FutureConverter.convert(asyncRestTemplate.exchange(rootUrl,
+                HttpMethod.GET, request, type)).thenApply(r -> {
                     return r.getBody();
                 });
     }

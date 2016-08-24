@@ -10,8 +10,10 @@ import org.springframework.core.ParameterizedTypeReference;
 
 import au.com.mountainpass.hyperstate.core.Address;
 import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
+import au.com.mountainpass.hyperstate.core.entities.DeletedEntity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
+import au.com.mountainpass.hyperstate.core.entities.VanillaEntity;
 
 public class WebDriverAddress implements Address {
 
@@ -42,11 +44,13 @@ public class WebDriverAddress implements Address {
     @Override
     public CompletableFuture<EntityWrapper<?>> get(
             Map<String, Object> parameters) {
-        throw new NotImplementedException("TODO");
+        return (CompletableFuture) resolver.get(this, parameters,
+                VanillaEntity.class);
     }
 
     @Override
-    public CompletableFuture<Void> delete(Map<String, Object> parameters) {
+    public CompletableFuture<DeletedEntity> delete(
+            Map<String, Object> parameters) {
         return resolver.delete(this, parameters);
     }
 

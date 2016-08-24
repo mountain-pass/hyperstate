@@ -93,20 +93,48 @@ Scenario: Expose single domain entity with create action
     And it will have a "createAccount" action
 
 
-@tom
 Scenario: Create a domain entity
     Given an "Accounts" domain entity
     And it has a "createAccount" action
     And it is exposed at "/accounts"
     When request is made to "/accounts" for an "au.com.mountainpass.hyperstate.server.entities.Accounts"
-    And the response entity's "createAccount" action is called with
+    And the response entity's "createAccount" action is called for an "au.com.mountainpass.hyperstate.server.entities.Account" with
     | username | nick |
     Then the response will be an "Account" domain entity with
     | username     | nick       |
     And it's creation date will be today    
+
+Scenario: Expose single domain entity with get action
+    Given an "Accounts" domain entity
+    And it has a "get" action
+    And it is exposed at "/accounts"
+    When request is made to "/accounts"
+    Then the response will be an "Accounts" domain entity
+    And it will have a "get" action
+
+@tom
+Scenario: search for a domain entity
+    Given an "Accounts" domain entity
+    And it has a "get" action
+    And it is exposed at "/accounts"
+    And an "Account" domain entity with
+    | username     | tom        |
+    | creationDate | 2016-01-15T12:00:00 |
+    And it is exposed at "/accounts/testAccount"
+    And an "Account" domain entity with
+    | username     | nick        |
+    | creationDate | 2016-01-15T12:00:00 |
+    And it is exposed at "/accounts/testAccount2"
+    When request is made to "/accounts" for an "au.com.mountainpass.hyperstate.server.entities.Accounts"
+    And the response entity's "get" action is called for an "au.com.mountainpass.hyperstate.server.entities.Account" with
+    | username | nick |
+    Then the response will be an "Account" domain entity with
+    | username     | nick       |
+    | creationDate | 2016-01-15T12:00:00 |
+
+  
     
-    
-# todo: test with a get action
+# todo: test with a get action returning a collection
 # todo: test with embedded entities (including rel check)
 # todo: test that tries to remotely execute an unexposed method
 # todo: test that validates the mediatype serializer

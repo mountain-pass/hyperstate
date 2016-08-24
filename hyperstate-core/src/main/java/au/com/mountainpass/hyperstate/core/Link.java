@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
+import au.com.mountainpass.hyperstate.core.entities.DeletedEntity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 
@@ -23,7 +24,8 @@ public class Link extends Titled {
     private MediaType representationFormat = MediaTypes.SIREN_JSON;
     private Address address;
 
-    public Link(Address address, @JsonProperty("title") final String title,
+    public Link(@JsonProperty("href") Address address,
+            @JsonProperty("title") final String title,
             @JsonProperty("class") final String... classes) {
         super(title, classes);
         this.address = address;
@@ -62,7 +64,7 @@ public class Link extends Titled {
         return address.get(filteredParameters);
     }
 
-    public CompletableFuture<Void> delete(
+    public CompletableFuture<DeletedEntity> delete(
             Map<String, Object> filteredParameters) {
         return address.delete(filteredParameters);
 
@@ -82,6 +84,7 @@ public class Link extends Titled {
         return address.get();
     }
 
+    @JsonIgnore
     public <T extends EntityWrapper<?>> CompletableFuture<T> get(
             Class<T> type) {
         return address.get(type);

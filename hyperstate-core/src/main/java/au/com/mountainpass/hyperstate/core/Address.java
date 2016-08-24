@@ -9,6 +9,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
+import au.com.mountainpass.hyperstate.core.entities.DeletedEntity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 
@@ -24,7 +25,7 @@ public interface Address {
     public CompletableFuture<EntityWrapper<?>> get(
             Map<String, Object> filteredParameters);
 
-    public CompletableFuture<Void> delete(
+    public CompletableFuture<DeletedEntity> delete(
             Map<String, Object> filteredParameters);
 
     public CompletableFuture<CreatedEntity> create(

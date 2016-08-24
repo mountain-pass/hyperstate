@@ -1,23 +1,16 @@
 package au.com.mountainpass.hyperstate.core.entities;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.hateoas.Identifiable;
 import org.springframework.http.HttpMethod;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -34,17 +27,16 @@ import au.com.mountainpass.hyperstate.core.JavaAction;
 import au.com.mountainpass.hyperstate.core.JavaAddress;
 import au.com.mountainpass.hyperstate.core.Link;
 import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
+import au.com.mountainpass.hyperstate.core.Parameter;
 import au.com.mountainpass.hyperstate.core.Relationship;
 
 @JsonPropertyOrder({ "class", "properties", "entities", "actions", "links",
         "title" })
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public class EntityWrapper<T> extends Entity implements Identifiable<String> {
+public class EntityWrapper<T> extends Entity {
     private static final int PAGE_SIZE = 10;
 
     private Map<String, Action<?>> actions = new HashMap<>();
-
-    private Collection<EntityRelationship> entities = null;
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
@@ -56,6 +48,8 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
     T properties;
 
     private RepositoryResolver resolver;
+
+    private Set<EntityRelationship> entityRelationships = new HashSet<>();
 
     protected EntityWrapper(final RepositoryResolver resolver,
             final String path, final T properties, final String title,
@@ -71,11 +65,12 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
         for (final Method method : methods) {
             final HttpMethod httpMethod = JavaAction
                     .determineMethodNature(method);
-            if (httpMethod != null) {
+            boolean formTypes = Parameter.hasFormTypes(method);
+            if (formTypes && httpMethod != null) {
                 switch (httpMethod) {
                 case DELETE:
-                    actions.put(method.getName(),
-                            new JavaAction<Void>(resolver, this, method));
+                    actions.put(method.getName(), new JavaAction<DeletedEntity>(
+                            resolver, this, method));
                     break;
                 case POST:
                     actions.put(method.getName(), new JavaAction<CreatedEntity>(
@@ -113,37 +108,9 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
         return ImmutableSet.copyOf(actions.values());
     }
 
-    public CompletableFuture<Collection<EntityRelationship>> getEntities() {
-        return getEntities(0);
-    }
-
-    public CompletableFuture<Collection<EntityRelationship>> getEntities(
-            final int page) {
-        if (entities != null) {
-            return CompletableFuture.supplyAsync(() -> entities);
-        }
-        if (resolver != null) {
-            return resolver.getRepository().findChildren(this)
-                    .thenApplyAsync(results -> {
-                        return results.skip(page * PAGE_SIZE).limit(PAGE_SIZE)
-                                .collect(Collectors.toList());
-                    });
-        }
-        final List<EntityRelationship> rval = new ArrayList<>();
-        return CompletableFuture.supplyAsync(() -> rval);
-    }
-
     @JsonProperty("entities")
-    private Collection<EntityRelationship> getEntitiesAndJoin()
-            throws IllegalAccessException, IllegalArgumentException,
-            InvocationTargetException, URISyntaxException {
-        return getEntities().join();
-    }
-
-    @Override
-    @JsonIgnore
-    public String getId() {
-        return this.path;
+    public ImmutableSet<EntityRelationship> getEntities() {
+        return ImmutableSet.copyOf(entityRelationships);
     }
 
     public Link getLink(final String rel) {
@@ -170,8 +137,12 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
     }
 
     @Override
-    public <K, L extends EntityWrapper<K>> L resolve(final Class<L> type) {
-        return (L) this;
+    public <L extends EntityWrapper<?>> CompletableFuture<L> resolve(
+            final Class<L> type) {
+        return CompletableFuture.supplyAsync(() -> {
+            return (L) this;
+        });
+
     }
 
     @Override
@@ -187,9 +158,17 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
 
     }
 
-    public void setEntities(
-            final Collection<EntityRelationship> entityRelationships) {
-        this.entities = entityRelationships;
+    public void setEntities(final EntityRelationship[] entities) {
+        for (final EntityRelationship entity : entities) {
+            this.entityRelationships.add(entity);
+        }
+
+    }
+
+    public CompletableFuture<EntityWrapper<T>> addEntity(
+            final EntityRelationship entityRelationship) {
+        this.entityRelationships.add(entityRelationship);
+        return resolver.getEntityRepository().save(this);
     }
 
     @Override
@@ -208,6 +187,10 @@ public class EntityWrapper<T> extends Entity implements Identifiable<String> {
     @JsonIgnore
     public Address getAddress() {
         return new JavaAddress(resolver, this);
+    }
+
+    public String getPath() {
+        return path;
     }
 
 }

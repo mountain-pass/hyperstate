@@ -5,7 +5,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import au.com.mountainpass.hyperstate.client.RepositoryResolver;
+import au.com.mountainpass.hyperstate.core.EntityRelationship;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
+import au.com.mountainpass.hyperstate.core.Relationship;
 
 public class AccountBuilder {
 
@@ -37,6 +39,10 @@ public class AccountBuilder {
         } else {
             entity = new Account(resolver, properties, path, "The Account");
         }
+        Accounts accounts = resolver.get("/accounts", Accounts.class).get();
+        accounts.addEntity(
+                new EntityRelationship(entity, Relationship.ITEM));
+
         return repository.save(entity);
     }
 

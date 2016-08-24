@@ -24,12 +24,14 @@ public class HyperstateTestController extends HyperstateController {
 
     @Override
     protected void onConstructed() {
+        init();
+    }
+
+    public void init() {
         super.getObjectMapper().addMixIn(AccountProperties.class,
                 AccountPropertiesMixin.class);
 
         final HyperstateTestRootEntity root = new HyperstateTestRootEntity(
                 resolver, this.getClass());
-
     }
-
 }

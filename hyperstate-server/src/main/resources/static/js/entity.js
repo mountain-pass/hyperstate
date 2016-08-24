@@ -50,6 +50,8 @@ app.config(function($locationProvider, $httpProvider) {
 
 app.controller('EntityController', function($scope, $http, $location, $window, $rootScope) {
     var controller = this;
+    
+    // TODO: fix app URL. It's only correct when you enter the page from the base URL
     $rootScope.appUrl = $window.location.href
     $rootScope.appName = "Hyperstate Tester"
 
@@ -100,13 +102,22 @@ app.controller('EntityController', function($scope, $http, $location, $window, $
     controller.processForm = function(form) {
         console.log("processForm", form, new Date());
         var action = form.action;
-        $http({
-            method : action.method || "GET",
-            url : action.href,
-            data : $.param(action.fields), // pass in data as strings
-            headers : {
+        var method = action.method || "GET";
+        var href = action.href;
+        var data = $.param(action.fields);
+        var headers = {
                 'Content-Type' : action.type || "application/x-www-form-urlencoded"
-            }
+        }
+        if( method === "GET" ) {
+            href = href + "?" + data;
+            data = "";
+            headers = {};
+        }
+        $http({
+            method : method,
+            url : href,
+            data : data, // pass in data as strings
+            headers : headers
         }).then(controller.successCallback);
         return false;
     };

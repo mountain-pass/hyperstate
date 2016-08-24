@@ -106,13 +106,16 @@ class WebDriverEntityInterceptor<E> implements MethodInterceptor {
                 .collect(Collectors.toSet()));
     }
 
-    private Object getClasses() {
+    private ImmutableSet<String> getClasses() {
         waitTillLoaded(5);
 
         final HashSet<String> rval = new HashSet<String>(Arrays
                 .asList(resolver.getWebDriver().findElement(By.tagName("html"))
                         .getAttribute("class").split("\\s+")));
-        return rval;
+        // TODO prefix "status" to avoid name conflicts
+        return ImmutableSet.copyOf(
+                rval.stream().filter(entry -> !entry.startsWith("status"))
+                        .collect(Collectors.toSet()));
     }
 
     private NavigationalRelationship getNavigationalRelationship(
@@ -137,6 +140,10 @@ class WebDriverEntityInterceptor<E> implements MethodInterceptor {
             resolver.getWebDriver()
                     .get(resolver.getWebDriver().getCurrentUrl());
             return resolver.createProxy((Class<E>) args[0]);
+        } else if (method.getName().equals("resolve")) {
+            return CompletableFuture.supplyAsync(() -> {
+                return resolver.createProxy((Class<?>) args[0]);
+            });
         } else if (method.getName().equals("getEntities")) {
             final List<WebElement> entities = resolver.getWebDriver()
                     .findElements(By.cssSelector("#entities > div.row > a"));
@@ -172,10 +179,17 @@ class WebDriverEntityInterceptor<E> implements MethodInterceptor {
                         final Object[] propertiesMethodArgs,
                         final MethodProxy propertiesMethodProxy)
                                 throws Throwable {
-                    String key = propertiesMethod.getName()
-                            .replaceFirst("^get", "").replaceFirst("^is", "");
-                    key = "property:" + key.substring(0, 1).toLowerCase()
-                            + key.substring(1);
+                    String key = propertiesMethod.getName();
+                    if ("get".equals(key)) {
+                        key = propertiesMethodArgs[0].toString();
+                    } else {
+                        key = key.replaceFirst("^get", "").replaceFirst("^is",
+                                "");
+                        key = key.substring(0, 1).toLowerCase()
+                                + key.substring(1);
+                    }
+                    key = "property:" + key;
+
                     final String value = WebDriverEntityInterceptor.this.resolver
                             .getWebDriver().findElement(By.id(key)).getText();
                     if (propertiesMethod.getReturnType()

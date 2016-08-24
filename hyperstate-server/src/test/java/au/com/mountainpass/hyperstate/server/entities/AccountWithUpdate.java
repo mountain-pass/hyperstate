@@ -19,7 +19,7 @@ public class AccountWithUpdate extends Account {
     public CompletableFuture<UpdatedEntity> update(String username) {
         return CompletableFuture.supplyAsync(() -> {
             this.getProperties().setUsername(username);
-            getResolver().getRepository().save(this);
+            getResolver().getEntityRepository().save(this);
             return new UpdatedEntity(this);
         });
     }

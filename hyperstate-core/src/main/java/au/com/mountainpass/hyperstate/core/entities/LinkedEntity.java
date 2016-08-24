@@ -1,6 +1,7 @@
 package au.com.mountainpass.hyperstate.core.entities;
 
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang3.NotImplementedException;
@@ -36,9 +37,9 @@ public class LinkedEntity extends Entity {
     }
 
     @Override
-    public <K, T extends EntityWrapper<K>> T resolve(final Class<T> type)
-            throws InterruptedException, ExecutionException {
-        return link.resolve(type).get();
+    public <T extends EntityWrapper<?>> CompletableFuture<T> resolve(
+            final Class<T> type) {
+        return link.resolve(type);
     }
 
     @Override

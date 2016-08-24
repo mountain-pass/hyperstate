@@ -11,11 +11,14 @@ import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.HttpMethod;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Maps;
+
+import au.com.mountainpass.hyperstate.core.entities.Entity;
 
 /**
  * Actions represent available behaviours an entity exposes.
@@ -24,7 +27,7 @@ import com.google.common.collect.Maps;
  *            the type returned by invoking the action
  */
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public abstract class Action<T> extends Titled {
+public abstract class Action<T extends Entity> extends Titled {
 
     private String name;
 
@@ -63,6 +66,7 @@ public abstract class Action<T> extends Titled {
     @JsonProperty("method")
     public abstract HttpMethod getNature();
 
+    @JsonIgnore
     public Set<String> getParameterKeys() {
         final Set<String> rval = new HashSet<>();
         for (final Parameter param : getParameters()) {

@@ -142,7 +142,15 @@ public abstract class HyperstateController {
             if (entity == null) {
                 return ResponseEntity.notFound().build();
             } else {
-                return ResponseEntity.ok(entity);
+                if (allRequestParams.containsKey("action")) {
+                    return ResponseEntity
+                            .ok(entity
+                                    .getAction(allRequestParams.get("action")
+                                            .toString())
+                            .invoke(allRequestParams).join());
+                } else {
+                    return ResponseEntity.ok(entity);
+                }
             }
         });
     }
@@ -152,17 +160,15 @@ public abstract class HyperstateController {
             final HttpServletRequest request) {
         String url = (String) request.getAttribute(
                 HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        if (!allRequestParams.isEmpty()) {
-            url += "?" + request.getQueryString();
-        }
+        // if (!allRequestParams.isEmpty()) {
+        // url += "?" + request.getQueryString();
+        // }
         CompletableFuture<EntityWrapper<?>> entityFuture = getEntity(url);
         return entityFuture;
     }
 
     protected CompletableFuture<EntityWrapper<?>> getEntity(
             final String identifier) {
-        final RequestMapping requestMapping = AnnotationUtils
-                .findAnnotation(this.getClass(), RequestMapping.class);
         return repository.findOne(identifier);
     }
 

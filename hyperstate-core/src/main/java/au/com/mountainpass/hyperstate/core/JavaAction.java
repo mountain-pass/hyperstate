@@ -16,10 +16,12 @@ import org.springframework.http.HttpMethod;
 import au.com.mountainpass.hyperstate.annotations.PresentationType;
 import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
+import au.com.mountainpass.hyperstate.core.entities.DeletedEntity;
+import au.com.mountainpass.hyperstate.core.entities.Entity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 
-public class JavaAction<T> extends Action<T> {
+public class JavaAction<T extends Entity> extends Action<T> {
 
     public static HttpMethod determineMethodNature(final Method method) {
         final Type type = method.getGenericReturnType();
@@ -35,7 +37,7 @@ public class JavaAction<T> extends Action<T> {
                 if (typeParams.length == 1) {
                     final Type typeParam = typeParams[0];
                     if (Class.class.isAssignableFrom(typeParam.getClass())
-                            && Void.class
+                            && DeletedEntity.class
                                     .isAssignableFrom((Class<?>) typeParam)) {
                         return HttpMethod.DELETE;
                     } else
@@ -67,6 +69,7 @@ public class JavaAction<T> extends Action<T> {
 
         final List<au.com.mountainpass.hyperstate.core.Parameter> rval = new ArrayList<>();
         for (int i = 0; i < params.size(); ++i) {
+            // todo add type support here
             rval.add(new au.com.mountainpass.hyperstate.core.Parameter(
                     params.get(i).getName()));
         }

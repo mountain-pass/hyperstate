@@ -470,6 +470,12 @@ tasks.getByName("githubRelease") {
 closeAndPromoteRepository.finalizedBy githubRelease
 
 
+versioneye {
+  includeSubProjects = true
+  dependencies = transitive
+}
+
+
 project(":hyperstate-core"){
   archivesBaseName = "hyperstate-core"
   

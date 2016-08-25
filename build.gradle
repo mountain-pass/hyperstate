@@ -470,10 +470,11 @@ tasks.getByName("githubRelease") {
 closeAndPromoteRepository.finalizedBy githubRelease
 
 
-versioneye {
-  includeSubProjects = true
-  dependencies = transitive
-}
+//versioneye {
+//  includeSubProjects = true
+  // need to test the following option
+  //dependencies = transitive
+//}
 
 
 project(":hyperstate-core"){

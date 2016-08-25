@@ -405,7 +405,7 @@ public class StepDefs {
             resolver.get(path, VanillaEntity.class).handle((entity, ee) -> {
                 assertThat(entity, nullValue());
                 assertThat(ee, notNullValue());
-                LOGGER.error("Exception resolving entity", ee.getCause());
+                LOGGER.debug("Exception resolving entity", ee.getCause());
                 assertThat(ee.getCause(),
                         instanceOf(EntityNotFoundException.class));
                 return entity;

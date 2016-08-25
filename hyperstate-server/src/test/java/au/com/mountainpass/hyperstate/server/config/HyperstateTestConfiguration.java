@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
 import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
@@ -30,4 +31,13 @@ public class HyperstateTestConfiguration {
         return new RepositoryResolver(repository);
     }
 
+    @Bean
+    public CommonsRequestLoggingFilter logFilter() {
+        CommonsRequestLoggingFilter filter = new CommonsRequestLoggingFilter();
+        filter.setIncludeQueryString(true);
+        filter.setIncludeHeaders(true);
+        filter.setIncludePayload(true);
+        filter.setMaxPayloadLength(5120);
+        return filter;
+    }
 }

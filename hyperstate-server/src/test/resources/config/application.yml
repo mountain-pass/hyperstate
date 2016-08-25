@@ -16,9 +16,11 @@ security:
     
     
 
-logging:
-    level.org.apache.http.wire: 'DEBUG'
-    level.au.com.mountainpass.hyperstate: 'DEBUG'
+logging.level:
+    org.apache.http.wire: DEBUG
+    au.com.mountainpass.hyperstate: DEBUG
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+    au.com.mountainpass.hyperstate.server.InMemoryEntityRepository: DEBUG
     
 server.tomcat.access-log-enabled: true
 

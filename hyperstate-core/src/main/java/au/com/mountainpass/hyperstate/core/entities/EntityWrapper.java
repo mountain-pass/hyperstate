@@ -19,10 +19,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.google.common.collect.ImmutableSet;
 
-import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.Action;
 import au.com.mountainpass.hyperstate.core.Address;
 import au.com.mountainpass.hyperstate.core.EntityRelationship;
+import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.JavaAction;
 import au.com.mountainpass.hyperstate.core.JavaAddress;
 import au.com.mountainpass.hyperstate.core.Link;
@@ -47,19 +47,19 @@ public class EntityWrapper<T> extends Entity {
 
     T properties;
 
-    private RepositoryResolver resolver;
+    private EntityRepository repository;
 
     private Set<EntityRelationship> entityRelationships = new HashSet<>();
 
-    protected EntityWrapper(final RepositoryResolver resolver,
+    protected EntityWrapper(final EntityRepository repository,
             final String path, final T properties, final String title,
             final String... classes) {
         super(title, classes);
-        this.resolver = resolver;
+        this.repository = repository;
         this.properties = properties;
         this.path = path;
         add(new NavigationalRelationship(
-                new Link(new JavaAddress(resolver, this), title),
+                new Link(new JavaAddress(repository, this), title),
                 Relationship.SELF));
         final Method[] methods = this.getClass().getMethods();
         for (final Method method : methods) {
@@ -70,19 +70,19 @@ public class EntityWrapper<T> extends Entity {
                 switch (httpMethod) {
                 case DELETE:
                     actions.put(method.getName(), new JavaAction<DeletedEntity>(
-                            resolver, this, method));
+                            repository, this, method));
                     break;
                 case POST:
                     actions.put(method.getName(), new JavaAction<CreatedEntity>(
-                            resolver, this, method));
+                            repository, this, method));
                     break;
                 case PUT:
                     actions.put(method.getName(), new JavaAction<UpdatedEntity>(
-                            resolver, this, method));
+                            repository, this, method));
                     break;
                 case GET:
                     actions.put(method.getName(),
-                            new JavaAction<EntityWrapper<?>>(resolver, this,
+                            new JavaAction<EntityWrapper<?>>(repository, this,
                                     method));
                     break;
                 default:
@@ -168,7 +168,7 @@ public class EntityWrapper<T> extends Entity {
     public CompletableFuture<EntityWrapper<T>> addEntity(
             final EntityRelationship entityRelationship) {
         this.entityRelationships.add(entityRelationship);
-        return resolver.getEntityRepository().save(this);
+        return repository.save(this);
     }
 
     @Override
@@ -178,18 +178,25 @@ public class EntityWrapper<T> extends Entity {
         return linkedEntity;
     }
 
+    @Override
     @JsonIgnore
-    public RepositoryResolver getResolver() {
-        return this.resolver;
+    public Address getAddress() {
+        return new JavaAddress(repository, this);
+    }
+
+    @JsonIgnore
+    public String getPath() {
+        return path;
+    }
+
+    @JsonIgnore
+    public EntityRepository getRepository() {
+        return this.repository;
     }
 
     @Override
     @JsonIgnore
-    public Address getAddress() {
-        return new JavaAddress(resolver, this);
-    }
-
-    public String getPath() {
+    public String getId() {
         return path;
     }
 

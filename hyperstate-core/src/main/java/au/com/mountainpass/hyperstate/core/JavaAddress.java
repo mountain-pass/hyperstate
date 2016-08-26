@@ -10,38 +10,37 @@ import org.springframework.hateoas.mvc.BasicLinkBuilder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
 import au.com.mountainpass.hyperstate.core.entities.DeletedEntity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
+import au.com.mountainpass.hyperstate.exceptions.EntityNotFoundException;
 
 public class JavaAddress implements Address {
 
-    private RepositoryResolver resolver;
+    private EntityRepository repository;
 
-    // TODO: use an entity path, here rather than the entity itself
-    private EntityWrapper<?> entity;
+    private String path;
 
-    public JavaAddress(RepositoryResolver resolver, EntityWrapper<?> entity) {
-        this.resolver = resolver;
-        this.entity = entity;
+    public JavaAddress(EntityRepository repository, EntityWrapper<?> entity) {
+        this.repository = repository;
+        this.path = entity.getId();
     }
 
     @Override
     @JsonProperty("href")
     public URI getHref() {
-        if (entity == null) {
+        if (path == null) {
             return null;
         }
         BasicLinkBuilder linkToCurrentMapping = BasicLinkBuilder
                 .linkToCurrentMapping();
-        BasicLinkBuilder slash = linkToCurrentMapping.slash(entity);
-        URI uri = slash.toUri();
-        if ("/".equals(entity.getId())) {
+        URI uri = linkToCurrentMapping.toUri();
+        if ("/".equals(path)) {
             return URI.create(uri.toString() + "/");
+        } else {
+            return uri.resolve(path);
         }
-        return uri;
     }
 
     @Override
@@ -57,7 +56,7 @@ public class JavaAddress implements Address {
 
     @Override
     public String getPath() {
-        return entity.getPath();
+        return path;
     }
 
     @Override
@@ -86,13 +85,25 @@ public class JavaAddress implements Address {
 
     @Override
     public CompletableFuture<EntityWrapper<?>> get() {
-        return resolver.get(this);
+        return repository.findOne(this.getPath()).thenApply(entity -> {
+            if (entity == null) {
+                throw new EntityNotFoundException();
+            } else {
+                return entity;
+            }
+        });
     }
 
     @Override
     public <T extends EntityWrapper<?>> CompletableFuture<T> get(
             Class<T> type) {
-        return resolver.get(this, type);
+        return repository.findOne(this.getPath()).thenApply(entity -> {
+            if (entity == null) {
+                throw new EntityNotFoundException();
+            } else {
+                return (T) entity;
+            }
+        });
     }
 
     @Override

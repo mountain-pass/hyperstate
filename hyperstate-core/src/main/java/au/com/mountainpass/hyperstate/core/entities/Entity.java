@@ -34,10 +34,4 @@ public abstract class Entity extends Titled implements Identifiable<String> {
 
     public abstract Address getAddress();
 
-    @Override
-    @JsonIgnore
-    public String getId() {
-        return getAddress().getPath();
-    }
-
 }

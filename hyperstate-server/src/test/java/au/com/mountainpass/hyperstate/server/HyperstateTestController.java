@@ -3,7 +3,6 @@ package au.com.mountainpass.hyperstate.server;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.server.entities.AccountProperties;
 import au.com.mountainpass.hyperstate.server.serialization.mixins.AccountPropertiesMixin;
@@ -13,9 +12,6 @@ public class HyperstateTestController extends HyperstateController {
 
     @Autowired
     private EntityRepository repository;
-
-    @Autowired
-    private RepositoryResolver resolver;
 
     @Override
     protected void onConstructed() {
@@ -27,6 +23,6 @@ public class HyperstateTestController extends HyperstateController {
                 AccountPropertiesMixin.class);
 
         final HyperstateTestRootEntity root = new HyperstateTestRootEntity(
-                resolver, this.getClass());
+                repository, this.getClass());
     }
 }

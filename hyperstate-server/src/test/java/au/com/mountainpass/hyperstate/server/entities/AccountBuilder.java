@@ -31,17 +31,16 @@ public class AccountBuilder {
 
         Account entity;
         if (deletable) {
-            entity = new AccountWithDelete(resolver, properties, path,
+            entity = new AccountWithDelete(repository, properties, path,
                     "The Account");
         } else if (updateable) {
-            entity = new AccountWithUpdate(resolver, properties, path,
+            entity = new AccountWithUpdate(repository, properties, path,
                     "The Account");
         } else {
-            entity = new Account(resolver, properties, path, "The Account");
+            entity = new Account(repository, properties, path, "The Account");
         }
         Accounts accounts = resolver.get("/accounts", Accounts.class).get();
-        accounts.addEntity(
-                new EntityRelationship(entity, Relationship.ITEM));
+        accounts.addEntity(new EntityRelationship(entity, Relationship.ITEM));
 
         return repository.save(entity);
     }

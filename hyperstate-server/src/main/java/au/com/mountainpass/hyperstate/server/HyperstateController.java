@@ -13,6 +13,7 @@ import javax.annotation.PostConstruct;
 import javax.script.ScriptException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,11 +147,14 @@ public abstract class HyperstateController {
                 return ResponseEntity.notFound().build();
             } else {
                 if (allRequestParams.containsKey("action")) {
-                    return ResponseEntity
-                            .ok(entity
-                                    .getAction(allRequestParams.get("action")
-                                            .toString())
-                            .invoke(allRequestParams).join());
+                    Action<?> action = entity.getAction(
+                            allRequestParams.get("action").toString());
+                    if (action != null) {
+                        return ResponseEntity
+                                .ok(action.invoke(allRequestParams).join());
+                    } else {
+                        throw new NotImplementedException("TODO");
+                    }
                 } else {
                     return ResponseEntity.ok(entity);
                 }

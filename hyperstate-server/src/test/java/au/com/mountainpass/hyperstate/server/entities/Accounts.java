@@ -5,8 +5,8 @@ import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import au.com.mountainpass.hyperstate.client.RepositoryResolver;
 import au.com.mountainpass.hyperstate.core.EntityRelationship;
+import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.Relationship;
 import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
@@ -18,18 +18,17 @@ public class Accounts extends EntityWrapper<Void> {
         super((Void) null);
     }
 
-    public Accounts(final RepositoryResolver resolver, final String path) {
-        super(resolver, path, (Void) null, "Accounts", "Accounts");
+    public Accounts(final EntityRepository repository, final String path) {
+        super(repository, path, (Void) null, "Accounts", "Accounts");
     }
 
     public CompletableFuture<CreatedEntity> createAccount(String username) {
         return CompletableFuture.supplyAsync(() -> {
-            Account account = new Account(getResolver(), getId(), username);
+            Account account = new Account(getRepository(), getId(), username);
             this.addEntity(new EntityRelationship(account, Relationship.ITEM));
 
-            getResolver().getEntityRepository().save(account)
-                    .thenCompose(saved -> {
-                return getResolver().getEntityRepository().save(this);
+            getRepository().save(account).thenCompose(saved -> {
+                return getRepository().save(this);
             });
 
             // note: returns before save is complete

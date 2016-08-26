@@ -58,4 +58,9 @@ public class LinkedEntity extends Entity {
     public Address getAddress() {
         return link.getAddress();
     }
+
+    @Override
+    public String getId() {
+        return link.getPath();
+    }
 }

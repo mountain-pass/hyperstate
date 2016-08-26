@@ -1,18 +1,14 @@
 package au.com.mountainpass.hyperstate.client;
 
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.core.ParameterizedTypeReference;
 
 import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.JavaAddress;
 import au.com.mountainpass.hyperstate.core.Resolver;
-import au.com.mountainpass.hyperstate.core.entities.CreatedEntity;
 import au.com.mountainpass.hyperstate.core.entities.DeletedEntity;
 import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
-import au.com.mountainpass.hyperstate.core.entities.UpdatedEntity;
 import au.com.mountainpass.hyperstate.exceptions.EntityNotFoundException;
 
 public class RepositoryResolver implements Resolver {
@@ -21,27 +17,6 @@ public class RepositoryResolver implements Resolver {
 
     public RepositoryResolver(EntityRepository repository) {
         this.repository = repository;
-    }
-
-    public CompletableFuture<CreatedEntity> create(final JavaAddress address,
-            final Map<String, Object> filteredParameters) {
-        throw new NotImplementedException("todo");
-    }
-
-    public CompletableFuture<Void> delete(final JavaAddress address,
-            final Map<String, Object> filteredParameters) {
-        throw new NotImplementedException("todo");
-
-    }
-
-    public <T> CompletableFuture<T> get(final JavaAddress address,
-            final Map<String, Object> filteredParameters, Class<T> type) {
-        throw new NotImplementedException("todo");
-    }
-
-    public CompletableFuture<UpdatedEntity> update(final JavaAddress address,
-            final Map<String, Object> filteredParameters) {
-        throw new NotImplementedException("todo");
     }
 
     public <T> CompletableFuture<T> get(final JavaAddress address,
@@ -66,11 +41,6 @@ public class RepositoryResolver implements Resolver {
                 return entity;
             }
         });
-    }
-
-    public CompletableFuture<EntityWrapper<?>> get(JavaAddress address,
-            Map<String, Object> filteredParameters) {
-        throw new NotImplementedException("todo");
     }
 
     @SuppressWarnings("unchecked")

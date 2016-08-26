@@ -1,6 +1,6 @@
 package au.com.mountainpass.hyperstate.server;
 
-import au.com.mountainpass.hyperstate.client.RepositoryResolver;
+import au.com.mountainpass.hyperstate.core.EntityRepository;
 import au.com.mountainpass.hyperstate.core.NavigationalRelationship;
 import au.com.mountainpass.hyperstate.server.entities.Accounts;
 import au.com.mountainpass.hyperstate.server.entities.HyperstateRootEntity;
@@ -10,17 +10,17 @@ public class HyperstateTestRootEntity extends HyperstateRootEntity {
     protected HyperstateTestRootEntity() {
     }
 
-    public HyperstateTestRootEntity(RepositoryResolver resolver,
+    public HyperstateTestRootEntity(EntityRepository repository,
             Class<? extends HyperstateController> controllerClass) {
-        super(resolver, controllerClass);
+        super(repository, controllerClass);
 
-        resolver.getEntityRepository().save(this).thenCompose(root -> {
-            final Accounts accounts = new Accounts(resolver,
+        repository.save(this).thenCompose(root -> {
+            final Accounts accounts = new Accounts(repository,
                     root.getId() + "accounts");
-            return resolver.getEntityRepository().save(accounts);
+            return repository.save(accounts);
         }).thenCompose(accounts -> {
             this.add(new NavigationalRelationship(accounts, "accounts"));
-            return resolver.getEntityRepository().save(this);
+            return repository.save(this);
         }).join();
     }
 

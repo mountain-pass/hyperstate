@@ -2,7 +2,7 @@ package au.com.mountainpass.hyperstate.core.entities;
 
 import java.util.Properties;
 
-import au.com.mountainpass.hyperstate.client.RepositoryResolver;
+import au.com.mountainpass.hyperstate.core.EntityRepository;
 
 public class VanillaEntity extends EntityWrapper<Properties> {
 
@@ -10,9 +10,9 @@ public class VanillaEntity extends EntityWrapper<Properties> {
         super(new Properties());
     }
 
-    public VanillaEntity(final RepositoryResolver resolver, final String path,
+    public VanillaEntity(final EntityRepository repository, final String path,
             final String title, final String... classes) {
-        super(resolver, path, new Properties(), title, classes);
+        super(repository, path, new Properties(), title, classes);
     }
 
 }

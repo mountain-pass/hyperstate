@@ -121,8 +121,9 @@ public class StepDefs {
         } else {
             resolver = repositoryResovler;
         }
-        repository.deleteAll();
-        testController.init();
+        repository.deleteAll().thenRun(() -> {
+            testController.init();
+        }).join();
     }
 
     @Given("^a Hyperstate controller \"([^\"]*)\" at \"([^\"]*)\"$")

@@ -1,4 +1,4 @@
-    Feature: Service Exposer
+Feature: Service Exposer
     In order minimise the code I need to write to produce a service
     and to ensure consistency for the services I create
     As a service developer

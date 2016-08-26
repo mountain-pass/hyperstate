@@ -45,6 +45,8 @@ import au.com.mountainpass.hyperstate.core.entities.EntityWrapper;
 import au.com.mountainpass.hyperstate.server.serialization.mixins.LinkSerialisationMixin;
 import au.com.mountainpass.hyperstate.server.serialization.mixins.TitledSerialisationMixin;
 
+@RequestMapping(value = "/", produces = { MediaTypes.SIREN_JSON_VALUE,
+        MediaType.APPLICATION_JSON_VALUE })
 public abstract class HyperstateController {
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());

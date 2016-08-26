@@ -13,6 +13,7 @@ public class HyperstateTestRootEntity extends HyperstateRootEntity {
     public HyperstateTestRootEntity(RepositoryResolver resolver,
             Class<? extends HyperstateController> controllerClass) {
         super(resolver, controllerClass);
+
         resolver.getEntityRepository().save(this).thenCompose(root -> {
             final Accounts accounts = new Accounts(resolver,
                     root.getId() + "accounts");

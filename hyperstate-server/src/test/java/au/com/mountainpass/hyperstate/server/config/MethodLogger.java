@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 public class MethodLogger {
 
-    private static final String POINT_CUT = "execution(* au.com.mountainpass.hyperstate.server.InMemoryEntityRepository.findOne(..))";
+    private static final String POINT_CUT = "execution(* au.com.mountainpass.hyperstate.server.InMemoryEntityRepository.*(..))";
 
     private static ForkJoinPool executer = new ForkJoinPool(1);
 

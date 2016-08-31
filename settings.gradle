@@ -1,1 +1,3 @@
 include "hyperstate-core", "hyperstate-server", "hyperstate-cert", "hyperstate-client", "hyperstate-client-webdriver", "hyperstate-repository-memory"
+
+rootProject.name = "hyperstate"

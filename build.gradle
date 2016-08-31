@@ -57,7 +57,7 @@ version = 'LOCAL'
 //
 // 4) If we are uploading a snapshot (still need to figure out why we
 // would do that) or printing the snapshot version, then we add
-// '-SNAPSHOT' to the version. 
+// '-SNAPSHOT' to the version.
 //
 // 5) It's not enough to set the version on the root project, we
 // need to iterate over the subprojects, setting the version
@@ -89,7 +89,7 @@ gradle.taskGraph.whenReady {taskGraph ->
   if(!snapshotTasks.empty) {
     version = version + "-SNAPSHOT"
   }
-  
+
   logger.lifecycle("${rootProject.name} version: " + rootProject.version)
   subprojects.each {
     it.version =  rootProject.version
@@ -431,21 +431,6 @@ subprojects {
     configurations.archives.allArtifacts.files.filter { !it.name.endsWith('asc') }.files.each { println it }
   }
 
-  github {
-    owner = 'mountain-pass'
-    repo = 'hyperstate'
-    token = project.hasProperty('githubToken') ? project.getProperty('githubToken') : 'NOTSET'
-    tagName = "${version}"
-    targetCommitish = 'master'
-    name = "v${version}"
-    body = """Release"""
-    assets = configurations.archives.allArtifacts.files.filter { !it.name.endsWith('asc') }.files
-    prerelease = true
-    draft = true
-  }
-
-
-
   task uploadSnapshotArchives() << { }
 
   uploadSnapshotArchives.finalizedBy uploadArchives
@@ -505,15 +490,31 @@ nexusStaging {
   delayBetweenRetriesInMillis = 5000
 }
 
+github {
+  owner = 'mountain-pass'
+  repo = 'hyperstate'
+  token = project.hasProperty('githubToken') ? project.getProperty('githubToken') : 'NOTSET'
+  tagName = "${version}"
+  targetCommitish = 'master'
+  name = "v${version}"
+  body = """Release"""
+  assets = subprojects.configurations.archives.allArtifacts.files.collect { it.filter { !it.name.endsWith('asc') } }.files.flatten()
+  prerelease = true
+  draft = true
+}
+
+task printAssets << {
+  logger.lifecycle("assets : ${project.github.assets}" )
+}
 
 
 tasks.getByName("githubRelease") {
   doFirst {
     project.github.tagName = version
     project.github.name = "v${version}"
-    println "TAG: " + project.github.tagName
-    println "NAME: " + project.github.name
-    println "Assests: " +  project.github.assets
+    logger.info("TAG: ${project.github.tagName}") 
+    logger.info("NAME: ${project.github.name}")
+    logger.info("Assests: ${project.github.assets}")
   }
 }
 

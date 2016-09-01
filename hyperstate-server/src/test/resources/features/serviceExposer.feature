@@ -17,7 +17,7 @@ Scenario: Add Relationship
     And its "accounts" link is followed
     Then the response will be a "Accounts" domain entity
 
-Scenario: Expose single domain entity
+Scenario: Expose single domain entity - concrete
     Given an "Account" domain entity with
     | username     | tom        |
     | creationDate | 2016-01-15T12:00:00 |
@@ -31,6 +31,22 @@ Scenario: Expose single domain entity
     And it will have no actions
     And it will have no links apart from "self"
     And it will have a self link referencing "/accounts/testAccount"
+
+Scenario: Expose single domain entity - generic
+    Given an "Account" domain entity with
+    | username     | tom        |
+    | creationDate | 2016-01-15T12:00:00 |
+    And it has no actions
+    And it has no additional links
+    And it is exposed at "/accounts/testAccount"
+    When request is made to "/accounts/testAccount" for a "VanillaEntity"
+    Then the response will be an "Account" domain entity with
+    | username     | tom        |
+    | creationDate | 2016-01-15T12:00:00 |
+    And it will have no actions
+    And it will have no links apart from "self"
+    And it will have a self link referencing "/accounts/testAccount"
+
 
 Scenario: Expose single domain entity with delete action
     Given an "Account" domain entity with
@@ -112,7 +128,6 @@ Scenario: Expose single domain entity with get action
     Then the response will be an "Accounts" domain entity
     And it will have a "get" action
 
-@tom
 Scenario: search for a domain entity
     Given an "Accounts" domain entity
     And it has a "get" action

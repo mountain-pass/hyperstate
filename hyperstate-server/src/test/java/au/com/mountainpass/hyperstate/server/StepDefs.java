@@ -276,7 +276,7 @@ public class StepDefs {
         currentEntity = resolver.get(path, VanillaEntity.class).get();
     }
 
-    @When("^request is made to \"([^\"]*)\" for an \"([^\"]*)\"$")
+    @When("^request is made to \"([^\"]*)\" for an? \"([^\"]*)\"$")
     public void request_is_made_to_for_an(final String path,
             final String typeName) throws Throwable {
         @SuppressWarnings("unchecked")
@@ -292,11 +292,15 @@ public class StepDefs {
         classes.put("AccountWithDelete", AccountWithDelete.class);
         classes.put("AccountWithUpdate", AccountWithUpdate.class);
         classes.put("Accounts", Accounts.class);
-
+        classes.put("VanillaEntity", VanillaEntity.class);
     }
 
-    private static Class<?> getClass(String typeName) {
-        return classes.get(typeName);
+    private static Class<?> getClass(String typeName) throws ClassNotFoundException {
+        Class<?> found = classes.get(typeName);
+        if (found == null) {
+            return Class.forName(typeName);
+        }
+        return found;
     }
 
     @Given("^the controller's root has an? \"([^\"]*)\" link to an \"([^\"]*)\" domain entity$")
@@ -364,8 +368,8 @@ public class StepDefs {
     @Then("^the response will be an? \"([^\"]*)\" domain entity$")
     public void the_response_will_be_an_domain_entity(final String type)
             throws Throwable {
-        final Set<String> natures = currentEntity.getClasses();
-        assertThat(natures, hasItem(type));
+        final Set<String> classes = currentEntity.getClasses();
+        assertThat(classes, hasItem(type));
     }
 
     @Then("^the response will be an? \"([^\"]*)\" domain entity with$")

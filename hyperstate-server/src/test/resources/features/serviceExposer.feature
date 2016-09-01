@@ -24,7 +24,7 @@ Scenario: Expose single domain entity
     And it has no actions
     And it has no additional links
     And it is exposed at "/accounts/testAccount"
-    When request is made to "/accounts/testAccount" for an "au.com.mountainpass.hyperstate.server.entities.Account"
+    When request is made to "/accounts/testAccount" for an "Account"
     Then the response will be an "Account" domain entity with
     | username     | tom        |
     | creationDate | 2016-01-15T12:00:00 |
@@ -38,7 +38,7 @@ Scenario: Expose single domain entity with delete action
     | creationDate | 2016-01-15T12:00:00 |
     And it has a "delete" action
     And it is exposed at "/accounts/testAccount"
-    When request is made to "/accounts/testAccount" for an "au.com.mountainpass.hyperstate.server.entities.AccountWithDelete"
+    When request is made to "/accounts/testAccount" for an "AccountWithDelete"
     Then the response will be an "Account" domain entity with
     | username     | tom        |
     | creationDate | 2016-01-15T12:00:00 |
@@ -52,7 +52,7 @@ Scenario: Delete domain entity
     | creationDate | 2016-01-15T12:00:00 |
     And it has a "delete" action
     And it is exposed at "/accounts/testAccount"
-    When request is made to "/accounts/testAccount" for an "au.com.mountainpass.hyperstate.server.entities.AccountWithDelete"
+    When request is made to "/accounts/testAccount" for an "AccountWithDelete"
     And the response entity is deleted
     Then there will no longer be an entity at "/accounts/testAccount"
 
@@ -63,7 +63,7 @@ Scenario: Expose single domain entity with update action
     | creationDate | 2016-01-15T12:00:00 |
     And it has a "update" action
     And it is exposed at "/accounts/testAccount"
-    When request is made to "/accounts/testAccount" for an "au.com.mountainpass.hyperstate.server.entities.AccountWithUpdate"
+    When request is made to "/accounts/testAccount" for an "AccountWithUpdate"
     Then the response will be an "Account" domain entity with
     | username     | tom        |
     | creationDate | 2016-01-15T12:00:00 |
@@ -77,7 +77,7 @@ Scenario: Update a domain entity
     | creationDate | 2016-01-15T12:00:00 |
     And it has a "update" action
     And it is exposed at "/accounts/testAccount"
-    When request is made to "/accounts/testAccount" for an "au.com.mountainpass.hyperstate.server.entities.AccountWithUpdate"
+    When request is made to "/accounts/testAccount" for an "AccountWithUpdate"
     And the response entity is updated with
     | username | nick |
     Then the response will be an "Account" domain entity with
@@ -97,8 +97,8 @@ Scenario: Create a domain entity
     Given an "Accounts" domain entity
     And it has a "createAccount" action
     And it is exposed at "/accounts"
-    When request is made to "/accounts" for an "au.com.mountainpass.hyperstate.server.entities.Accounts"
-    And the response entity's "createAccount" action is called for an "au.com.mountainpass.hyperstate.server.entities.Account" with
+    When request is made to "/accounts" for an "Accounts"
+    And the response entity's "createAccount" action is called for an "Account" with
     | username | nick |
     Then the response will be an "Account" domain entity with
     | username     | nick       |
@@ -125,8 +125,8 @@ Scenario: search for a domain entity
     | username     | nick        |
     | creationDate | 2016-01-15T12:00:00 |
     And it is exposed at "/accounts/testAccount2"
-    When request is made to "/accounts" for an "au.com.mountainpass.hyperstate.server.entities.Accounts"
-    And the response entity's "get" action is called for an "au.com.mountainpass.hyperstate.server.entities.Account" with
+    When request is made to "/accounts" for an "Accounts"
+    And the response entity's "get" action is called for an "Account" with
     | username | nick |
     Then the response will be an "Account" domain entity with
     | username     | nick       |

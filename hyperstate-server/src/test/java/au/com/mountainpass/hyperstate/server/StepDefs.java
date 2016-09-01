@@ -280,9 +280,23 @@ public class StepDefs {
     public void request_is_made_to_for_an(final String path,
             final String typeName) throws Throwable {
         @SuppressWarnings("unchecked")
-        final Class<? extends EntityWrapper<?>> type = (Class<? extends EntityWrapper<?>>) Class
-                .forName(typeName);
+        final Class<? extends EntityWrapper<?>> type = (Class<? extends EntityWrapper<?>>) getClass(
+                typeName);
         currentEntity = resolver.get(path, type).get();
+    }
+
+    private final static Map<String, Class<?>> classes = new HashMap<>();
+
+    static {
+        classes.put("Account", Account.class);
+        classes.put("AccountWithDelete", AccountWithDelete.class);
+        classes.put("AccountWithUpdate", AccountWithUpdate.class);
+        classes.put("Accounts", Accounts.class);
+
+    }
+
+    private static Class<?> getClass(String typeName) {
+        return classes.get(typeName);
     }
 
     @Given("^the controller's root has an? \"([^\"]*)\" link to an \"([^\"]*)\" domain entity$")
@@ -331,8 +345,8 @@ public class StepDefs {
             String actionName, String typeName,
             final Map<String, Object> properties) throws Throwable {
         @SuppressWarnings("unchecked")
-        final Class<? extends EntityWrapper<?>> type = (Class<? extends EntityWrapper<?>>) Class
-                .forName(typeName);
+        final Class<? extends EntityWrapper<?>> type = (Class<? extends EntityWrapper<?>>) getClass(
+                typeName);
         Entity result = currentEntity.getAction(actionName).invoke(properties)
                 .join();
         currentEntity = result.resolve(type).join();

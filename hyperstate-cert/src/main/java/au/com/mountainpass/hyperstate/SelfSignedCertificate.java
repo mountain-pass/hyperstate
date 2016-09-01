@@ -118,7 +118,9 @@ public class SelfSignedCertificate {
                 new java.security.cert.Certificate[] {
                         selfSignedCertificate.getCertificate() });
         // Write the key store to disk.
-        final FileOutputStream fos = new FileOutputStream(keyStore);
+        File ksFile = new File(keyStore);
+        ksFile.getParentFile().mkdirs();
+        final FileOutputStream fos = new FileOutputStream(ksFile);
         ks.store(fos, keyStorePassword.toCharArray());
         fos.close();
     }

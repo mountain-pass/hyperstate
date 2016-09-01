@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -295,7 +294,8 @@ public class StepDefs {
         classes.put("VanillaEntity", VanillaEntity.class);
     }
 
-    private static Class<?> getClass(String typeName) throws ClassNotFoundException {
+    private static Class<?> getClass(String typeName)
+            throws ClassNotFoundException {
         Class<?> found = classes.get(typeName);
         if (found == null) {
             return Class.forName(typeName);
@@ -377,42 +377,18 @@ public class StepDefs {
             final Map<String, String> expectedProperties) throws Throwable {
         the_response_will_be_an_domain_entity(type);
 
-        // TODO: better duck typing
-        switch (type) {
-        case "Account":
-            if (currentEntity.getProperties() instanceof AccountProperties) {
-                final AccountProperties entityProperties = (AccountProperties) currentEntity
-                        .getProperties();
-                for (Entry<String, String> expectedProperty : expectedProperties
-                        .entrySet()) {
-                    switch (expectedProperty.getKey()) {
-                    case "username":
-                        assertThat(entityProperties.getUsername(),
-                                equalTo(expectedProperty.getValue()));
-                        break;
-                    case "creationDate":
-                        assertThat(entityProperties.getCreationDate(),
-                                equalTo(LocalDateTime
-                                        .parse(expectedProperty.getValue())));
-                        break;
-                    default:
-                        throw new PendingException("checking for property "
-                                + type + " has not been implemented");
-                    }
-                }
+        for (Entry<String, String> expectedProperty : expectedProperties
+                .entrySet()) {
+            Object actualPropertyValue = currentEntity
+                    .getProperty(expectedProperty.getKey());
+            if (actualPropertyValue instanceof LocalDateTime) {
+                LocalDateTime expectedValue = LocalDateTime
+                        .parse(expectedProperty.getValue());
+                assertThat(actualPropertyValue, equalTo(expectedValue));
             } else {
-                final Properties entityProperties = (Properties) currentEntity
-                        .getProperties();
-                for (Entry<String, String> expectedProperty : expectedProperties
-                        .entrySet()) {
-                    assertThat(entityProperties.get(expectedProperty.getKey()),
-                            equalTo(expectedProperty.getValue()));
-                }
+                assertThat(actualPropertyValue,
+                        equalTo(expectedProperty.getValue()));
             }
-            break;
-        default:
-            throw new PendingException("checking properties for a " + type
-                    + " has not been implemented");
         }
     }
 

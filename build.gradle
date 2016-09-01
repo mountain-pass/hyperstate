@@ -553,6 +553,8 @@ project(":hyperstate-core"){
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile("org.eclipse.jdt:org.eclipse.jdt.annotation:2.0.0")
     compile 'org.apache.commons:commons-lang3:3.4'
+    compile group: 'com.github.spullara.mustache.java', name: 'compiler', version:'0.9.3'
+    
 
   }
 

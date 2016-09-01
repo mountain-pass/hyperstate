@@ -211,6 +211,12 @@ class WebDriverEntityInterceptor<E> implements MethodInterceptor {
 
             return propertiesEnhancer.create(new Class[] {}, new Object[] {});
 
+        } else if (method.getName().equals("getProperty")) {
+            String key = "property:" + (String) args[0];
+            String value = resolver.getWebDriver().findElement(By.id(key))
+                    .getText();
+            return value;
+
         } else if (method.getName().equals("getClasses")) {
 
             return getClasses();
@@ -233,9 +239,7 @@ class WebDriverEntityInterceptor<E> implements MethodInterceptor {
                 return null;
             }
         } else if (method.getName().equals("toLinkedEntity")
-                || method.getName().equals("getProperties")
-                || method.getName().equals("getTitle")
-                || method.getName().equals("getLink")) {
+                || method.getName().equals("getTitle")) {
             throw new NotImplementedException("method: " + method.getName());
         } else if (method.getName().equals("toString")
                 || method.getName().equals("hashCode")) {

@@ -48,13 +48,28 @@ Scenario: Expose single domain entity - generic
     And it will have a self link referencing "/accounts/testAccount"
 
 
-Scenario: Expose single domain entity with delete action
+Scenario: Expose single domain entity with delete action - concrete
     Given an "Account" domain entity with
     | username     | tom        |
     | creationDate | 2016-01-15T12:00:00 |
     And it has a "delete" action
     And it is exposed at "/accounts/testAccount"
     When request is made to "/accounts/testAccount" for an "AccountWithDelete"
+    Then the response will be an "Account" domain entity with
+    | username     | tom        |
+    | creationDate | 2016-01-15T12:00:00 |
+    And it will have a "delete" action
+    And it will have no links apart from "self"
+    And it will have a self link referencing "/accounts/testAccount"
+
+@tom
+Scenario: Expose single domain entity with delete action - generic
+    Given an "Account" domain entity with
+    | username     | tom        |
+    | creationDate | 2016-01-15T12:00:00 |
+    And it has a "delete" action
+    And it is exposed at "/accounts/testAccount"
+    When request is made to "/accounts/testAccount" for a "VanillaEntity"
     Then the response will be an "Account" domain entity with
     | username     | tom        |
     | creationDate | 2016-01-15T12:00:00 |

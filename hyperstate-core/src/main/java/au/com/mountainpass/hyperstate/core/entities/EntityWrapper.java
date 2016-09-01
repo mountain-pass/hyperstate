@@ -1,8 +1,10 @@
 package au.com.mountainpass.hyperstate.core.entities;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -17,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.github.mustachejava.reflect.SimpleObjectHandler;
 import com.google.common.collect.ImmutableSet;
 
 import au.com.mountainpass.hyperstate.core.Action;
@@ -198,6 +201,13 @@ public class EntityWrapper<T> extends Entity {
     @JsonIgnore
     public String getId() {
         return path;
+    }
+
+    static SimpleObjectHandler handler = new SimpleObjectHandler();
+
+    public Object getProperty(String key) {
+        List<Object> scopes = Arrays.asList(new Object[] { properties });
+        return handler.find(key, scopes).call(scopes);
     }
 
 }

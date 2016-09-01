@@ -15,7 +15,7 @@ A Hypermedia as the Engine of Application State (HATEOAS) library
 
 [![hyperstate-server](https://img.shields.io/maven-central/v/au.com.mountain-pass/hyperstate-server.svg?label=hyperstate-server)](https://maven-badges.herokuapp.com/maven-central/au.com.mountain-pass/hyperstate-server)
 [![hyperstate-repository-memory](https://img.shields.io/maven-central/v/au.com.mountain-pass/hyperstate-repository-memory.svg?label=hyperstate-repository-memory)](https://maven-badges.herokuapp.com/maven-central/au.com.mountain-pass/hyperstate-repository-memory)
-[![hyperstate-client-webdriver](https://img.shields.io/maven-central/v/au.com.mountain-pass/hyperstate-client-webdriver.svg?label=hyperstate-client-webdriver)](https://maven-badges.herokuapp.com/maven-central/au.com.mountain-pass/hyperstate-client-webdriver)
+[![hyperstate-core](https://img.shields.io/maven-central/v/au.com.mountain-pass/hyperstate-core.svg?label=hyperstate-core)](https://maven-badges.herokuapp.com/maven-central/au.com.mountain-pass/hyperstate-core)[![hyperstate-client-webdriver](https://img.shields.io/maven-central/v/au.com.mountain-pass/hyperstate-client-webdriver.svg?label=hyperstate-client-webdriver)](https://maven-badges.herokuapp.com/maven-central/au.com.mountain-pass/hyperstate-client-webdriver)
 [![hyperstate-client](https://img.shields.io/maven-central/v/au.com.mountain-pass/hyperstate-client.svg?label=hyperstate-client)](https://maven-badges.herokuapp.com/maven-central/au.com.mountain-pass/hyperstate-client)
 [![hyperstate-cert](https://img.shields.io/maven-central/v/au.com.mountain-pass/hyperstate-cert.svg?label=hyperstate-cert)](https://maven-badges.herokuapp.com/maven-central/au.com.mountain-pass/hyperstate-cert)
 

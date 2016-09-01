@@ -63,7 +63,7 @@ version = 'LOCAL'
 // need to iterate over the subprojects, setting the version
 // for them as well.
 gradle.taskGraph.whenReady {taskGraph ->
-  def uploadTasks = taskGraph.getAllTasks().findAll { task -> task.name.startsWith('upload') || task.name.endsWith('printVersion') || task.name.endsWith('printSnapshotVersion') }
+  def uploadTasks = taskGraph.getAllTasks().findAll { task -> task.name.startsWith('upload') || task.name.endsWith('githubRelease')  || task.name.endsWith('printVersion') || task.name.endsWith('printSnapshotVersion') }
   if(!uploadTasks.empty) {
     URL url = new URL( "https://oss.sonatype.org/service/local/artifact/maven/redirect?g=${project.group}&a=${project.name}&v=LATEST&r=releases" )
     logger.lifecycle("url: " + url)

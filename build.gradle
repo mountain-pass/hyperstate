@@ -449,7 +449,7 @@ subprojects {
         }
 
         pom.project {
-          name 'Hyperstate'
+          name 'hyperstate'
           packaging 'jar'
           // optionally artifactId can be defined here
           description 'A Hypermedia as the Engine of Application State (HATEOAS) library'

@@ -101,7 +101,6 @@ Scenario: Expose single domain entity with update action - concrete
     And it will have no links apart from "self"
     And it will have a self link referencing "/accounts/testAccount"
 
-@tom  
 Scenario: Expose single domain entity with update action - generic
     Given an "Account" domain entity with
     | username     | tom        |
@@ -117,7 +116,7 @@ Scenario: Expose single domain entity with update action - generic
     And it will have a self link referencing "/accounts/testAccount"
 
     
-Scenario: Update a domain entity
+Scenario: Update a domain entity - concrete
     Given an "Account" domain entity with
     | username     | tom        |
     | creationDate | 2016-01-15T12:00:00 |
@@ -130,6 +129,20 @@ Scenario: Update a domain entity
     | username     | nick       |
     | creationDate | 2016-01-15T12:00:00 |
 
+Scenario: Update a domain entity - generic
+    Given an "Account" domain entity with
+    | username     | tom        |
+    | creationDate | 2016-01-15T12:00:00 |
+    And it has a "update" action
+    And it is exposed at "/accounts/testAccount"
+    When request is made to "/accounts/testAccount" for a "VanillaEntity"
+    And the response entity is updated with
+    | username | nick |
+    Then the response will be an "Account" domain entity with
+    | username     | nick       |
+    | creationDate | 2016-01-15T12:00:00 |
+
+
 Scenario: Expose single domain entity with create action
     Given an "Accounts" domain entity
     And it has a "createAccount" action
@@ -139,7 +152,7 @@ Scenario: Expose single domain entity with create action
     And it will have a "createAccount" action
 
 
-Scenario: Create a domain entity
+Scenario: Create a domain entity - concrete
     Given an "Accounts" domain entity
     And it has a "createAccount" action
     And it is exposed at "/accounts"
@@ -149,6 +162,19 @@ Scenario: Create a domain entity
     Then the response will be an "Account" domain entity with
     | username     | nick       |
     And it's creation date will be today    
+
+@tom
+Scenario: Create a domain entity - generic
+    Given an "Accounts" domain entity
+    And it has a "createAccount" action
+    And it is exposed at "/accounts"
+    When request is made to "/accounts" for a "VanillaEntity"
+    And the response entity's "createAccount" action is called for an "VanillaEntity" with
+    | username | nick |
+    Then the response will be an "Account" domain entity with
+    | username     | nick       |
+    And it's creation date will be today    
+
 
 Scenario: Expose single domain entity with get action
     Given an "Accounts" domain entity

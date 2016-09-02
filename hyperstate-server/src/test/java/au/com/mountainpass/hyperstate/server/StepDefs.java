@@ -52,7 +52,6 @@ import au.com.mountainpass.hyperstate.exceptions.EntityNotFoundException;
 import au.com.mountainpass.hyperstate.server.config.HyperstateTestConfiguration;
 import au.com.mountainpass.hyperstate.server.entities.Account;
 import au.com.mountainpass.hyperstate.server.entities.AccountBuilder;
-import au.com.mountainpass.hyperstate.server.entities.AccountProperties;
 import au.com.mountainpass.hyperstate.server.entities.AccountWithDelete;
 import au.com.mountainpass.hyperstate.server.entities.AccountWithUpdate;
 import au.com.mountainpass.hyperstate.server.entities.Accounts;
@@ -232,9 +231,9 @@ public class StepDefs {
     @Then("^it's creation date will be today$")
     public void it_s_creation_date_will_be_today() throws Throwable {
 
-        AccountProperties props = (AccountProperties) currentEntity
-                .getProperties();
-        assertThat(props.getCreationDate(), sameDay(LocalDateTime.now()));
+        LocalDateTime creationDate = om.convertValue(
+                currentEntity.getProperty("creationDate"), LocalDateTime.class);
+        assertThat(creationDate, sameDay(LocalDateTime.now()));
     }
 
     @Then("^it will have a \"([^\"]*)\" action$")
@@ -335,12 +334,10 @@ public class StepDefs {
 
     @When("^the response entity is updated with$")
     public void the_response_entity_is_updated_with(
-            final Map<String, String> properties) throws Throwable {
+            final Map<String, Object> properties) throws Throwable {
         assumeThat(properties.keySet(), contains("username"));
-        assertTrue(currentEntity instanceof AccountWithUpdate);
-        AccountWithUpdate account = (AccountWithUpdate) currentEntity;
-        UpdatedEntity updatedEntity = account.update(properties.get("username"))
-                .get();
+        UpdatedEntity updatedEntity = (UpdatedEntity) currentEntity
+                .getAction("update").invoke(properties).join();
         currentEntity = updatedEntity.resolve(AccountWithUpdate.class).get();
     }
 

@@ -292,6 +292,8 @@ public abstract class HyperstateController {
             final CompletableFuture<Entity> futureResult = (CompletableFuture<Entity>) action
                     .invoke(allRequestParams.toSingleValueMap());
 
+            RequestContextHolder.setRequestAttributes(currentRequestAttributes,
+                    Boolean.TRUE);
             return ResponseEntity
                     .created(futureResult.join().getAddress().getHref())
                     .build();

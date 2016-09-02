@@ -62,7 +62,6 @@ Scenario: Expose single domain entity with delete action - concrete
     And it will have no links apart from "self"
     And it will have a self link referencing "/accounts/testAccount"
 
-@tom
 Scenario: Expose single domain entity with delete action - generic
     Given an "Account" domain entity with
     | username     | tom        |
@@ -88,7 +87,7 @@ Scenario: Delete domain entity
     Then there will no longer be an entity at "/accounts/testAccount"
 
 
-Scenario: Expose single domain entity with update action
+Scenario: Expose single domain entity with update action - concrete
     Given an "Account" domain entity with
     | username     | tom        |
     | creationDate | 2016-01-15T12:00:00 |
@@ -101,6 +100,22 @@ Scenario: Expose single domain entity with update action
     And it will have a "update" action
     And it will have no links apart from "self"
     And it will have a self link referencing "/accounts/testAccount"
+
+@tom  
+Scenario: Expose single domain entity with update action - generic
+    Given an "Account" domain entity with
+    | username     | tom        |
+    | creationDate | 2016-01-15T12:00:00 |
+    And it has a "update" action
+    And it is exposed at "/accounts/testAccount"
+    When request is made to "/accounts/testAccount" for an "VanillaEntity"
+    Then the response will be an "Account" domain entity with
+    | username     | tom        |
+    | creationDate | 2016-01-15T12:00:00 |
+    And it will have a "update" action
+    And it will have no links apart from "self"
+    And it will have a self link referencing "/accounts/testAccount"
+
     
 Scenario: Update a domain entity
     Given an "Account" domain entity with

@@ -163,7 +163,6 @@ Scenario: Create a domain entity - concrete
     | username     | nick       |
     And it's creation date will be today    
 
-@tom
 Scenario: Create a domain entity - generic
     Given an "Accounts" domain entity
     And it has a "createAccount" action
@@ -203,7 +202,16 @@ Scenario: search for a domain entity
     | username     | nick       |
     | creationDate | 2016-01-15T12:00:00 |
 
-  
+@skip-local @tom
+Scenario: Tries to remotely execute an unexposed method
+    Given an "Account" domain entity with
+    | username     | tom        |
+    | creationDate | 2016-01-15T12:00:00 |
+    And it is exposed at "/accounts/testAccount"
+    When request is made to "/accounts/testAccount" for an "Account"
+    Then calling it's native "localMethod" action should result in a "IllegalAccessException" exception
+
+
     
 # todo: test with a get action returning a collection
 # todo: test with embedded entities (including rel check)

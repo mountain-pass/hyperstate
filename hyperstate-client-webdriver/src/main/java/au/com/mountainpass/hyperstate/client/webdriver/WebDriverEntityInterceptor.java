@@ -133,8 +133,12 @@ class WebDriverEntityInterceptor<E> implements MethodInterceptor {
             waitTillLoaded(5);
 
             final String actionName = args[0].toString();
-            return getAction(resolver,
-                    resolver.getWebDriver().findElement(By.name(actionName)));
+            List<WebElement> actions = resolver.getWebDriver()
+                    .findElements(By.name(actionName));
+            if (actions.isEmpty()) {
+                return null;
+            }
+            return getAction(resolver, actions.get(0));
 
         } else if (method.getName().equals("reload")) {
             resolver.getWebDriver()
@@ -255,8 +259,8 @@ class WebDriverEntityInterceptor<E> implements MethodInterceptor {
             final Action<?> action = ((EntityWrapper<?>) obj)
                     .getAction(method.getName());
             if (action == null) {
-                throw new RuntimeException("The method `" + method.getName()
-                        + "` cannot be executed remotely");
+                throw new IllegalAccessException("The method `"
+                        + method.getName() + "` cannot be executed remotely");
             } else {
                 @SuppressWarnings("unchecked")
                 final CompletableFuture<Entity> result = (CompletableFuture<Entity>) action

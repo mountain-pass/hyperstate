@@ -210,7 +210,7 @@ subprojects {
       append = false
       destinationFile = file("${outputDir}/${name}/jacoco/${name}.exec")
     }
-    systemProperty 'cucumber.options',  "--plugin json:${outputDir}/${name}/bdd/${archivesBaseName}.json --plugin html:${outputDir}/${name}/bdd/html --plugin junit:${outputDir}/${name}/bdd/TEST-${archivesBaseName}.xml"
+    systemProperty 'cucumber.options',  "--tags ~@skip-local --plugin json:${outputDir}/${name}/bdd/${archivesBaseName}.json --plugin html:${outputDir}/${name}/bdd/html --plugin junit:${outputDir}/${name}/bdd/TEST-${archivesBaseName}.xml"
   }
 
 

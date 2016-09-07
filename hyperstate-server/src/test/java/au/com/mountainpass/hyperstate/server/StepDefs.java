@@ -5,6 +5,8 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -17,6 +19,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import org.junit.AssumptionViolatedException;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +61,8 @@ import au.com.mountainpass.hyperstate.server.entities.AccountWithDelete;
 import au.com.mountainpass.hyperstate.server.entities.AccountWithUpdate;
 import au.com.mountainpass.hyperstate.server.entities.Accounts;
 import cucumber.api.PendingException;
+import cucumber.api.Scenario;
+import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -108,7 +115,8 @@ public class StepDefs {
     private WebDriver webDriver;
 
     @Before
-    public void _before() {
+    public void _before(Scenario scenario) {
+
         final URI baseUri = getBaseUri();
         final List<String> activeProfiles = Arrays
                 .asList(this.environment.getActiveProfiles());
@@ -118,10 +126,18 @@ public class StepDefs {
             resolver = new WebDriverResolver(baseUri, webDriver);
         } else {
             resolver = repositoryResovler;
+            if (scenario.getSourceTagNames().contains("@skip-local")) {
+                throw new PendingException(
+                        "skipped. Add `--tags ~@skip-local` to your cucumber.options");
+            }
         }
         repository.deleteAll().thenRun(() -> {
             testController.init();
         }).join();
+    }
+
+    @After
+    public void _after(Scenario scenario) {
     }
 
     @Given("^a Hyperstate controller \"([^\"]*)\" at \"([^\"]*)\"$")
@@ -291,6 +307,7 @@ public class StepDefs {
         classes.put("AccountWithUpdate", AccountWithUpdate.class);
         classes.put("Accounts", Accounts.class);
         classes.put("VanillaEntity", VanillaEntity.class);
+        classes.put("IllegalAccessException", IllegalAccessException.class);
     }
 
     private static Class<?> getClass(String typeName)
@@ -351,6 +368,39 @@ public class StepDefs {
         Entity result = currentEntity.getAction(actionName).invoke(properties)
                 .join();
         currentEntity = result.resolve(type).join();
+    }
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
+    @Then("^calling it's native \"([^\"]*)\" action should result in a \"([^\"]*)\" exception$")
+    public void calling_it_s_native_action_should_result_in_a_exception(
+            String actionName, String exception) throws Throwable {
+        List<Method> methods = Arrays
+                .asList(currentEntity.getClass().getMethods());
+        Optional<Method> maybeMethod = methods.stream()
+                .filter(method -> actionName.equals(method.getName()))
+                .findAny();
+        // this is an assumption, because we want the method to exist on the
+        // entity,
+        // but we want to make sure it fails when called remotely.
+        assumeThat(maybeMethod.isPresent(), equalTo(true));
+
+        // invocation only failed for remote resolvers, so skip
+        // if we are using a local resolver
+        try {
+            assumeThat(resolver, not(instanceOf(RepositoryResolver.class)));
+        } catch (AssumptionViolatedException e) {
+            throw new PendingException(e.getLocalizedMessage());
+        }
+        try {
+            maybeMethod.get().invoke(currentEntity);
+            assertFalse("expected exception", true);
+        } catch (InvocationTargetException e) {
+            LOGGER.debug("exception: ", e);
+            assertThat(e.getCause(), instanceOf(getClass(exception)));
+        }
+        // currentEntity = result.resolve(type).join();
     }
 
     @When("^the response entity's \"([^\"]*)\" action is called with$")

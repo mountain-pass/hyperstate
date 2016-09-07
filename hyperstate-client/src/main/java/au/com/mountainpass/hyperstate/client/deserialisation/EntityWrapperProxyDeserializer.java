@@ -81,7 +81,7 @@ public class EntityWrapperProxyDeserializer extends DelegatingDeserializer {
                         final Action<?> action = ((EntityWrapper<?>) obj)
                                 .getAction(method.getName());
                         if (action == null) {
-                            throw new RuntimeException(
+                            throw new IllegalAccessException(
                                     "The method `" + method.getName()
                                             + "` cannot be executed remotely");
                         } else {

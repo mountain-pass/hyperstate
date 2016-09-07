@@ -28,6 +28,10 @@ public class Account extends EntityWrapper<AccountProperties> {
                 createProperties(username), username, "Account");
     }
 
+    public String localMethod() {
+        return "don't try to call me remotely";
+    }
+
     private static AccountProperties createProperties(String username) {
         return new AccountProperties(username, LocalDateTime.now());
     }

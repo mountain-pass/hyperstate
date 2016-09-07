@@ -21,9 +21,10 @@ logging.level:
     au.com.mountainpass.hyperstate: DEBUG
     org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
     au.com.mountainpass.hyperstate.server.InMemoryEntityRepository: DEBUG
-    
+
 server.tomcat.access-log-enabled: true
 
+management.trace.include: request-headers,response-headers,cookies,errors
 
 au.com.mountainpass.hyperstate.test    :
     ssl:

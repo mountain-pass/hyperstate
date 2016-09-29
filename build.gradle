@@ -547,8 +547,8 @@ project(":hyperstate-core"){
   dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-hateoas")
-    compile("com.fasterxml.jackson.core:jackson-core:2.8.0")
-    compile('com.fasterxml.jackson.core:jackson-annotations:2.8.0')
+    compile("com.fasterxml.jackson.core:jackson-core:2.8.3")
+    compile('com.fasterxml.jackson.core:jackson-annotations:2.8.3')
     compile('com.google.guava:guava:19.0')
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile("org.eclipse.jdt:org.eclipse.jdt.annotation:2.0.0")
@@ -587,8 +587,8 @@ project(":hyperstate-server"){
 
     compile("org.eclipse.jdt:org.eclipse.jdt.annotation:2.0.0")
 
-    compile("com.fasterxml.jackson.core:jackson-core:2.8.1")
-    compile('com.fasterxml.jackson.core:jackson-annotations:2.8.1')
+    compile("com.fasterxml.jackson.core:jackson-core:2.8.3")
+    compile('com.fasterxml.jackson.core:jackson-annotations:2.8.3')
 
     compile('org.apache.httpcomponents:httpasyncclient:4.1.2')
     compile('commons-codec:commons-codec:1.10')
@@ -605,7 +605,7 @@ project(":hyperstate-server"){
     testCompile "info.cukes:cucumber-java:1.2.4","info.cukes:cucumber-junit:1.2.4","info.cukes:cucumber-spring:1.2.4"
 
     testCompile group: 'org.exparity', name: 'hamcrest-date', version: '2.0.4'
-    testCompile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.8.1'
+    testCompile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.8.3'
 
     //compile('org.flywaydb:flyway-core')
     testCompile("com.h2database:h2:1.4.192")

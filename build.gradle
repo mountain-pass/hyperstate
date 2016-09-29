@@ -156,7 +156,7 @@ subprojects {
   dependencies {
     codacy group: 'com.codacy', name: 'codacy-coverage-reporter', version: '1.0.10'
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:7.1'
+    checkstyle 'com.puppycrawl.tools:checkstyle:7.1.1'
     jdepend 'org.apache.ant:ant-jdepend:1.9.7'
     pmd 'net.sourceforge.pmd:pmd-java:5.5.1'
   }
@@ -602,7 +602,7 @@ project(":hyperstate-server"){
     providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
-    testCompile "info.cukes:cucumber-java:1.2.4","info.cukes:cucumber-junit:1.2.4","info.cukes:cucumber-spring:1.2.4"
+    testCompile "info.cukes:cucumber-java:1.2.5","info.cukes:cucumber-junit:1.2.5","info.cukes:cucumber-spring:1.2.5"
 
     testCompile group: 'org.exparity', name: 'hamcrest-date', version: '2.0.4'
     testCompile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.8.3'

@@ -156,7 +156,7 @@ subprojects {
   dependencies {
     codacy group: 'com.codacy', name: 'codacy-coverage-reporter', version: '1.0.10'
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:7.1.1'
+    checkstyle 'com.puppycrawl.tools:checkstyle:7.1.2'
     jdepend 'org.apache.ant:ant-jdepend:1.9.7'
     pmd 'net.sourceforge.pmd:pmd-java:5.5.1'
   }
@@ -594,7 +594,7 @@ project(":hyperstate-server"){
     compile('commons-codec:commons-codec:1.10')
 
     compile("org.webjars:bootstrap:3.3.7-1") // when updating, don't forget to update index.html
-    compile("org.webjars:jquery:3.1.0") // when updating, don't forget to update index.html
+    compile("org.webjars:jquery:3.1.1") // when updating, don't forget to update index.html
     compile 'org.webjars.bower:angularjs:1.5.8' // when updating, don't forget to update index.html
 
     compile project(":hyperstate-core")
